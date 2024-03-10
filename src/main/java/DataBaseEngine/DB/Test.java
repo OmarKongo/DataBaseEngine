@@ -1,9 +1,8 @@
 package DataBaseEngine.DB;
-/*ayaaa */
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Properties;
-
+/*aya */
 public class Test {
 	private String filename = "DBApp.config";
 	Properties prop;
