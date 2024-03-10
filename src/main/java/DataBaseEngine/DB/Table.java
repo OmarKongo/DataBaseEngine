@@ -50,6 +50,30 @@ public class Table {
     public void appendPage(String pageFileName){
         pageFileNames.add(pageFileName);
     }
+    
+    public void insertRow(){
+        //logic to choose page
+        //deserialise correct page Page.p
+        //pinsertIntoPage()
 
+        //if specific chosen page is full,
+        //create new page
+        //insert in it
+        //serialise
+        //append page file name 
+    }
+
+    public void updateRow(){
+        
+    }
+
+    public void deleteRow(){
+
+    }
+
+    public void selectRow(){
+
+    }
+    
     
 }
