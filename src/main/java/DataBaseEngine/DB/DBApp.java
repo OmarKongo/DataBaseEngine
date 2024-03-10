@@ -28,9 +28,17 @@ public class DBApp {
 	// be passed in htblColNameType
 	// htblColNameValue will have the column name as key and the data 
 	// type as value
+
+
 	public void createTable(String strTableName, 
 							String strClusteringKeyColumn,  
 							Hashtable<String,String> htblColNameType) throws DBAppException{
+								for(String s : htblColNameType.values()){
+									if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.double"))){
+										throw new DBAppException("Column DataType invalid");
+									}
+								}
+								
 								
 		throw new DBAppException("not implemented yet");
 	}
