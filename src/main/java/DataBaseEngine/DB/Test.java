@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class Test {
 	private String filename = "DBApp.config";
-	Properties prop;
+	Properties prop;int x;
 	public Test()  throws Exception{
 		try(FileInputStream fis = new FileInputStream(filename) ){
 			prop = new Properties();
