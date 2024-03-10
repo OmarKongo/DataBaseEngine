@@ -23,10 +23,6 @@ public class Table {
         return pageFileNames;
     }
 
-    public void setPageFileNames(ArrayList<String> pageFileNames) {
-        this.pageFileNames = pageFileNames;
-    }
-
     public String getStrTableName() {
         return strTableName;
     }
