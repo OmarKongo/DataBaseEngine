@@ -1,0 +1,6 @@
+Table Name	Column Name	Column Type	Clustring Key	Index Name	Index Type
+CityShop	ID	java.lang.Integer	TRUE	IDIndex	B+tree
+CityShop	Name	java.lang.String	FALSE	null	null
+CityShop	Number	java.lang.Integer	FALSE	NumberIndex	B+tree
+CityShop	Specialization	java.lang.String	FALSE	SpecIndex	B+tree
+CityShop	Address	java.lang.String	FALSE	AddrIndex	B+tree
