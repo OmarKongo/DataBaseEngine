@@ -2,6 +2,7 @@ package DataBaseEngine.DB;
 /** * @author Wael Abouelsaadat */ 
 
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 
@@ -16,6 +17,11 @@ public class DBApp {
 	// this does whatever initialization you would like 
 	// or leave it empty if there is no code you want to 
 	// execute at application startup 
+
+	//contains serialisation names of tables
+	ArrayList<String> Tables = new ArrayList<>();
+
+	
 	public void init( ){
 		
 		
