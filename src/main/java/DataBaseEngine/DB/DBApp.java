@@ -33,14 +33,24 @@ public class DBApp {
 	public void createTable(String strTableName, 
 							String strClusteringKeyColumn,  
 							Hashtable<String,String> htblColNameType) throws DBAppException{
-								for(String s : htblColNameType.values()){
-									if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.double"))){
-										throw new DBAppException("Column DataType invalid");
-									}
+								try{
+									checkDataType(htblColNameType);
+								}
+								catch(DBAppException e){
+									System.out.println(e.getMessage());
 								}
 								
 								
 		throw new DBAppException("not implemented yet");
+	}
+
+	public void checkDataType(Hashtable<String,String> htblColNameType) throws DBAppException{
+		for(String s : htblColNameType.values()){
+			if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.double"))){
+				throw new DBAppException("Column DataType invalid");
+			}
+		}
+
 	}
 
 
