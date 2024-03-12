@@ -2,6 +2,7 @@ package DataBaseEngine.DB;
 /** * @author Wael Abouelsaadat */ 
 
 import java.util.Iterator;
+import java.io.FileReader;
 import java.util.Hashtable;
 
 
@@ -73,8 +74,25 @@ public class DBApp {
 	// htblColNameValue enteries are ANDED together
 	public void deleteFromTable(String strTableName, 
 								Hashtable<String,Object> htblColNameValue) throws DBAppException{
+									CSVReader readingTheFile= new CSVReader(new FileReader("src/trying.csv"));
+									StringBuffer s=new StringBuffer();
+									String row[];
+									while ((row=((Object) readingTheFile).readNext())!=null){
+										for(int i=0;i<row.length;i+1){
+											if(row[0]==strTableName ){
+												//delete(htblColNameValue)-->method ad5l feha el values 3shan t delete 
+
+											}
+											else {
+												System.out.println("we not have this table");
+											}
+										}
+									}
 	
 		throw new DBAppException("not implemented yet");
+	}
+	public void delete(Hashtable<String,Object>){
+		
 	}
 
 

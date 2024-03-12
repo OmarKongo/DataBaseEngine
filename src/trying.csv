@@ -1,0 +1,5 @@
+student,5515053,java.lang.Integer,True ,IDIndex,B+Tree
+student,demiana,java.lang.String,False ,null,null
+student,5,java.lang.Integer,False ,NumberIndex,B+Tree
+student,special,java.lang.String,False ,SpecIndex,B+Tree
+student,Adress,java.lang.String,False ,AddrIndex,B+Tree
