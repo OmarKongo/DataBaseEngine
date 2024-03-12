@@ -1,8 +1,9 @@
 package DataBaseEngine.DB;
 
+import java.io.Serializable;
 import java.util.Vector;
 
-public class Page{
+public class Page implements Serializable{
     //Vector<Tuple> tuplesInPage = new Vector<Tuple>();
     Vector<Object> tuplesInPage = new Vector<Object>();
 

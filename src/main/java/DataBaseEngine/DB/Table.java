@@ -1,13 +1,16 @@
 package DataBaseEngine.DB;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class Table {
+public class Table implements Serializable{
+    //Is it correct that only the pageFileName are persistent?
+
     ArrayList<String> pageFileNames;
-    String strTableName;
-    String strClusteringKeyColumn;
-    Hashtable<String,String> htblColNameType;
+    transient String strTableName;
+    transient String strClusteringKeyColumn;
+    transient Hashtable<String,String> htblColNameType;
 
 
 

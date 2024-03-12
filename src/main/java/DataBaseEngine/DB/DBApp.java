@@ -46,8 +46,6 @@ public class DBApp {
 									System.out.println(e.getMessage());
 								}
 								
-								
-		throw new DBAppException("not implemented yet");
 	}
 
 	public void checkDataType(Hashtable<String,String> htblColNameType) throws DBAppException{
