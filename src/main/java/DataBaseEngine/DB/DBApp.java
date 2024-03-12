@@ -2,6 +2,10 @@ package DataBaseEngine.DB;
 /** * @author Wael Abouelsaadat */ 
 
 import java.util.Iterator;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -38,11 +42,19 @@ public class DBApp {
 
 	public void createTable(String strTableName, 
 							String strClusteringKeyColumn,  
-							Hashtable<String,String> htblColNameType) throws DBAppException{
+							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
 								try{
 									checkDataType(htblColNameType);
+									Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+									// Serialize created table to a file and appending to array of tables.
+									FileOutputStream f = new FileOutputStream(strTableName+".ser");
+									Tables.add(strTableName+".ser");
+									ObjectOutput s = new ObjectOutputStream(f);
+									s.writeObject(t);
+									s.close();
 								}
-								catch(DBAppException e){
+								//or should be explicitly DBApp exception?
+								catch(Exception e){
 									System.out.println(e.getMessage());
 								}
 								
