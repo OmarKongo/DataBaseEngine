@@ -32,26 +32,6 @@ public class Page implements Serializable{
        
     }
 
-
-
-    public static int initDBAppConfig() {
-        Properties properties = new Properties();
-        int n = 0;
-        try{
-            
-            properties.load(new FileInputStream("DBApp.config"));
-            n = Integer.parseInt(properties.getProperty("MaximumRowsCountinPage"));
-        }
-        catch(FileNotFoundException e){
-            System.out.print(e.getStackTrace());
-        } 
-        catch(IOException e){
-            System.out.print(e.getStackTrace());
-        } 
-        return n;
-    }
-
-
     public String toString(){
         String res = "";
         for(int i = 0; i<tuplesInPage.size(); i++){
