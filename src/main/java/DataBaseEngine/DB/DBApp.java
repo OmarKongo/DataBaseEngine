@@ -43,40 +43,104 @@ public class DBApp {
 		throw new DBAppException("not implemented yet");
 	}
 
-	// following method inserts one row only.
-	// htblColNameValue must include a value for the primary key
-	public void insertIntoTable(String strTableName,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException {
-
+	// mehtod to validate attributes of hashtable are in csv file
+	public static boolean validateAttributesInCSV(Hashtable<String, Object> htblColNameValue) {
 		try {
-			// Create an object of filereader
-			// class with CSV file as a parameter.
 			FileReader filereader = new FileReader("src/meta.csv");
-
-			// create csvReader object passing
-			// file reader as a parameter
 			CSVReader csvReader = new CSVReader(filereader);
 			String[] nextRecord;
-
-			// Creating a 2D String array
 			ArrayList<ArrayList<String>> twoDCells = new ArrayList<ArrayList<String>>();
-
-			// Getting all the values from the csv file and storing them in a 2D array
 			while ((nextRecord = csvReader.readNext()) != null) {
 				for (String cell : nextRecord) {
-					// splitting the cell into pieces
 					String[] cellPieces = cell.split("\t");
 					ArrayList<String> cellArrayList = new ArrayList<String>(Arrays.asList(cellPieces));
 					twoDCells.add(cellArrayList);
 				}
 			}
-			System.out.println(twoDCells);
+			ArrayList<String> csvAttributes = new ArrayList<String>();
+			for (String key : htblColNameValue.keySet()) {
+				csvAttributes.add(key);
+			}
+			for (String key : htblColNameValue.keySet()) {
+				for (int i = 0; i < twoDCells.size(); i++) {
+					if (twoDCells.get(i).get(1).equals(key)) {
+						csvAttributes.remove(key);
+					}
+				}
+			}
 			csvReader.close();
-
+			if (csvAttributes.isEmpty()) {
+				// System.out.println("All attributes are valid");
+				return true;
+			} else {
+				// System.out.println("Not all attributes are valid");
+				return false;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// throw new DBAppException("not implemented yet");
+		return false;
+	}
+
+	// method to validate the data types from a hashtable to corresponding
+	// attributes in csv file
+	public static boolean validateDataTypesInCSV(Hashtable<String, Object> htblColNameValue) {
+		try {
+			FileReader filereader = new FileReader("src/meta.csv");
+			CSVReader csvReader = new CSVReader(filereader);
+			String[] nextRecord;
+			ArrayList<ArrayList<String>> twoDCells = new ArrayList<ArrayList<String>>();
+			while ((nextRecord = csvReader.readNext()) != null) {
+				for (String cell : nextRecord) {
+					String[] cellPieces = cell.split("\t");
+					ArrayList<String> cellArrayList = new ArrayList<String>(Arrays.asList(cellPieces));
+					twoDCells.add(cellArrayList);
+				}
+			}
+			ArrayList<String> csvTypes = new ArrayList<String>();
+			for (String key : htblColNameValue.keySet()) {
+				csvTypes.add(key);
+			}
+
+			for (String key : htblColNameValue.keySet()) {
+				for (int i = 0; i < twoDCells.size(); i++) {
+					if (twoDCells.get(i).get(1).equals(key)) {
+						if (twoDCells.get(i).get(2).equals(htblColNameValue.get(key).getClass().getName())) {
+							// System.out.println("Type: " + key + " is " + twoDCells.get(i).get(2));
+							csvTypes.remove(key);
+						}
+					}
+				}
+			}
+			csvReader.close();
+			if (csvTypes.isEmpty()) {
+				// System.out.println("All data types are valid");
+				return true;
+			} else {
+				// System.out.println("Not all data types are valid");
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	// following method inserts one row only.
+	// htblColNameValue must include a value for the primary key
+	public void insertIntoTable(String strTableName,
+			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		if (validateAttributesInCSV(htblColNameValue)) {
+			if (validateDataTypesInCSV(htblColNameValue)) {
+
+				// here the serialization will be done
+
+			} else {
+				System.out.println("Not all data types are valid");
+			}
+		} else {
+			System.out.println("Not all attributes are valid");
+		}
 	}
 
 	// following method updates one row only
