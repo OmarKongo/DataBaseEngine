@@ -15,9 +15,8 @@ public class Page implements Serializable{
     //Vector<Tuple> tuplesInPage = new Vector<Tuple>();
     
 
-    public Page(Vector<Tuple> tuplesInPage) {
+    public Page() {
 
-        this.tuplesInPage = tuplesInPage;
         try{
             Properties properties = new Properties();
             properties.load(new FileInputStream("DBApp.config"));
