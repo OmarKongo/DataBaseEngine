@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Properties;
 
 public class Test {
@@ -26,6 +28,7 @@ public class Test {
 		
 	}
 
+	@SuppressWarnings("removal")
 	public static void main(String[] args) throws Exception {
 		
 		Test T = new Test();
@@ -130,6 +133,23 @@ public class Test {
 		System.out.println(p5.getName());
 		System.out.println(Page.getTableToNumOfPages());
 
-	}
+	
+	Hashtable<String,Object> attributesInTuple = new Hashtable<String,Object>();
+	attributesInTuple.put("id", new Integer( 23498 ));
+	attributesInTuple.put("name", new String("John Noor" ) );
+	attributesInTuple.put("gpa", new Double( 1.5 ) );
+	String res = "";
+	Enumeration<Object> en = attributesInTuple.elements();
 
-}
+	while (en.hasMoreElements()) {
+		Object val = en.nextElement();
+
+		res = res + val;
+		if(en.hasMoreElements()){
+			res = res + ",";
+		}
+	
+	}
+	System.out.println(res);
+
+	}}

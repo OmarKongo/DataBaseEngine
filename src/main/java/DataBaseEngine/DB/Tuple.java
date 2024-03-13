@@ -1,34 +1,45 @@
 package DataBaseEngine.DB;
 
-import java.util.Vector;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
 
 public class Tuple {
-    Vector<Object> attributesInTuple = new Vector<Object>();
+    Hashtable<String, Object> attributesInTuple = new Hashtable<String,Object>();
 
-    public Tuple(Vector<Object> attributesInTuple) {
+    public Tuple(Hashtable<String, Object> attributesInTuple) {
         this.attributesInTuple = attributesInTuple;
     }
 
-    public Vector<Object> getAttributesInTuple() {
+    public Hashtable<String, Object> getAttributesInTuple() {
         return attributesInTuple;
     }
 
-    public void setAttributesInTuple(Vector<Object> attributesInTuple) {
+    public void setAttributesInTuple(Hashtable<String, Object> attributesInTuple) {
         this.attributesInTuple = attributesInTuple;
     }
 
+    @SuppressWarnings("removal")
     public String toString(){
         String res = "";
-        for(int i = 0; i<attributesInTuple.size(); i++){
-            //what does the toString of Object class do?
-            //not yet finished because I dont know how to convert from different column types stored in object toString()
-            //default toString() of object is a bit not specific
-            res = res + attributesInTuple.elementAt(i).toString();
-            if(i!=attributesInTuple.size()-1){
+
+        this.attributesInTuple.put("id", new Integer( 23498 ));
+        this.attributesInTuple.put("name", new String("John Noor" ) );
+        this.attributesInTuple.put("gpa", new Double( 1.5 ) );
+
+        Enumeration<Object> en = attributesInTuple.elements();
+    
+        while (en.hasMoreElements()) {
+            Object val = en.nextElement();
+    
+            res = res + val;
+            if(en.hasMoreElements()){
                 res = res + ",";
             }
+        
         }
         return res;
+
     }
     
 }
