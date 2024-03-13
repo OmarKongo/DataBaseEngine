@@ -5,7 +5,7 @@ import java.util.Hashtable;
 
 
 public class Tuple {
-    Hashtable<String, Object> attributesInTuple = new Hashtable<String,Object>();
+    private Hashtable<String, Object> attributesInTuple = new Hashtable<String,Object>();
 
     public Tuple(Hashtable<String, Object> attributesInTuple) {
         this.attributesInTuple = attributesInTuple;
@@ -19,22 +19,21 @@ public class Tuple {
         this.attributesInTuple = attributesInTuple;
     }
 
-    @SuppressWarnings("removal")
+
+
     public String toString(){
         String res = "";
 
-        this.attributesInTuple.put("id", new Integer( 23498 ));
-        this.attributesInTuple.put("name", new String("John Noor" ) );
-        this.attributesInTuple.put("gpa", new Double( 1.5 ) );
 
-        Enumeration<Object> en = attributesInTuple.elements();
+
+        Enumeration<Object> en = getAttributesInTuple().elements();
     
         while (en.hasMoreElements()) {
             Object val = en.nextElement();
-    
-            res = res + val;
+
+            res = val + res;
             if(en.hasMoreElements()){
-                res = res + ",";
+                res = "," + res;
             }
         
         }

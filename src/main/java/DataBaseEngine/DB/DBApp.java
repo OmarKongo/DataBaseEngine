@@ -3,33 +3,52 @@ package DataBaseEngine.DB;
 
 
 import java.util.Iterator;
-import java.io.FileOutputStream;
+
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
-
+import com.opencsv.CSVWriter;
 
 public class DBApp {
-
+	final static String csvPath = "metadata.csv";
+	//contains serialisation names of tables
+	ArrayList<String> tablesFileNames;
 
 
 	public DBApp( ){
-		
+		this.tablesFileNames = new ArrayList<String>();
+		this.init();
 	}
 
 	// this does whatever initialization you would like 
 	// or leave it empty if there is no code you want to 
 	// execute at application startup 
 
-	//contains serialisation names of tables
-	ArrayList<String> Tables = new ArrayList<>();
-
 	
 	public void init( ){
+		CSVWriter writer =null;
+		try {
+			
+			writer = new CSVWriter(new FileWriter(csvPath,true));
+			String [] header = {"Table Name","Column Name","Column Type"
+						,"Clustering Key","IndexName","IndexType"};
+			
+			writer.writeNext(header);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+		}
 		
-		
+	}
+
+	public ArrayList<String> getTablesFileNames() {
+		return this.tablesFileNames;
+	}
+
+	public void setTablesFileNames(ArrayList<String> tables) {
+		this.tablesFileNames = tables;
 	}
 
 
@@ -44,6 +63,17 @@ public class DBApp {
 	public void createTable(String strTableName, 
 							String strClusteringKeyColumn,  
 							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
+
+								
+
+								Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+								//in Kongo he there was htblcolName provided to add Table is this correct?
+								t.addTable(strTableName,strClusteringKeyColumn,DBApp.csvPath);
+								//String serName = t.serialiseTable();
+								String serName = Serialize.serializeTable(t);
+								this.getTablesFileNames().add(serName);
+								/*
+								 
 								try{
 									checkDataType(htblColNameType);
 									Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
@@ -59,15 +89,7 @@ public class DBApp {
 									System.out.println(e.getMessage());
 								}
 								
-	}
-
-	public void checkDataType(Hashtable<String,String> htblColNameType) throws DBAppException{
-		for(String s : htblColNameType.values()){
-			if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.double"))){
-				throw new DBAppException("Column DataType invalid");
-			}
-		}
-
+								 */
 	}
 
 

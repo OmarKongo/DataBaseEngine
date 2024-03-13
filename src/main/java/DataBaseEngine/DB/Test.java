@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Vector;
 
 public class Test {
 	private String filename = "DBApp.config";
@@ -63,93 +64,53 @@ public class Test {
 
 		Page p = (Page)s.readObject();
 		s.close();
-
-		try{
-			
-			Page pa = new Page("PC");
-			// Serialize created table to a file and appending to array of tables.
-			FileOutputStream f = new FileOutputStream("PC.ser");
-
-			ObjectOutput s2 = new ObjectOutputStream(f);
-
-			s2.writeObject(pa);
-			s2.close();
-			}
-			//or should be explicitly DBApp exception?
-			catch(Exception e){
-				System.out.println(e.getMessage());
-			}
-
-			// Deserialize a string and date from a file.
-		FileInputStream in1 = new FileInputStream("PC.ser");
-		ObjectInputStream s1 = new ObjectInputStream(in1);
-
-		Page pa = (Page)s1.readObject();
-		s1.close();
-
-
-
 		System.out.println(p.getName());
-		System.out.println(pa.getName());
 
 
-		try{
-			
-			Page pag = new Page("Book");
-			// Serialize created table to a file and appending to array of tables.
-			FileOutputStream f = new FileOutputStream("Book.ser");
-
-			ObjectOutput s3 = new ObjectOutputStream(f);
-
-			s3.writeObject(pag);
-			s3.close();
-			}
-			//or should be explicitly DBApp exception?
-			catch(Exception e){
-				System.out.println(e.getMessage());
-			}
-
-			// Deserialize a string and date from a file.
-		FileInputStream in2 = new FileInputStream("Book.ser");
-		ObjectInputStream s3 = new ObjectInputStream(in2);
-
-		Page pag = (Page)s3.readObject();
-		s3.close();
-		
-		System.out.println(pag.getName());
-
-
-
-		Page p4 = new Page("Book");
-		System.out.println(p4.getName());
-
-		Page p40 = new Page("CD");
-		System.out.println(p40.getName());
-		Page p41 = new Page("CD");
-		System.out.println(p41.getName());
-
-
-		Page p5 = new Page("PC");
-		System.out.println(p5.getName());
-		System.out.println(Page.getTableToNumOfPages());
 
 	
 	Hashtable<String,Object> attributesInTuple = new Hashtable<String,Object>();
 	attributesInTuple.put("id", new Integer( 23498 ));
 	attributesInTuple.put("name", new String("John Noor" ) );
 	attributesInTuple.put("gpa", new Double( 1.5 ) );
+	
+	Tuple t1 = new Tuple(attributesInTuple);
+
+
+	Hashtable<String,Object> attributesInTuple2 = new Hashtable<String,Object>();
+	attributesInTuple2.put("id", new Integer( 2615 ));
+	attributesInTuple2.put("name", new String("brolo" ) );
+	attributesInTuple2.put("gpa", new Double( 1.2 ) );
+
+	Tuple t2 = new Tuple(attributesInTuple2);
+
 	String res = "";
 	Enumeration<Object> en = attributesInTuple.elements();
 
 	while (en.hasMoreElements()) {
 		Object val = en.nextElement();
 
-		res = res + val;
+		res = val + res;
 		if(en.hasMoreElements()){
-			res = res + ",";
+			res = "," + res;
 		}
 	
 	}
 	System.out.println(res);
+	//testing the page toString()
+	Vector<Tuple> tuplesInPage = new Vector<Tuple>();
+	tuplesInPage.add(t1);
+	tuplesInPage.add(t2);
+	String res2 = "";
+	for(int i = 0; i<tuplesInPage.size(); i++){
+		res2 = res2 + tuplesInPage.elementAt(i).toString();
+		if(i!=tuplesInPage.size()-1){
+			res2 = res2 + ",";
+		}
+	}
+
+	//makes all separated by commas
+	System.out.println(res2);
+
 
 	}}
