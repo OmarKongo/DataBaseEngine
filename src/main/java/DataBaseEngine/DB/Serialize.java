@@ -11,8 +11,7 @@ import java.io.ObjectOutputStream;
 
 public class Serialize {
 	
-	//final static String filePath = "Tables.ser";
-	
+
     public static String serializeTable(Table t) {
     	String filePath = t.getStrTableName()+".ser";
     	try {

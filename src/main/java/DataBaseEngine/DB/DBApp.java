@@ -72,24 +72,6 @@ public class DBApp {
 								//String serName = t.serialiseTable();
 								String serName = Serialize.serializeTable(t);
 								this.getTablesFileNames().add(serName);
-								/*
-								 
-								try{
-									checkDataType(htblColNameType);
-									Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-									// Serialize created table to a file and appending to array of tables.
-									FileOutputStream f = new FileOutputStream(strTableName+".ser");
-									Tables.add(strTableName+".ser");
-									ObjectOutput s = new ObjectOutputStream(f);
-									s.writeObject(t);
-									s.close();
-								}
-								//or should be explicitly DBApp exception?
-								catch(Exception e){
-									System.out.println(e.getMessage());
-								}
-								
-								 */
 	}
 
 
