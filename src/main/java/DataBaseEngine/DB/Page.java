@@ -69,16 +69,6 @@ public class Page implements Serializable{
         this.name = name;
     }
 
-
-    /* 
-    public static int getPageNumber() {
-        return pageNumber;
-    }
-
-    public static void setPageNumber(int pageNumber) {
-        Page.pageNumber = pageNumber;
-    }
-    */
     public Vector<Tuple> getTuplesInPage() {
         return tuplesInPage;
     }
