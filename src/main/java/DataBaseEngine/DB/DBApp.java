@@ -1,24 +1,54 @@
 package DataBaseEngine.DB;
 /** * @author Wael Abouelsaadat */ 
 
-import java.util.Iterator;
-import java.util.Hashtable;
 
+import java.util.Iterator;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import com.opencsv.CSVWriter;
 
 public class DBApp {
-
+	final static String csvPath = "metadata.csv";
+	//contains serialisation names of tables
+	ArrayList<String> tablesFileNames;
 
 
 	public DBApp( ){
-		
+		this.tablesFileNames = new ArrayList<String>();
+		this.init();
 	}
 
 	// this does whatever initialization you would like 
 	// or leave it empty if there is no code you want to 
 	// execute at application startup 
+
+	
 	public void init( ){
+		CSVWriter writer =null;
+		try {
+			
+			writer = new CSVWriter(new FileWriter(csvPath,true));
+			String [] header = {"Table Name","Column Name","Column Type"
+						,"Clustering Key","IndexName","IndexType"};
+			
+			writer.writeNext(header);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+		}
 		
-		
+	}
+
+	public ArrayList<String> getTablesFileNames() {
+		return this.tablesFileNames;
+	}
+
+	public void setTablesFileNames(ArrayList<String> tables) {
+		this.tablesFileNames = tables;
 	}
 
 
@@ -28,11 +58,20 @@ public class DBApp {
 	// be passed in htblColNameType
 	// htblColNameValue will have the column name as key and the data 
 	// type as value
+
+
 	public void createTable(String strTableName, 
 							String strClusteringKeyColumn,  
-							Hashtable<String,String> htblColNameType) throws DBAppException{
+							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
+
 								
-		throw new DBAppException("not implemented yet");
+
+								Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+								//in Kongo he there was htblcolName provided to add Table is this correct?
+								t.addTable(strTableName,strClusteringKeyColumn,DBApp.csvPath);
+								//String serName = t.serialiseTable();
+								String serName = Serialize.serializeTable(t);
+								this.getTablesFileNames().add(serName);
 	}
 
 
