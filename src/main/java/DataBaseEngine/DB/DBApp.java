@@ -64,14 +64,19 @@ public class DBApp {
 							String strClusteringKeyColumn,  
 							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
 
-								
+								try{
+									checkDataType(this.htblColNameType);
+									Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+									//in Kongo he there was htblcolName provided to add Table is this correct?
+									t.addTable(strTableName,strClusteringKeyColumn,DBApp.csvPath);
+									//String serName = t.serialiseTable();
+									String serName = Serialize.serializeTable(t);
+									this.getTablesFileNames().add(serName);
+								}
+								catch(Exception ex) {
+									ex.printStackTrace();
+								}
 
-								Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-								//in Kongo he there was htblcolName provided to add Table is this correct?
-								t.addTable(strTableName,strClusteringKeyColumn,DBApp.csvPath);
-								//String serName = t.serialiseTable();
-								String serName = Serialize.serializeTable(t);
-								this.getTablesFileNames().add(serName);
 	}
 
 
@@ -81,6 +86,18 @@ public class DBApp {
 							String   strIndexName) throws DBAppException{
 		
 		throw new DBAppException("not implemented yet");
+	}
+
+
+
+
+	public static void checkDataType(Hashtable<String,String> htblColNameType) throws DBAppException{
+		for(String s : htblColNameType.values()){
+			if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.Double"))){
+				throw new DBAppException("Column DataType invalid");
+			}
+		}
+
 	}
 
 

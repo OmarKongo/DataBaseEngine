@@ -78,7 +78,6 @@ public class Table implements Serializable{
 
     public void addTable(String tableName,String pK,String filePath) {
         try {
-            checkDataType(this.htblColNameType);
             CSVWriter writer = new CSVWriter(new FileWriter(filePath,true));
             Enumeration<String> types = this.htblColNameType.elements();
             Enumeration<String> keys = this.htblColNameType.keys();
@@ -96,15 +95,6 @@ public class Table implements Serializable{
         }
     
     }
-
-    public static void checkDataType(Hashtable<String,String> htblColNameType) throws DBAppException{
-		for(String s : htblColNameType.values()){
-			if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.Double"))){
-				throw new DBAppException("Column DataType invalid");
-			}
-		}
-
-	}
 
     public static String[] insertLine(String []line,String tableName,String name, String type,String primaryKey) {
 		

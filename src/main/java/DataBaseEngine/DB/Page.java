@@ -57,7 +57,7 @@ public class Page implements Serializable{
     public void deleteFromPage(){
         
     }
-    public void selectFromPage(){
+    public static void selectFromPage(){
         
     }
 
@@ -80,3 +80,4 @@ public class Page implements Serializable{
     public static int getMaxNumberOfRows() {
         return maxNumberOfRows;
     }
+}
