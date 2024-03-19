@@ -80,3 +80,4 @@ public class Page implements Serializable{
     public static int getMaxNumberOfRows() {
         return maxNumberOfRows;
     }
+}
