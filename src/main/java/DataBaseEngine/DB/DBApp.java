@@ -168,7 +168,7 @@ public class DBApp {
 	}
 
 
-	@SuppressWarnings({ "removal" })
+	@SuppressWarnings({ "removal", "deprecation" })
 	public static void main( String[] args ){
 	
 	try{
