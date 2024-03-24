@@ -24,6 +24,18 @@ public class Table implements Serializable{
     private int pagesCounter;
 
 
+
+
+
+
+
+
+
+
+
+    public Table() {
+    	
+    }
     public Table(String strTableName, String strClusteringKeyColumn,
             Hashtable<String, String> htblColNameType) {
         pagesCounter = 1;
@@ -117,7 +129,21 @@ public class Table implements Serializable{
 	
         return line;
     }
-
+/* 
+    public Page createPage(String tableName) {
+		int counter = this.getPagesCounter();
+		String pageName = tableName+counter;
+		Page p = new Page(pageName);
+		this.setPagesCounter(++counter);
+        
+        String serializedName = Serialize.serializePage(p);
+		this.getPageFileNames().add(serializedName);
+		
+		
+		return p;
+		
+	}
+*/
     public Page createPage(){
             
         int counter = this.getPagesCounter();
@@ -133,7 +159,7 @@ public class Table implements Serializable{
         pageFileNames.add(pageFileName);
     }
     
-    public void insertRow(){
+   // public void insertRow(){
         //logic to choose page
         //deserialise correct page Page.p
         //pinsertIntoPage()
@@ -143,7 +169,7 @@ public class Table implements Serializable{
         //insert in it
         //serialise
         //append page file name 
-    }
+    //}
 
     public void updateRow(){
         
@@ -156,6 +182,50 @@ public class Table implements Serializable{
     public void selectRow(){
 
     }
+
+    /**
+     * @author Brolosy
+     * @param p the table to be serialised
+     * serialises table
+     * @return returns filename of type .ser
+     */
+
+    public String serialiseTable(){
+        String filename = this.getStrTableName()+".ser";
+        try{
+            //this.pageFileNames.add(filename);
+            FileOutputStream f = new FileOutputStream(filename);
+            
+            ObjectOutput s = new ObjectOutputStream(f);
+            s.writeObject(this);
+            s.close();
+            }
+        //or should be explicitly DBApp exception?
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        return filename;
+    }
+
+    /**
+     * @author Brolosy
+     * @param tableFileName the .ser filename of a page
+     * @return the table after deserialisation
+     * @throws Exception either FileNotFoundException or IOException (i think)
+     * Deserialises the specified table.
+     */
+    public Table deserialiseTable(String tableFileName) throws Exception{
+		// Deserialize a string and date from a file.
+        //must make try catch statement when calling this
+		FileInputStream in = new FileInputStream(tableFileName);
+		ObjectInputStream s = new ObjectInputStream(in);
+
+		Table t = (Table)s.readObject();
+		s.close();
+
+        return t;
+    }
+
 
     
     

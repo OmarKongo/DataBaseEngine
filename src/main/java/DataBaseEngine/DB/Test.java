@@ -29,7 +29,7 @@ public class Test {
 		
 	}
 
-	@SuppressWarnings("removal")
+	@SuppressWarnings({ "removal", "deprecation" })
 	public static void main(String[] args) throws Exception {
 		
 		Test T = new Test();
