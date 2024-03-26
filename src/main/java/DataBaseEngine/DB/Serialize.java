@@ -10,14 +10,16 @@ import java.io.ObjectOutputStream;
 
 
 public class Serialize {
-	
+        static final String tableFolderPath = "serialize/table/";
+        static final String pageFolderPath = "serialize/page/";
+        static final String indexFolderPath = "serialize/index/";
 
     public static String serializeTable(Table t) {
-    	String filePath = t.getStrTableName()+".ser";
+    	String filePath = t.getStrTableName() + ".ser";
     	try {
     		
     		 //Saving of object in a file
-            FileOutputStream file = new FileOutputStream(filePath);
+            FileOutputStream file = new FileOutputStream(tableFolderPath+filePath);
             ObjectOutputStream out = new ObjectOutputStream(file);
             // Method for serialization of object
             out.writeObject(t);
@@ -38,7 +40,7 @@ public class Serialize {
     	try {
     		
    		 //Saving of object in a file
-           FileOutputStream file = new FileOutputStream(filePath);
+           FileOutputStream file = new FileOutputStream(pageFolderPath+filePath);
            ObjectOutputStream out = new ObjectOutputStream(file);
             
            // Method for serialization of object
@@ -68,7 +70,7 @@ public class Serialize {
     public static Page deserializePage(String pageFileName) throws Exception{
 		// Deserialize a string and date from a file.
         //must make try catch statement when calling this
-		FileInputStream in = new FileInputStream(pageFileName);
+		FileInputStream in = new FileInputStream(pageFolderPath+pageFileName);
 		ObjectInputStream s = new ObjectInputStream(in);
 
 		Page p = (Page)s.readObject();
@@ -80,7 +82,7 @@ public class Serialize {
     public static Table deserializeTable(String tableFileName) throws Exception{
 		// Deserialize a string and date from a file.
         //must make try catch statement when calling this
-		FileInputStream in = new FileInputStream(tableFileName);
+		FileInputStream in = new FileInputStream(tableFolderPath+tableFileName);
 		ObjectInputStream s = new ObjectInputStream(in);
 
 		Table t = (Table)s.readObject();
