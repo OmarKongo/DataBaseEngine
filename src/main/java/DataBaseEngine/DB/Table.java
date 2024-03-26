@@ -3,6 +3,7 @@ package DataBaseEngine.DB;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -38,7 +39,7 @@ public class Table implements Serializable{
     }
     public Table(String strTableName, String strClusteringKeyColumn,
             Hashtable<String, String> htblColNameType) {
-        pagesCounter = 1;
+        pagesCounter = 0;
         this.pageFileNames = new ArrayList<>();
         this.strTableName = strTableName;
         this.strClusteringKeyColumn = strClusteringKeyColumn;
@@ -88,10 +89,11 @@ public class Table implements Serializable{
 
 
 
-    public void addTable(String tableName,String pK,String filePath) {
+    public void addTable(String tableName,String pK,String filePath) throws IOException {
+        CSVWriter writer = null;
         try {
             checkDataType(this.htblColNameType);
-            CSVWriter writer = new CSVWriter(new FileWriter(filePath,true));
+            writer = new CSVWriter(new FileWriter(filePath,true));
             Enumeration<String> types = this.htblColNameType.elements();
             Enumeration<String> keys = this.htblColNameType.keys();
             String []line =  new String[6];
@@ -100,11 +102,13 @@ public class Table implements Serializable{
                 line = insertLine(line,tableName,keys.nextElement(),types.nextElement(),pK);
                 writer.writeNext(line);
             }
-            writer.flush();
-            writer.close();
+
         }
         catch(Exception ex) {
             ex.printStackTrace();
+        } finally {
+            writer.flush();
+            writer.close();
         }
     
     }
