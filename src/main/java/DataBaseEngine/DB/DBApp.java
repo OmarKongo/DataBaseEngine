@@ -16,12 +16,12 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
 public class DBApp {
-	final static String csvPath = "metadata.csv";
+	final static String csvPath = "files\\metadata.csv";
 	//contains serialisation names of tables
 	ArrayList<String> tablesFileNames;
 
 
-	public DBApp( ){
+	public DBApp( ) throws IOException{
 		this.tablesFileNames = new ArrayList<String>();
 		this.init();
 	}
@@ -31,7 +31,7 @@ public class DBApp {
 	// execute at application startup 
 
 	
-	public void init( ){
+	public void init( ) throws IOException{
 		CSVWriter writer =null;
 		try {
 			
@@ -43,6 +43,9 @@ public class DBApp {
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
+		} finally {
+			writer.flush();
+			writer.close();
 		}
 		
 	}
@@ -168,7 +171,6 @@ public class DBApp {
 	}
 
 
-	@SuppressWarnings({ "removal", "deprecation" })
 	public static void main( String[] args ){
 	
 	try{
