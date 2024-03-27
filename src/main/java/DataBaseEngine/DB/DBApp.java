@@ -3,6 +3,7 @@ package DataBaseEngine.DB;
 
 
 import java.util.Iterator;
+import java.util.Properties;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,12 +18,8 @@ import com.opencsv.CSVWriter;
 
 public class DBApp {
 	final static String csvPath = "metadata.csv";
-	//contains serialisation names of tables
-	ArrayList<String> tablesFileNames;
-
 
 	public DBApp( ){
-		this.tablesFileNames = new ArrayList<String>();
 		this.init();
 	}
 
@@ -40,63 +37,15 @@ public class DBApp {
 						,"Clustering Key","IndexName","IndexType"};
 			
 			writer.writeNext(header);
+			 writer.flush();
+	            writer.close();
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
 		}
 		
 	}
-
-	public ArrayList<String> getTablesFileNames() {
-		return this.tablesFileNames;
-	}
-
-	public void setTablesFileNames(ArrayList<String> tables) {
-		this.tablesFileNames = tables;
-	}
 	
-	public static void checkData(String tableName,Hashtable<String,Object> data) throws Exception {
-		CSVReader csvReader = new CSVReaderBuilder(new FileReader(csvPath)) 
-                .withSkipLines(1) 
-                .build();
-		String[] nextRecord;boolean flag = false;
-		Enumeration<Object> values = data.elements();
-        Enumeration<String> keys = data.keys();
-        Hashtable<String,String> collector = new Hashtable<String,String>();
-        // this loop iterate over the csv file untill the table is founded
-        // if it's not founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) { 
-            
-            if(nextRecord[0].equals(tableName)) {
-            	flag = true;
-            	break;
-            }
-            else
-            	continue;
-        }
-		if(!flag)
-			throw new Exception("Invalid Table");
-		// this loop insert all the original attributes of the table inside collector hashtable
-		while(nextRecord!=null && nextRecord[0].equals(tableName)) {
-			collector.put(nextRecord[1],nextRecord[2]);
-			nextRecord = csvReader.readNext();
-			
-		}
-		// this loop checks the entered data and throws exception if anything mismatches the original attributes 
-		while(keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			if(collector.containsKey(key)){
-				if(!(values.nextElement().getClass().equals(Class.forName(collector.get(key)))))
-					throw new Exception("Mismatch type");
-				
-			}
-			else
-				throw new Exception("mismatch key");
-			
-    	}
-	}
-
-
 	// following method creates one table only
 	// strClusteringKeyColumn is the name of the column that will be the primary
 	// key and the clustering column as well. The data type of that column will
@@ -110,15 +59,12 @@ public class DBApp {
 							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
 
 								
-
-								Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-								//in Kongo he there was htblcolName provided to add Table is this correct?
-								t.addTable(strTableName,strClusteringKeyColumn,DBApp.csvPath);
-								//String serName = t.serialiseTable();
-								String serName = Serialize.serializeTable(t);
-								this.getTablesFileNames().add(serName);
+                 
+								Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+								T.addTable(strTableName,strClusteringKeyColumn,csvPath);
+								Serialize.Table(T);			
+							
 	}
-
 
 	// following method creates a B+tree index 
 	public void createIndex(String   strTableName,
@@ -133,8 +79,24 @@ public class DBApp {
 	// htblColNameValue must include a value for the primary key
 	public void insertIntoTable(String strTableName, 
 								Hashtable<String,Object>  htblColNameValue) throws DBAppException{
+;
+		
+		try {
+			Table.checkData(strTableName, htblColNameValue, csvPath);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		Table T = Deserialize.Table(strTableName);
+		Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
+		try {
+			T = T.insertIntoTable(record);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Serialize.Table(T);
 	
-		throw new DBAppException("not implemented yet");
 	}
 
 
@@ -168,10 +130,10 @@ public class DBApp {
 	}
 
 
-	@SuppressWarnings({ "removal", "deprecation" })
+	@SuppressWarnings({ "removal" })
 	public static void main( String[] args ){
 	
-	try{
+		try{
 			String strTableName = "Student";
 			DBApp	dbApp = new DBApp( );
 			
@@ -232,7 +194,7 @@ public class DBApp {
 		}
 		catch(Exception exp){
 			exp.printStackTrace( );
-		}
+		}}
 	}
-
-}
+		
+	
