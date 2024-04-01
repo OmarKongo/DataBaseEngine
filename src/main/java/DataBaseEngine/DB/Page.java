@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
-public class Page  implements Serializable,Comparable<Object>{
+public class Page  implements Serializable,Comparable<Page>{
   
 	private String name;
 	private Hashtable<String,Pair> pageProp;
@@ -67,11 +67,10 @@ public class Page  implements Serializable,Comparable<Object>{
 		
 	}
     @Override
-	public int compareTo(Object o) {
+	public int compareTo(Page p) {
 		
-	    Page P = (Page) o;
 	    int fMin = this.getPageProp().get(this.getName()).getMin();
-	    int sMin = P.getPageProp().get(P.getName()).getMin();
+	    int sMin = p.getPageProp().get(p.getName()).getMin();
 	    return fMin - sMin;
 	}
     public boolean tupleFounded(Tuple T) {

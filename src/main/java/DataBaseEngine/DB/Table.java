@@ -152,14 +152,11 @@ public class Table implements Serializable{
 	
         return line;
     }
-    
-    public static void checkData(String tableName,Hashtable<String,Object> data,String filePath) throws Exception {
+    public static Hashtable<String, String> csvMatchingRows(String tableName, String filePath) throws Exception{
 		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-                .withSkipLines(1) 
-                .build();
+						.withSkipLines(1) 
+						.build();
 		String[] nextRecord;boolean flag = false;
-		Enumeration<Object> values = data.elements();
-        Enumeration<String> keys = data.keys();
         Hashtable<String,String> collector = new Hashtable<String,String>();
         // this loop iterate over the csv file untill the table is founded
         // if it's not founded then an exception will be thrown
@@ -180,6 +177,14 @@ public class Table implements Serializable{
 			nextRecord = csvReader.readNext();
 			
 		}
+		return collector;
+	}
+    public static void checkData(String tableName,Hashtable<String,Object> data,String filePath) throws Exception {
+		
+
+		Hashtable<String, String> collector = csvMatchingRows(tableName, filePath);
+		Enumeration<Object> values = data.elements();
+        Enumeration<String> keys = data.keys();
 		// this loop checks the entered data and throws exception if anything mismatches the original attributes 
 		while(keys.hasMoreElements()) {
 			String key = keys.nextElement();
@@ -201,7 +206,7 @@ public class Table implements Serializable{
 		return pageName;
     }
      
-    public  Table insertIntoTable(Tuple T) throws Exception {
+    public  String insertIntoTable(Tuple T) throws Exception {
     	Page p = null;String pageName;boolean flag = false;
            int maxKeyInPreviousPage;// this attribute connect the pages with each other maxLastpage = minNextPage
     	//Base Case
@@ -274,7 +279,7 @@ public class Table implements Serializable{
     	    	
     	    }
     	}
-    	return this;
+    	return p.getName();
     	
     }
     

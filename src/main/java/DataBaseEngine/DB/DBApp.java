@@ -72,6 +72,12 @@ public class DBApp {
 							String   strIndexName) throws DBAppException{
 		
 		throw new DBAppException("not implemented yet");
+
+		//validation
+		
+		//Insert all tuples previosly created
+		//Serialize index using strIndexName
+
 	}
 
 
@@ -90,12 +96,15 @@ public class DBApp {
 		Table T = Deserialize.Table(strTableName);
 		Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
 		try {
-			T = T.insertIntoTable(record);
+			String pageName = T.insertIntoTable(record);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Serialize.Table(T);
+
+		//Conditions to add into index using pageName variable
+		//check all columns and matching indice existance
 	
 	}
 

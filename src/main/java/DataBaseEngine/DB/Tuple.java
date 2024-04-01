@@ -12,10 +12,10 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 
-public class Tuple extends Page implements Comparable<Object>,Serializable{
+public class Tuple implements Comparable<Tuple>,Serializable{
     private Hashtable<String, Object> attributesInTuple = new Hashtable<String,Object>();
     private String primaryKey;
-
+ 
     public String getStrPrimaryKey() {
 		return primaryKey;
 	}
@@ -49,12 +49,18 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
         }
         return res;
     }
-    
+    /**
+	 * Compares between two tuples based on their primary key.
+	 * Note: Primary Key can be of different types, all of which should implement Comparable
+	 * @param t: tuple to compare with
+	 * @return positive int, zero, negative int if tuple specified is less than, equal to, 
+	 * 			or greater than respectively 
+	 */
 	@Override
-	public int compareTo(Object o) {
-		Tuple T = (Tuple) o;
+	public int compareTo(Tuple t) {
+
 		int x = (int)this.getAttributesInTuple().get(this.getStrPrimaryKey());
-		int y = (int) (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
+		int y = (int) (t.getAttributesInTuple().get(t.getStrPrimaryKey()));
 		return  x - y;
 	}
 	
