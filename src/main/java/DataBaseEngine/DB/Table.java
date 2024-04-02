@@ -117,17 +117,10 @@ public class Table implements Serializable{
 				throw new DBAppException("Column DataType invalid");
 			}
 		}
-		CSVReader csvReader = null;
-		try {
-			csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-			        .withSkipLines(1) 
-			        .build();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String[] nextRecord;boolean flag = false;
-		
+
+		CSVReader csvReader = CSV.createReader();
+		String[] nextRecord;
+
         // this loop iterate over the csv file untill the table is founded
         // if it's  founded then an exception will be thrown
 		while ((nextRecord = csvReader.readNext()) != null) { 
@@ -153,9 +146,7 @@ public class Table implements Serializable{
         return line;
     }
     public static Hashtable<String, String> csvMatchingRows(String tableName, String filePath) throws Exception{
-		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-						.withSkipLines(1) 
-						.build();
+		CSVReader csvReader = CSV.createReader();
 		String[] nextRecord;boolean flag = false;
         Hashtable<String,String> collector = new Hashtable<String,String>();
         // this loop iterate over the csv file untill the table is founded
