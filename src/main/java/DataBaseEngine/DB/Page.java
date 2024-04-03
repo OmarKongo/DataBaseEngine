@@ -70,9 +70,24 @@ public class Page  implements Serializable,Comparable<Object>{
 	public int compareTo(Object o) {
 		
 	    Page P = (Page) o;
-	    int fMin = this.getPageProp().get(this.getName()).getMin();
-	    int sMin = P.getPageProp().get(P.getName()).getMin();
-	    return fMin - sMin;
+	    Object fMin = this.getPageProp().get(this.getName()).getMin();
+	    Object sMin = P.getPageProp().get(P.getName()).getMin();
+	    
+	    if(fMin instanceof Integer) {
+			  int first = (int) fMin; int second = (int) sMin;
+			return  first - second;
+			}
+			else {
+				if(fMin instanceof Double) {
+					Double first = (Double) fMin;Double second = (Double) sMin;
+					return (int)Math.ceil(first - second);
+				}
+				else {
+					String first = (String) fMin;String second = (String) sMin;
+					return first.compareToIgnoreCase(second);
+				}
+				
+			}
 	}
     public boolean tupleFounded(Tuple T) {
     	int index = Collections.binarySearch(this.getTuplesInPage(),T);
@@ -109,7 +124,7 @@ public class Page  implements Serializable,Comparable<Object>{
 		.setMax(this.getTuplesInPage().lastElement().getPK());
     	return this;
     }
-    public Page updateMin(int min) {
+    public Page updateMin(Object min) {
     	this.getPageProp().get(this.getName()).setMin(min);
     return this;
     }
@@ -117,48 +132,7 @@ public class Page  implements Serializable,Comparable<Object>{
     	return this.getTuplesInPage().size()>this.getMaxCount();
     	
     }
-    //Not yet sure if this is better than implementing serialise class
-    /**
-     * @author Brolosy
-     * @param p the page to be serialised
-     * serialises page
-     * @return returns filename of tyoe .ser
-     */
-    public void serialisePage(){
-        String filename = "Pages"+ this.getName()+".ser";
-        try{
-            //this.pageFileNames.add(filename);
-            FileOutputStream f = new FileOutputStream(filename);
-            
-            ObjectOutput s = new ObjectOutputStream(f);
-            s.writeObject(this);
-            s.close();
-            }
-        //or should be explicitly DBApp exception?
-        catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-      //  return filename;
-    }
-
-    /**
-     * @author Brolosy
-     * @param pageFileName the .ser filename of a page
-     * @return the page after deserialisation
-     * @throws Exception either FileNotFoundException or IOException (i think)
-     * Deserialises the specified page.
-     */
-    public Page deserialisePage(String pageFileName) throws Exception{
-		// Deserialize a string and date from a file.
-        //must make try catch statement when calling this
-		FileInputStream in = new FileInputStream(pageFileName);
-		ObjectInputStream s = new ObjectInputStream(in);
-
-		Page p = (Page)s.readObject();
-		s.close();
-
-        return p;
-    }
+   
     public static void main(String[]args) {
     	Page p = new Page("s");
     	int r = (int)(Math.random()*5021100);
@@ -172,26 +146,26 @@ public class Page  implements Serializable,Comparable<Object>{
 
 class Pair implements Serializable{
 
-	   int min,max;
-	   public Pair(int max) {
+	   Object min,max;
+	   public Pair(Object start) {
 		   
-		   this.max = max;
-		   this.min = max;
+		  // this.max = max;
+		   this.min = start;
 	   }
-	public int getMin() {
+	public Object getMin() {
 		return min;
 	}
-	public void setMin(int min) {
+	public void setMin(Object min) {
 		this.min = min;
 	}
 	@Override
 	public String toString() {
 		return "Pair [min=" + min + ", max=" + max + "]";
 	}
-	public int getMax() {
+	public Object getMax() {
 		return max;
 	}
-	public void setMax(int max) {
+	public void setMax(Object max) {
 		this.max = max;
 	}
 		

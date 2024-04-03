@@ -53,13 +53,27 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 	@Override
 	public int compareTo(Object o) {
 		Tuple T = (Tuple) o;
-		int x = (int)this.getAttributesInTuple().get(this.getStrPrimaryKey());
-		int y = (int) (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
-		return  x - y;
+		Object x = this.getAttributesInTuple().get(this.getStrPrimaryKey());
+		Object y =  (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
+		if(x instanceof Integer) {
+		  int first = (int) x; int second = (int) y;
+		return  first - second;
+		}
+		else {
+			if(x instanceof Double) {
+				Double first = (Double) x;Double second = (Double) y;
+				return (int)Math.ceil(first - second);
+			}
+			else {
+				String first = (String) x;String second = (String) y;
+				return first.compareToIgnoreCase(second);
+			}
+			
+		}
 	}
 	
-	public int getPK() {
-		int pk = (int) this.getAttributesInTuple().get(this.getStrPrimaryKey());
+	public Object getPK() {
+		Object pk = this.getAttributesInTuple().get(this.getStrPrimaryKey());
 		return pk;
 	}
 	

@@ -1,21 +1,9 @@
 package DataBaseEngine.DB;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.io.*;
+
+import java.util.*;
+
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -200,15 +188,26 @@ public class Table implements Serializable{
 		this.setPagesCounter(++counter);
 		return pageName;
     }
-     
+     public static Object baseType(Tuple T) {
+    	 Object key = T.getPK();
+    	 if((key instanceof String)) {
+    		 return "";
+    	 }
+    	 else
+    		 if(key instanceof Double)
+    			 return 0.0;
+    		 else
+    			 return 0;
+    	 
+     }
     public  Table insertIntoTable(Tuple T) throws Exception {
     	Page p = null;String pageName;boolean flag = false;
-           int maxKeyInPreviousPage;// this attribute connect the pages with each other maxLastpage = minNextPage
+           Object maxKeyInPreviousPage;// this attribute connect the pages with each other maxLastpage = minNextPage
     	//Base Case
     
     	if(this.getPages().size()==0) {
     		 p = new Page(this.setNameForpage());
-    		 p.getPageProp().put(p.getName(),new Pair(0));
+    		 p.getPageProp().put(p.getName(),new Pair(baseType(T)));
     		 this.getPages().add(p);
     		 T.addTuple(p);
     		 p = p.updateMax();
@@ -239,7 +238,7 @@ public class Table implements Serializable{
                    Serialize.Page(p);
                  //OVERFLOW ON THE LAST PAGE
                 if(index == this.getPages().size()-1) { // if the overflow in the last page, I will create a new page without going through any loops
-                	p = new Page(this.setNameForpage());p.getPageProp().put(p.getName(),new Pair(0)); 
+                	p = new Page(this.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T))); 
                 	this.getPages().add(p);p = p.updateMin(maxKeyInPreviousPage);	
                 	T.addTuple(p);p = p.updateMax();Serialize.Page(p);
                 }
@@ -266,7 +265,7 @@ public class Table implements Serializable{
                 	index++;
                 }
                 	if(!flag) { // this if handles the last overflow can happen
-                		p = new Page(this.setNameForpage());p.getPageProp().put(p.getName(),new Pair(0));
+                		p = new Page(this.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T)));
                 		this.getPages().add(p);p = p.updateMin(maxKeyInPreviousPage);	
                     	T.addTuple(p);p = p.updateMax();Serialize.Page(p);
                 	}
@@ -292,7 +291,7 @@ public class Table implements Serializable{
     // this method return the index of the right page to insert in
     public int binarySearch(Tuple T) throws Exception
     {
-    	int key = T.getPK();int mid = 0;
+    	Object key = T.getPK();int mid = 0;
     	Vector<Page> v =this.getPages();
 	  int l = 0; int r = v.size()-1;
 	  if(r == 0)
@@ -300,24 +299,66 @@ public class Table implements Serializable{
 	                                                                              
         while (l <= r) {
              mid = (l + r) / 2;
+             
  
-            Page P = Deserialize.Page(v.get(mid).getName());
-            int min = P.getPageProp().get(P.getName()).getMin();
-            int max = P.getPageProp().get(P.getName()).getMax();
-            if (min == key || max == key) 
+            
+           // Page P = Deserialize.Page(v.get(mid).getName());
+            Page P = this.getPages().get(mid);
+             if(key instanceof Integer) {
+            	//int min = this.getPages().get(mid).getPageProp().get()
+            int min = (int) P.getPageProp().get(P.getName()).getMin();
+            int max = (int) P.getPageProp().get(P.getName()).getMax();
+            if (min == (int)key || max == (int)key) 
                 throw new Exception("Duplicate Key");
              
  
           
-            if(key>min & key<max)
+            if((int)key>min & (int)key<max)
             	return mid;
             else
-            	if(max>key)
+            	if(max>(int)key)
             		r = mid - 1;
             	else
             		l = mid + 1;
             	
-            	
+            }
+             else 
+            	 if(key instanceof Double) {
+            		 Double min = (Double) P.getPageProp().get(P.getName()).getMin();
+                     Double max = (Double) P.getPageProp().get(P.getName()).getMax();
+                     if (min == (Double)key || max == (Double)key) 
+                         throw new Exception("Duplicate Key");
+                      
+          
+                   
+                     if((Double)key>min & (Double)key<max)
+                     	return mid;
+                     else
+                     	if(max>(Double)key)
+                     		r = mid - 1;
+                     	else
+                     		l = mid + 1;
+            		 
+            	 }
+             
+             else {
+            	 String min = (String) P.getPageProp().get(P.getName()).getMin();
+                 String max = (String) P.getPageProp().get(P.getName()).getMax();
+                 if (min.equals(key) || max.equals(key)) 
+                     throw new Exception("Duplicate Key");
+                  
+      
+               
+                 if(((String)key).compareTo(min)>0 & ((String)key).compareTo(max)<0)
+                 	return mid;
+                 else
+                 	if(((String)key).compareTo(max)<0)
+                 		r = mid - 1;
+                 	else
+                 		l = mid + 1;
+            	 
+            	 
+             }
         }
  
      
