@@ -3,22 +3,23 @@ package DataBaseEngine.DB;
 
 
 import java.util.Iterator;
-
+import java.util.Properties;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
+
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
 public class DBApp {
 	final static String csvPath = "metadata.csv";
-	//contains serialisation names of tables
-	ArrayList<String> tablesFileNames;
-
 
 	public DBApp( ){
-		this.tablesFileNames = new ArrayList<String>();
 		this.init();
 	}
 
@@ -36,22 +37,15 @@ public class DBApp {
 						,"Clustering Key","IndexName","IndexType"};
 			
 			writer.writeNext(header);
+			 writer.flush();
+	            writer.close();
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
 		}
 		
 	}
-
-	public ArrayList<String> getTablesFileNames() {
-		return this.tablesFileNames;
-	}
-
-	public void setTablesFileNames(ArrayList<String> tables) {
-		this.tablesFileNames = tables;
-	}
-
-
+	
 	// following method creates one table only
 	// strClusteringKeyColumn is the name of the column that will be the primary
 	// key and the clustering column as well. The data type of that column will
@@ -64,21 +58,13 @@ public class DBApp {
 							String strClusteringKeyColumn,  
 							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
 
-								try{
-									checkDataType(this.htblColNameType);
-									Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-									//in Kongo he there was htblcolName provided to add Table is this correct?
-									t.addTable(strTableName,strClusteringKeyColumn,DBApp.csvPath);
-									//String serName = t.serialiseTable();
-									String serName = Serialize.serializeTable(t);
-									this.getTablesFileNames().add(serName);
-								}
-								catch(Exception ex) {
-									ex.printStackTrace();
-								}
-
+								
+                 
+								Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+								T.addTable(strTableName,strClusteringKeyColumn,csvPath);
+								Serialize.Table(T);			
+							
 	}
-
 
 	// following method creates a B+tree index 
 	public void createIndex(String   strTableName,
@@ -105,8 +91,24 @@ public class DBApp {
 	// htblColNameValue must include a value for the primary key
 	public void insertIntoTable(String strTableName, 
 								Hashtable<String,Object>  htblColNameValue) throws DBAppException{
+;
+		
+		try {
+			Table.checkData(strTableName, htblColNameValue, csvPath);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		Table T = Deserialize.Table(strTableName);
+		Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
+		try {
+			T = T.insertIntoTable(record);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Serialize.Table(T);
 	
-		throw new DBAppException("not implemented yet");
 	}
 
 
@@ -145,7 +147,7 @@ public class DBApp {
 	@SuppressWarnings({ "removal" })
 	public static void main( String[] args ){
 	
-	try{
+		try{
 			String strTableName = "Student";
 			DBApp	dbApp = new DBApp( );
 			
@@ -206,7 +208,7 @@ public class DBApp {
 		}
 		catch(Exception exp){
 			exp.printStackTrace( );
-		}
+		}}
 	}
-
-}
+		
+	
