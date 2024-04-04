@@ -1,15 +1,18 @@
-package DataBaseEngine.DB;
+package btree;
 
 import java.lang.*;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.io.*;
-// @SuppressWarnings(rawtypes)
-public class bplustree implements BtreeInterface {
-	final String keyType;
+
+
+
+// @SuppressWarnings("rawtypes")
+public class bplustree<K extends Comparable<K>> {
+	private Class<K> clazz;
 	int m;
 	InternalNode root;
 	LeafNode firstLeaf;
-
 
 	/*~~~~~~~~~~~~~~~~ HELPER FUNCTIONS ~~~~~~~~~~~~~~~~*/
 
@@ -22,9 +25,9 @@ public class bplustree implements BtreeInterface {
 	 * @param t: target key value of dictionary pair being searched for
 	 * @return index of the target value if found, else a negative value
 	 */
-	private int  binarySearch(DictionaryPair[] dps, int numPairs, DictionaryPair dp) {
+	private int  binarySearch(DictionaryPair[] dps, int numPairs, K key) {
 		
-		return Arrays.binarySearch(dps, 0, numPairs, dp, null);
+		return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(key, null), null);
 	}
 
 	/**
@@ -34,10 +37,10 @@ public class bplustree implements BtreeInterface {
 	 * @param key: the unique key that lies within the dictionary of a LeafNode object
 	 * @return the LeafNode object that contains the key within its dictionary
 	 */
-	private LeafNode findLeafNode(Key key) {
+	private LeafNode findLeafNode(K key) {
 
 		// Initialize keys and index variable
-		Key[] keys = this.root.keys;
+		K[] keys = this.root.keys;
 		int i;
 
 		// Find next node on path to appropriate leaf node
@@ -56,10 +59,10 @@ public class bplustree implements BtreeInterface {
 		}
 	}
 
-	private LeafNode findLeafNode(InternalNode node, Key key) {
+	private LeafNode findLeafNode(InternalNode node, K key) {
 
 		// Initialize keys and index variable
-		Key[] keys = node.keys;
+		K[] keys = node.keys;
 		int i;
 
 		// Find next node on path to appropriate leaf node
@@ -133,7 +136,7 @@ public class bplustree implements BtreeInterface {
 			sibling = in.rightSibling;
 
 			// Copy 1 key and pointer from sibling (atm just 1 key)
-			Key borrowedKey = sibling.keys[0];
+			K borrowedKey = sibling.keys[0];
 			Node pointer = sibling.childPointers[0];
 
 			// Copy root key and pointer into parent
@@ -229,7 +232,7 @@ public class bplustree implements BtreeInterface {
 	 * @param amount: the amount by which the pointers are to be shifted
 	 */
 	private void shiftDown(Node[] pointers, int amount) {
-		Node[] newPointers = new Node[this.m + 1];
+		Node[] newPointers = new bplustree.Node[this.m + 1];
 		for (int i = amount; i < pointers.length; i++) {
 			newPointers[i - amount] = pointers[i];
 		}
@@ -265,7 +268,7 @@ public class bplustree implements BtreeInterface {
 	private Node[] splitChildPointers(InternalNode in, int split) {
 
 		Node[] pointers = in.childPointers;
-		Node[] halfPointers = new Node[this.m + 1];
+		Node[] halfPointers = new bplustree.Node[this.m + 1];
 
 		// Copy half of the values into halfPointers while updating original keys
 		for (int i = split + 1; i < pointers.length; i++) {
@@ -293,7 +296,7 @@ public class bplustree implements BtreeInterface {
 
 		/* Initialize two dictionaries that each hold half of the original
 		   dictionary values */
-		DictionaryPair[] halfDict = new DictionaryPair[this.m];
+		DictionaryPair[] halfDict = new bplustree.DictionaryPair[this.m];
 
 		// Copy half of the values into halfDict
 		for (int i = split; i < dictionary.length; i++) {
@@ -318,8 +321,8 @@ public class bplustree implements BtreeInterface {
 
 		// Split keys and pointers in half
 		int midpoint = getMidpoint();
-		Key newParentKey = in.keys[midpoint];
-		Key[] halfKeys = splitKeys(in.keys, midpoint);
+		K newParentKey = in.keys[midpoint];
+		K[] halfKeys = splitKeys(in.keys, midpoint);
 		Node[] halfPointers = splitChildPointers(in, midpoint);
 
 		// Change degree of original InternalNode in
@@ -342,7 +345,7 @@ public class bplustree implements BtreeInterface {
 		if (parent == null) {
 
 			// Create new root node and add midpoint key and pointers
-			Key[] keys = new Key[this.m];
+			K[] keys = createKeyArray();
 			keys[0] = newParentKey;
 			InternalNode newRoot = new InternalNode(this.m, keys);
 			newRoot.appendChildPointer(in);
@@ -374,9 +377,9 @@ public class bplustree implements BtreeInterface {
 	 * @param split: the index where the split is to occur
 	 * @return Integer[] of removed keys
 	 */
-	private Key[] splitKeys(Key[] keys, int split) {
+	private K[] splitKeys(K[] keys, int split) {
 
-		Key[] halfKeys = new Key[this.m];
+		K[] halfKeys = createKeyArray();
 
 		// Remove split-indexed value from keys
 		keys[split] = null;
@@ -390,15 +393,8 @@ public class bplustree implements BtreeInterface {
 		return halfKeys;
 	}
 
-	/**
-	 * Given a Key and Value, a new DictionaryPair is instantiated
-	 * @param key: A Key class instance to pass to DictionaryPair
-	 * @param value: A string to add to DictionaryPair
-	 * @return new DictionaryPair instance 
-	 */
-	public DictionaryPair createDictionaryPair(Comparable o, ArrayList<String> values) {
-		Key key = new Key(o);
-		return new DictionaryPair(key, values);
+	private K[] createKeyArray() {
+		return (K[]) Array.newInstance(clazz, this.m);
 	}
 
 	/*~~~~~~~~~~~~~~~~ API: DELETE, INSERT, SEARCH, UPDATE ~~~~~~~~~~~~~~~~*/
@@ -408,7 +404,9 @@ public class bplustree implements BtreeInterface {
 	 * It deletes the values within the dictionaryPair's value array 
 	 * @param dp: dictionaryPair to delete with.
 	 */
-	public ArrayList<String> delete(bplustree.DictionaryPair dp) {
+	public ArrayList<String> delete(K key, ArrayList<String> pageNames) {
+
+		DictionaryPair dp = new DictionaryPair(key, pageNames);
 
 		if (isEmpty()) {
 
@@ -418,7 +416,7 @@ public class bplustree implements BtreeInterface {
 		}
 		// Get leaf node and attempt to find index of key to delete
 		LeafNode ln = (this.root == null) ? this.firstLeaf : findLeafNode(dp.key);
-		int dpIndex = binarySearch(ln.dictionary, ln.numPairs, dp);
+		int dpIndex = binarySearch(ln.dictionary, ln.numPairs, key);
 
 
 		if (dpIndex < 0) {
@@ -436,21 +434,17 @@ public class bplustree implements BtreeInterface {
 		//PageNames to be returned by method
 		ArrayList<String> pagesHadKey = new ArrayList<>();
 		//delete relevant pages from dictionaryPair
-		for (String o : targetDP.value) {
-			int filterValue = dp.value.indexOf(o);
-			if(filterValue == -1) {
-				System.err.println("Key: " + dp.key + " does not exist in page: " + o);
-				dp.value.remove(filterValue);
-				break;
-			}
+		for (String o : dp.value) {
+			int filterValue = targetDP.value.indexOf(o);
+			if(filterValue > -1) {
+				targetDP.value.remove(filterValue);
+				pagesHadKey.add(o);
+			} else {
+				System.out.println("Key: " + key + " does not contain " + o);
+		}
+		}
 
-			dp.value.remove(filterValue);
-			targetDP.value.remove(filterValue);
-			pagesHadKey.add(o);
-			
-			}		
-
-			if (!targetDP.value.isEmpty()) return pagesHadKey;
+		if (!targetDP.value.isEmpty()) return pagesHadKey;
 
 		}
 
@@ -571,7 +565,10 @@ public class bplustree implements BtreeInterface {
 	 * @param key: an integer key to be used in the dictionary pair
 	 * @param value: a floating point number to be used in the dictionary pair
 	 */
-	public void insert(DictionaryPair dp){
+	public void insert(K key, ArrayList<String> pageNames){
+
+		DictionaryPair dp = new DictionaryPair(key, pageNames);
+
 		if (isEmpty()) {
 
 			/* Flow of execution goes here only when first insert takes place */
@@ -588,7 +585,7 @@ public class bplustree implements BtreeInterface {
 			LeafNode ln = (this.root == null) ? this.firstLeaf :
 												findLeafNode(dp.key);
 
-			int indexOfEqualKey = binarySearch(ln.dictionary, ln.numPairs, dp);
+			int indexOfEqualKey = binarySearch(ln.dictionary, ln.numPairs, key);
 			if(indexOfEqualKey >= 0) {
 
 				ln.dictionary[indexOfEqualKey].value.addAll(dp.value);
@@ -610,7 +607,7 @@ public class bplustree implements BtreeInterface {
 					/* Flow of execution goes here when there is 1 node in tree */
 
 					// Create internal node to serve as parent, use dictionary midpoint key
-					Key[] parent_keys = new Key[this.m];
+					K[] parent_keys = createKeyArray();
 					parent_keys[0] = halfDict[0].key;
 					InternalNode parent = new InternalNode(this.m, parent_keys);
 					ln.parent = parent;
@@ -621,7 +618,7 @@ public class bplustree implements BtreeInterface {
 					/* Flow of execution goes here when parent exists */
 
 					// Add new key to parent for proper indexing
-					Key newParentKey = halfDict[0].key;
+					K newParentKey = halfDict[0].key;
 					ln.parent.keys[ln.parent.degree - 1] = newParentKey;
 					Arrays.sort(ln.parent.keys, 0, ln.parent.degree);
 				}
@@ -670,8 +667,8 @@ public class bplustree implements BtreeInterface {
 	 * @param key: the key to be searched within the B+ tree
 	 * @return the floating point value associated with the key within the B+ tree
 	 */
-	public ArrayList<String> search(Comparable o) {
-		Key key = new Key(o);
+	public ArrayList<String> search(K key) {
+
 		//Empty ArrayList if search doesn't find anything
 		ArrayList<String> returnEmpty = new ArrayList<>();
 		// If B+ tree is completely empty, simply return null
@@ -685,7 +682,7 @@ public class bplustree implements BtreeInterface {
 
 		// Perform binary search to find index of key within dictionary
 		DictionaryPair[] dps = ln.dictionary;
-		int index = binarySearch(dps, ln.numPairs, createDictionaryPair(key, null));
+		int index = binarySearch(dps, ln.numPairs, key);
 
 		// If index negative, the key doesn't exist in B+ tree
 		if (index < 0) {
@@ -705,9 +702,8 @@ public class bplustree implements BtreeInterface {
 	 * @return an ArrayList<Double> that holds all values of dictionary pairs
 	 * whose keys are within the specified range
 	 */
-	public ArrayList<String> search(Comparable o1, Comparable o2) {
-		Key lowerBound = new Key(o1);
-		Key upperBound = new Key(o2);
+	public ArrayList<String> search(K lowerBound, K upperBound) {
+
 		// Instantiate Double array to hold values
 		ArrayList<String> values = new ArrayList<String>();
 
@@ -728,12 +724,10 @@ public class bplustree implements BtreeInterface {
 					values.addAll(dp.value);
 				}
 			}
-
 			/* Update the current node to be the right sibling,
 				leaf traversal is from left to right */
 			currNode = currNode.rightSibling;
-
-		}
+			}	
 
 		return values;
 	}
@@ -742,21 +736,19 @@ public class bplustree implements BtreeInterface {
 	 * This method takes a DictionaryPair and map the values to another key
 	 * @param oldDP: The dictionaryPair of key and specific pages that are to be changed
 	 */
-	public void update(bplustree.DictionaryPair oldDP, Comparable o1) {
-		
-		Key newKey = new Key(o1);
+	public void update(K oldKey, ArrayList<String> pageNamesToMove, K newKey) {
+				
+		ArrayList<String> values = this.delete(oldKey, pageNamesToMove);
 
-		ArrayList<String> values = this.delete(oldDP);
-
-		this.insert(createDictionaryPair(newKey, values));
+		this.insert(newKey, values);
 	}
 
 	/**
 	 * Constructor
 	 * @param m: the order (fanout) of the B+ tree
 	 */
-	public bplustree(String keyType, int m) {
-		this.keyType = keyType;
+	public bplustree(Class<K> clazz, int m) {
+		this.clazz = clazz;
 		this.m = m;
 		this.root = null;
 	}
@@ -780,7 +772,7 @@ public class bplustree implements BtreeInterface {
 		int degree;
 		InternalNode leftSibling;
 		InternalNode rightSibling;
-		Key[] keys;
+		K[] keys;
 		Node[] childPointers;
 
 		/**
@@ -916,12 +908,12 @@ public class bplustree implements BtreeInterface {
 		 * @param m: the max degree of the InternalNode
 		 * @param keys: the list of keys that InternalNode is initialized with
 		 */
-		private InternalNode(int m, Key[] keys) {
+		private InternalNode(int m, K[] keys) {
 			this.maxDegree = m;
 			this.minDegree = (int)Math.ceil(m/2.0);
 			this.degree = 0;
 			this.keys = keys;
-			this.childPointers = new Node[this.maxDegree+1];
+			this.childPointers = new bplustree.Node[this.maxDegree+1];
 		}
 
 		/**
@@ -930,7 +922,7 @@ public class bplustree implements BtreeInterface {
 		 * @param keys: the list of keys that InternalNode is initialized with
 		 * @param pointers: the list of pointers that InternalNode is initialized with
 		 */
-		private InternalNode(int m, Key[] keys, Node[] pointers) {
+		private InternalNode(int m, K[] keys, Node[] pointers) {
 			this.maxDegree = m;
 			this.minDegree = (int)Math.ceil(m/2.0);
 			this.degree = linearNullSearch(pointers);
@@ -1042,7 +1034,7 @@ public class bplustree implements BtreeInterface {
 		public LeafNode(int m, DictionaryPair dp) {
 			this.maxNumPairs = m - 1;
 			this.minNumPairs = (int)(Math.ceil(m/2) - 1);
-			this.dictionary = new DictionaryPair[m];
+			this.dictionary = new bplustree.DictionaryPair[m];
 			this.numPairs = 0;
 			this.insert(dp);
 		}
@@ -1070,7 +1062,7 @@ public class bplustree implements BtreeInterface {
 	 * so that the DictionaryPair objects can be sorted later on.
 	 */
 	public class DictionaryPair implements Comparable<DictionaryPair> {
-		Key key;
+		private K key;
 		ArrayList<String> value;
 	
 		/**
@@ -1078,9 +1070,13 @@ public class bplustree implements BtreeInterface {
 		 * @param key: the key of the key-value pair
 		 * @param value: the value of the key-value pair
 		 */
-		public DictionaryPair(Key key, ArrayList<String> value) {
+		public DictionaryPair(K key, ArrayList<String> value) {
 			this.key = key;
 			this.value = value;
+		}
+
+		public K getKey() {
+			return key;
 		}
 	
 		/**
@@ -1091,48 +1087,10 @@ public class bplustree implements BtreeInterface {
 		 */
 		@Override
 		public int compareTo(DictionaryPair o) {
-			return this.key.compareTo(o.key);
+			return this.key.compareTo(o.getKey());
 		}
-	}
-
-	public class Key implements Comparable<Key> {
-		private final Comparable key;
-	
-		public Key(Comparable key) {
-			this.key = key;
-		}
-	
-		public Comparable getKey(){
-			return key;
-		}
-	
-		@Override
-		public int compareTo(Key k) {
-			Comparable keyValue1 = this.getKey();
-			Comparable keyValue2 = k.getKey();
-			switch(keyType) {
-				case "java.lang.String": 
-					String stringKey1 = (String) keyValue1;
-					String stringKey2 = (String) keyValue2;
-					return stringKey1.compareTo(stringKey2);
-				case "java.lang.Double":
-					Double doubleKey1 = (Double) keyValue1;
-					Double doubleKey2 = (Double) keyValue2;
-					return doubleKey1.compareTo(doubleKey2);
-				case "java.lang.Integer":
-					Integer integerKey1 = (Integer) keyValue1;
-					Integer integerKey2 = (Integer) keyValue2;
-					return integerKey1.compareTo(integerKey2);
-				default: 
-					System.err.println("keyType not matching known types\n" +
-						"Assuming that the two objects are equal");
-						return 0;
-			}
-		}
-	}
 
 	public static void main(String[] args) {
-
-		
+		}
 	}
 }
