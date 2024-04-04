@@ -71,10 +71,21 @@ public class DBApp {
 							String   strColName,
 							String   strIndexName) throws DBAppException{
 		
-		throw new DBAppException("not implemented yet");
+		/*
+		 * Validates method arguments
+		 */
+		//if strTableName and strColName don't exist in a row of csv, return
+		if(CSV.getTableColumnRow(strTableName, strIndexName).length == 0) {
+			System.err.println("Row to create index on doesn't exist!");
+			return;
+		}
+			
+		//if there already exists a previous index over the specified column
+		if(!CSV.getcell(strTableName, strColName, CSV.INDEX_NAME_INDEX).isBlank()) {
+			System.err.println("There already exists an index over this column");
+			return;
+		}
 
-		//validation
-		
 		//Insert all tuples previosly created
 		//Serialize index using strIndexName
 
