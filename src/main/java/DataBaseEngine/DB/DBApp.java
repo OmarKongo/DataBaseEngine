@@ -107,15 +107,12 @@ public class DBApp {
 		Table T = Deserialize.Table(strTableName);
 		Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
 		try {
-			String pageName = T.insertIntoTable(record);
+			T = T.insertIntoTable(record);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Serialize.Table(T);
-
-		//Conditions to add into index using pageName variable
-		//check all columns and matching indice existance
 	
 	}
 
