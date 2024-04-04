@@ -25,7 +25,13 @@ public class CSV {
     public static final int COLUMN_TYPE_INDEX = 2;
     public static final int CLUSTERING_KEY_INDEX = 3;
     public static final int INDEX_NAME_INDEX = 4;
-    public static final int INDEX_TYPE = 5;
+    public static final int INDEX_TYPE_INDEX = 5;
+    /*
+     * column types allowed in DB app
+     */
+    public static final String STRING_TYPE = "java.lang.String";
+	public static final String DOUBLE_TYPE = "java.lang.Double";
+	public static final String INTEGER_TYPE = "java.lang.Integer";
 
 
     

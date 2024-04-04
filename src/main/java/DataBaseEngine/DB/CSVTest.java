@@ -1,6 +1,5 @@
+package DataBaseEngine.DB;
 import java.util.Arrays;
-
-import DataBaseEngine.DB.CSV;
 
 public class CSVTest {
     public static void main(String[] args) {
