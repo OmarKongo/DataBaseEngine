@@ -132,10 +132,12 @@ public class DBApp {
 		throw new DBAppException("not implemented yet");
 	}
 
-
+	//starr operator are: AND OR, or XOR
 	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, 
 									String[]  strarrOperators) throws DBAppException{
-										
+		//need to check if table is in MetaData File
+		
+
 		return null;
 	}
 
@@ -199,7 +201,7 @@ public class DBApp {
 
 			String[]strarrOperators = new String[1];
 			strarrOperators[0] = "OR";
-			// select * from Student where name = "John Noor" or gpa = 1.5;
+			// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 			Iterator<Object> resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);
 		}
 		catch(Exception exp){
