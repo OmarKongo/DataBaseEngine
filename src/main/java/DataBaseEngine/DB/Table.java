@@ -145,7 +145,8 @@ public class Table implements Serializable{
 		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
                 .withSkipLines(1) 
                 .build();
-		String[] nextRecord;boolean flag = false;
+		String[] nextRecord;
+		boolean flag = false;
 		Enumeration<Object> values = data.elements();
         Enumeration<String> keys = data.keys();
         Hashtable<String,String> collector = new Hashtable<String,String>();
