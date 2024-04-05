@@ -1,4 +1,4 @@
-package btree;
+package DataBaseEngine.DB;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -6,7 +6,6 @@ public class bplustreeTest {
     public static void main(String[] args) {
 
         bplustree<String> bpt = new bplustree<>(String.class, 10);
-
 
         for(int i = 0; i < 100; i++) {
             String key = "key" + (i % 10);
@@ -20,7 +19,6 @@ public class bplustreeTest {
         ArrayList<String> pages = bpt.search("key3");
 
         System.out.println(pages + "size: " + pages.size());
-
 
         ArrayList<String> deletedPages = new ArrayList<>();
         deletedPages.add("page23");

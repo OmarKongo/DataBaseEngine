@@ -1,5 +1,6 @@
 package DataBaseEngine.DB;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.ObjectOutputStream;
 public class Serialize {
 	static String pagesPath = "Pages";
 	static String tablesPath = "Tables";
+	static String indexPath = "Indices";
 	
 	
 	public static void  Page(Page p) {

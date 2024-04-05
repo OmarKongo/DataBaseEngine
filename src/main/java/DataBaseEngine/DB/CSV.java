@@ -1,13 +1,21 @@
 package DataBaseEngine.DB;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Serial;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.CSVWriter;
 
 
 public class CSV {
@@ -15,7 +23,7 @@ public class CSV {
     private CSV() {
     }
 
-    public static final String FILE_PATH = "metadata.csv";
+    public static final String FILE_PATH = "C:\\Users\\paula\\Documents\\Workspace\\Java\\CSV\\metadata.csv";
     /*
      * column headers + indices of csv file to enhance readability and to introduce flexibility
      */
@@ -52,10 +60,14 @@ public class CSV {
 
     public static ArrayList<String[]> getCSV() {
         ArrayList<String[]> csvRows = new ArrayList<>();
-        CSVReader csvReader = createReader();
+        
+        try(CSVReader csvReader = createReader()) {
         Iterator<String[]> iter = csvReader.iterator();
         while(iter.hasNext()) {
             csvRows.add(iter.next());
+        }
+        } catch(IOException e) {
+            e.printStackTrace();
         }
         return csvRows;
     }
@@ -89,5 +101,76 @@ public class CSV {
     public static String getcell(String tableName, String column, int rowIndex){
         String[] csvRow = getTableColumnRow(tableName, column);
         return csvRow[rowIndex];
+    }
+
+    private static boolean checkIndexFileExists(String indexName) {
+        File file = new File(Serialize.indexPath + File.separator + indexName + ".ser");
+        return file.exists();
+    }
+
+    public static boolean writeIndex
+        (String tableName, String columnName, String indexName) {
+
+        if(checkIndexFileExists(indexName)) {
+            System.err.println("An index file with this name already exists, please pick to a unique name.\n" +
+                "A common convention is '<tableName><columnName>Index' in camelCase.");
+            return false;
+        }
+
+        //Create a new csv file to move data to
+        File tempCSV = new File("C:\\Users\\paula\\Documents\\Workspace\\Java\\CSV\\tempmetadata.csv");
+
+        //used when checking for valid conditions
+        boolean rowExists = false;
+        boolean cellEmpty = false;
+
+        try(            
+            CSVWriter writer = new CSVWriter(new FileWriter(tempCSV));
+            //created new csvReader that goes through all of rows as opposed to createReader() method
+            CSVReader reader = new CSVReaderBuilder(new FileReader(FILE_PATH)).build();
+        ) {
+
+            tempCSV.createNewFile();
+
+            Iterator<String[]> iter = reader.iterator();
+
+            while(iter.hasNext()){
+                String[] row = iter.next();
+
+                if(row[TABLE_NAME_INDEX].equals(tableName) && 
+                    row[COLUMN_NAME_INDEX].equals(columnName)){
+                        rowExists = true;
+                        if(!row[INDEX_NAME_INDEX].isBlank()) break;
+                        cellEmpty = true;
+                        row[INDEX_NAME_INDEX] = indexName;
+                        row[INDEX_TYPE_INDEX] = "B+Tree";
+                    }
+                writer.writeNext(row);
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        if(rowExists && cellEmpty) {
+            File oldCSV = new File(FILE_PATH);
+
+            boolean deleteOP = oldCSV.delete();
+            System.out.println("Deletion is: " + deleteOP);
+
+            boolean renamingOP = tempCSV.renameTo(oldCSV);
+            System.out.println("Renaming operation is: " + renamingOP);
+
+            System.out.println("Added the value: " + cellEmpty + " to its location successfully");
+            return true;
+        }
+        //failed to write to cell
+        tempCSV.delete();
+
+        if(!rowExists) {
+            System.out.println("Row isn't found based on given arguments!");
+        } else {
+            System.out.println("Cell isn't empty and can't be overriden!");
+        }
+        return false;
     }
 }
