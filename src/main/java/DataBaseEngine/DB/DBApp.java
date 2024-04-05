@@ -191,11 +191,12 @@ public class DBApp {
 
 			SQLTerm[] arrSQLTerms;
 			arrSQLTerms = new SQLTerm[2];
+			arrSQLTerms[0]= new SQLTerm();
 			arrSQLTerms[0]._strTableName =  "Student";
 			arrSQLTerms[0]._strColumnName=  "name";
 			arrSQLTerms[0]._strOperator  =  "=";
 			arrSQLTerms[0]._objValue     =  "John Noor";
-
+			arrSQLTerms[1]= new SQLTerm();
 			arrSQLTerms[1]._strTableName =  "Student";
 			arrSQLTerms[1]._strColumnName=  "gpa";
 			arrSQLTerms[1]._strOperator  =  "=";
