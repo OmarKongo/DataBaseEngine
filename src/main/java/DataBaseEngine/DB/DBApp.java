@@ -122,25 +122,10 @@ public class DBApp {
 		throw new DBAppException("not implemented yet");
 	}
 
-	//starr operator are: AND OR, or XOR
+
 	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, 
 									String[]  strarrOperators) throws DBAppException{
 										
-		//need to check if SQLTerm tables are in MetaData File with correct data types
-		Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
-		try{	
-			for(SQLTerm sqlTerm : arrSQLTerms){
-
-				htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
-				Table.checkData(sqlTerm._strTableName, htblColNameValue, csvPath);
-				htblColNameValue.clear( );
-	
-			}
-		}	
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		return null;
 	}
 
@@ -205,9 +190,7 @@ public class DBApp {
 
 			String[]strarrOperators = new String[1];
 			strarrOperators[0] = "OR";
-			// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
-			//will they all be from the same table? [ie all sql terms will have the same table]
-			//I think  yes because no joins
+			// select * from Student where name = "John Noor" or gpa = 1.5;
 			Iterator<Object> resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);
 		}
 		catch(Exception exp){
