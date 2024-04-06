@@ -7,7 +7,7 @@ import java.util.Properties;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -67,11 +67,30 @@ public class DBApp {
 	}
 
 	// following method creates a B+tree index 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void createIndex(String   strTableName,
 							String   strColName,
-							String   strIndexName) throws DBAppException{
+							String   strIndexName) throws DBAppException, IOException{
+		Table t = Deserialize.Table(strTableName);
+		String type =  t.addIndex(strTableName, strColName, strIndexName, csvPath);
+		bplustree btree = Table.btreeType(type);
+		ArrayList<String> pageName = new ArrayList<String>();
+		Serialize.Index(btree, strIndexName);
+		for(int i = 0;i<t.getPages().size();i++) {
+			 
+			Page p = Deserialize.Page(t.getPages().get(i).getName());
+			pageName.add(p.getName());
+			for(int j = 0 ;j<p.getTuplesInPage().size();j++) {
+				btree = Deserialize.Index(strIndexName);
+				Tuple T = p.getTuplesInPage().get(j);
+				btree.insert((Comparable) T.getAttributesInTuple().get(strColName) ,pageName);
+				Serialize.Index(btree, strIndexName);
+			}
+			
+			pageName.clear();
+		}
+	      
 		
-		throw new DBAppException("not implemented yet");
 	}
 
 
@@ -79,10 +98,10 @@ public class DBApp {
 	// htblColNameValue must include a value for the primary key
 	public void insertIntoTable(String strTableName, 
 								Hashtable<String,Object>  htblColNameValue) throws DBAppException{
-;
-		
+
+		Hashtable<String,String> indexes = null;
 		try {
-			Table.checkData(strTableName, htblColNameValue, csvPath);
+			 indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
 		} catch (Exception e) {
 			
 			e.printStackTrace();
@@ -90,7 +109,7 @@ public class DBApp {
 		Table T = Deserialize.Table(strTableName);
 		Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
 		try {
-			T = T.insertIntoTable(record);
+			T = T.insertIntoTable(record,indexes);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -118,17 +137,68 @@ public class DBApp {
 	// htblColNameValue enteries are ANDED together
 	public void deleteFromTable(String strTableName, 
 								Hashtable<String,Object> htblColNameValue) throws DBAppException{
-	
-		throw new DBAppException("not implemented yet");
+								
+		Hashtable<String,String> indexes = null;
+		try {
+			 indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		Table T = Deserialize.Table(strTableName);Page p = null;
+		if (htblColNameValue.size()==1) {
+			if (isPK(T,htblColNameValue)) {
+				String indexName = indexes.get(T.getStrClusteringKeyColumn());
+				Object key = htblColNameValue.get(T.getStrClusteringKeyColumn());
+				try {
+					p = searchPK(T,key,hasIndex(indexes,T.getStrClusteringKeyColumn()),indexName);
+				    //int index = 
+					//p.getTuplesInPage().remove(0);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			
+			}
+			}
 	}
 
+	public static boolean isPK(Table t, Hashtable<String,Object> h ) {
+		if(h.containsKey(t.getStrClusteringKeyColumn()))
+			return true;
+		return false;
+	}
+	
+	public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
+		if (indexes.containsKey(strFromHshTblCol))
+			return true;
+		return false ;
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Page searchPK(Table t,Object key, boolean hasIndex,String indexName) throws Exception {
+		Page p = null;
+		if (hasIndex) {
+			bplustree bTree= Deserialize.Index(indexName);
+			ArrayList<String> page = bTree.search((Comparable)key);
+			bTree.delete((Comparable)key, page);
+			p = Deserialize.Page(page.get(0));
+		}
+		else {
+			
+			int index = t.binarySearch(key);
+			 p = Deserialize.Page(t.getPages().get(index).getName());
+		}
+		return p ;
+	}
+	
+	
 
 	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, 
 									String[]  strarrOperators) throws DBAppException{
 										
 		return null;
 	}
-
 
 	@SuppressWarnings({ "removal" })
 	public static void main( String[] args ){

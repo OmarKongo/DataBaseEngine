@@ -9,6 +9,40 @@ import java.io.ObjectOutputStream;
 public class Serialize {
 	static String pagesPath = "Pages";
 	static String tablesPath = "Tables";
+	static String indexesPath = "Indexes";
+	
+	
+	
+	public static void  Index(bplustree btree,String indexName) {
+		//System.out.println(p.getName());
+		String path = indexesPath+"/"+indexName+".ser";
+		
+		try
+	        {   
+	            //Saving of object in a file
+			 
+	            FileOutputStream file = new FileOutputStream(path);
+	            ObjectOutputStream out = new ObjectOutputStream(file);
+	             
+	            // Method for serialization of object
+	            out.writeObject(btree);
+	             
+	            out.close();
+	            file.close();
+	             
+	          //  System.out.println("Object has been serialized ff");
+	 
+	        }
+	         
+	        catch(IOException ex)
+	        {
+	            System.out.println("IOException is caught qq");
+	        }
+		//return path;
+	}
+	
+	
+	
 	
 	
 	public static void  Page(Page p) {
@@ -75,6 +109,7 @@ public class Serialize {
 class Deserialize{
 	static String pagesPath = "Pages";
 	static String tablesPath = "Tables";
+	static String indexesPath = "Indexes";
 	
 	/**
      * @author Brolosy
@@ -143,6 +178,37 @@ class Deserialize{
             System.out.println("ClassNotFoundException is caught");
         }
 		return p;
+	}
+	@SuppressWarnings({ "rawtypes" })
+	public static bplustree Index(String indexName) {
+		bplustree btree = null;
+		String path = indexesPath+"/"+indexName+".ser";
+		try
+        {   
+            // Reading the object from a file
+            FileInputStream file = new FileInputStream(path);
+            ObjectInputStream in = new ObjectInputStream(file);
+             
+            // Method for deserialization of object
+             btree = (bplustree)in.readObject();
+             
+            in.close();
+            file.close();
+             
+            //System.out.println("Object has been deserialized ");
+       
+        }
+         
+        catch(IOException ex)
+        {
+            System.out.println("IOException is caught zz");
+        }
+         
+        catch(ClassNotFoundException ex)
+        {
+            System.out.println("ClassNotFoundException is caught");
+        }
+		return btree;
 	}
 	
 	

@@ -36,7 +36,7 @@ public class Page  implements Serializable,Comparable<Object>{
 
 	
 	public void display() {
-	System.out.print("Page [pageProp=" + pageProp + "]");
+	System.out.print("                      Page [pageProp=" + pageProp + "]");
 	}
 	public String toString(){
         String res = "";

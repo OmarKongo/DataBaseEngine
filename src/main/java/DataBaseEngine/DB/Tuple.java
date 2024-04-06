@@ -80,7 +80,7 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 	public int getIndex(Vector<Tuple> v) {
 		int index = Collections.binarySearch(v,this);
 		index = -1 * (index+1);
-		System.out.println("index : "+index +" key : "+this.getPK());
+		//System.out.println("index : "+index +" key : "+this.getPK());
 		return index;
 		
 	}

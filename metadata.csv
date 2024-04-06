@@ -1,7 +1,7 @@
 "Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
-"Student","gpa","java.lang.Double","False",,
-"Student","name","java.lang.String","False",,
-"Student","id","java.lang.Integer","True",,
-"TA","name","java.lang.String","False",,
-"TA","Office","java.lang.String","False",,
-"TA","id","java.lang.Integer","True",,
+"Student","gpa","java.lang.Double","False","gpaIndex","B+ tree"
+"Student","name","java.lang.String","False","nameIndex","B+ tree"
+"Student","id","java.lang.Integer","True","",""
+"TA","name","java.lang.String","False","nameTAIndex","B+ tree"
+"TA","Attendance","java.lang.Double","False","attIndex","B+ tree"
+"TA","id","java.lang.Integer","True","",""
