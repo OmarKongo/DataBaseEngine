@@ -185,7 +185,7 @@ public class Table implements Serializable {
 
 			if (nextRecord[0].equals(tableName)) {
 				flag = true;
-				if(!(nextRecord[4].equals(""))){
+				if (!(nextRecord[4].equals(""))) {
 					res = true;
 				}
 				break;
@@ -383,9 +383,23 @@ public class Table implements Serializable {
 
 	}
 
-	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'selectFromTable'");
+	public Iterator<Object> selectFromTableNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		/*
+		 * First case: Only one SQL term and no strarrOperators
+		 * Implementing on: 		
+		 * arrSQLTerms[0]._strTableName = "Student";
+		 * arrSQLTerms[0]._strColumnName = "name";
+		 * arrSQLTerms[0]._strOperator = "=";
+		 * arrSQLTerms[0]._objValue = "John Noor";
+		 */
+		if(strarrOperators.length == 0){
+
+		}
+		return null;
+	}
+
+	public Iterator<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		return null;
 	}
 
 }

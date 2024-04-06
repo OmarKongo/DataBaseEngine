@@ -135,7 +135,19 @@ public class DBApp {
 
 		String tableName = arrSQLTerms[0]._strTableName;
 		Table t = Deserialize.Table(tableName);
-		Iterator<Object> result = t.selectFromTable(arrSQLTerms, strarrOperators);
+		ArrayList<Object> resList = new ArrayList<>();
+		Iterator<Object> result = resList.iterator();
+		try {
+			boolean withIndex = Table.checkIndex(tableName, csvPath);
+			if (!(withIndex)) {
+				result = t.selectFromTableNoIndex(arrSQLTerms, strarrOperators);
+			} else {
+				result = t.selectFromTableWithIndex(arrSQLTerms, strarrOperators);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		Serialize.Table(t);
 		return result;
 	}
