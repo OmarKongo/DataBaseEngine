@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -127,7 +128,9 @@ public class DBApp {
 			String[] strarrOperators) throws DBAppException {
 
 		try {
+			// if no exception is thrown, continue
 			checkValidSQLTerm(arrSQLTerms, strarrOperators);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -144,22 +147,29 @@ public class DBApp {
 			/*
 			 * Checking if valid table and valid columns
 			 * Making sure that no joins are allowed
+			 * Making sure the operators inside the SQLTerm are supported
 			 * By this order
 			 */
 			Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
-			ArrayList<String> temp = new ArrayList<>();
+			ArrayList<String> checkNoJoin = new ArrayList<>();
+			ArrayList<String> checkForStrOperators = new ArrayList<>(Arrays.asList(">", ">=", "<", "<=", "!=", "="));
 			for (SQLTerm sqlTerm : arrSQLTerms) {
 				// should I say that if table names differ throw exception "joins not
 				// supported?"
 				htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
 				Table.checkData(sqlTerm._strTableName, htblColNameValue, csvPath);
 				htblColNameValue.clear();
+
 				if (arrSQLTerms[0].equals(sqlTerm)) {
-					temp.add(sqlTerm._strTableName);
+					checkNoJoin.add(sqlTerm._strTableName);
 				} else {
-					if (!(sqlTerm._strTableName.equals(temp.get(0)))) {
+					if (!(sqlTerm._strTableName.equals(checkNoJoin.get(0)))) {
 						throw new DBAppException("Joins are not supported on this engine.");
 					}
+				}
+				if (!(checkForStrOperators.contains(sqlTerm._strOperator))) {
+					throw new DBAppException(
+							"Please enter a valid string operator.\nSupported operators are >, >=, <, <=, != or =");
 				}
 			}
 			/*
