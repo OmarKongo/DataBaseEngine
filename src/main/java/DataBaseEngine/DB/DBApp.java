@@ -56,9 +56,9 @@ public class DBApp {
 			String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
 
-		Table T = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
-		T.addTable(strTableName, strClusteringKeyColumn, csvPath);
-		Serialize.Table(T);
+		Table t = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
+		t.addTable(strTableName, strClusteringKeyColumn, csvPath);
+		Serialize.Table(t);
 
 	}
 
@@ -91,15 +91,14 @@ public class DBApp {
 
 			e.printStackTrace();
 		}
-		Table T = Deserialize.Table(strTableName);
-		Tuple record = new Tuple(T.getStrClusteringKeyColumn(), htblColNameValue.keys(), htblColNameValue.elements());
+		Table t = Deserialize.Table(strTableName);
+		Tuple record = new Tuple(t.getStrClusteringKeyColumn(), htblColNameValue.keys(), htblColNameValue.elements());
 		try {
-			T = T.insertIntoTable(record);
+			t = t.insertIntoTable(record);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Serialize.Table(T);
+		Serialize.Table(t);
 
 	}
 
@@ -130,12 +129,15 @@ public class DBApp {
 		try {
 			// if no exception is thrown, continue
 			checkValidSQLTerm(arrSQLTerms, strarrOperators);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		String tableName = arrSQLTerms[0]._strTableName;
+		Table t = Deserialize.Table(tableName);
+		Iterator<Object> result = t.selectFromTable(arrSQLTerms, strarrOperators);
+		Serialize.Table(t);
+		return result;
 	}
 
 	public void checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
@@ -164,7 +166,7 @@ public class DBApp {
 					checkNoJoin.add(sqlTerm._strTableName);
 				} else {
 					if (!(sqlTerm._strTableName.equals(checkNoJoin.get(0)))) {
-						throw new DBAppException("Joins are not supported on this engine.");
+						throw new DBAppException("Multiple table queries are not supported on this engine.");
 					}
 				}
 				if (!(checkForStrOperators.contains(sqlTerm._strOperator))) {
@@ -195,7 +197,7 @@ public class DBApp {
 			Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 			htblColNameType.put("id", "java.lang.Integer");
 			htblColNameType.put("name", "java.lang.String");
-			htblColNameType.put("gpa", "java.lang.double");
+			htblColNameType.put("gpa", "java.lang.Double");
 			dbApp.createTable(strTableName, "id", htblColNameType);
 			dbApp.createIndex(strTableName, "gpa", "gpaIndex");
 
@@ -239,7 +241,7 @@ public class DBApp {
 			arrSQLTerms[1] = new SQLTerm();
 			arrSQLTerms[1]._strTableName = "Student";
 			arrSQLTerms[1]._strColumnName = "gpa";
-			arrSQLTerms[1]._strOperator = "=";
+			arrSQLTerms[1]._strOperator = "k";
 			arrSQLTerms[1]._objValue = new Double(1.5);
 
 			String[] strarrOperators = new String[1];
@@ -249,8 +251,6 @@ public class DBApp {
 			// table]
 			// I think yes because no joins
 			Iterator<Object> resultSet = dbApp.selectFromTable(arrSQLTerms, strarrOperators);
-
-			System.out.println("brolos");
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
