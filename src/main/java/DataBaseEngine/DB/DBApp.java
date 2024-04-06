@@ -3,10 +3,11 @@ package DataBaseEngine.DB;
 
 
 import java.util.Iterator;
+import java.util.Properties;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -17,12 +18,8 @@ import com.opencsv.CSVWriter;
 
 public class DBApp {
 	final static String csvPath = "metadata.csv";
-	//contains serialisation names of tables
-	ArrayList<String> tablesFileNames;
-
 
 	public DBApp( ){
-		this.tablesFileNames = new ArrayList<String>();
 		this.init();
 	}
 
@@ -40,63 +37,15 @@ public class DBApp {
 						,"Clustering Key","IndexName","IndexType"};
 			
 			writer.writeNext(header);
+			 writer.flush();
+	            writer.close();
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
 		}
 		
 	}
-
-	public ArrayList<String> getTablesFileNames() {
-		return this.tablesFileNames;
-	}
-
-	public void setTablesFileNames(ArrayList<String> tables) {
-		this.tablesFileNames = tables;
-	}
 	
-	public static void checkData(String tableName,Hashtable<String,Object> data) throws Exception {
-		CSVReader csvReader = new CSVReaderBuilder(new FileReader(csvPath)) 
-                .withSkipLines(1) 
-                .build();
-		String[] nextRecord;boolean flag = false;
-		Enumeration<Object> values = data.elements();
-        Enumeration<String> keys = data.keys();
-        Hashtable<String,String> collector = new Hashtable<String,String>();
-        // this loop iterate over the csv file untill the table is founded
-        // if it's not founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) { 
-            
-            if(nextRecord[0].equals(tableName)) {
-            	flag = true;
-            	break;
-            }
-            else
-            	continue;
-        }
-		if(!flag)
-			throw new Exception("Invalid Table");
-		// this loop insert all the original attributes of the table inside collector hashtable
-		while(nextRecord!=null && nextRecord[0].equals(tableName)) {
-			collector.put(nextRecord[1],nextRecord[2]);
-			nextRecord = csvReader.readNext();
-			
-		}
-		// this loop checks the entered data and throws exception if anything mismatches the original attributes 
-		while(keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			if(collector.containsKey(key)){
-				if(!(values.nextElement().getClass().equals(Class.forName(collector.get(key)))))
-					throw new Exception("Mismatch type");
-				
-			}
-			else
-				throw new Exception("mismatch key");
-			
-    	}
-	}
-
-
 	// following method creates one table only
 	// strClusteringKeyColumn is the name of the column that will be the primary
 	// key and the clustering column as well. The data type of that column will
@@ -110,22 +59,38 @@ public class DBApp {
 							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
 
 								
-
-								Table t = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-								//in Kongo he there was htblcolName provided to add Table is this correct?
-								t.addTable(strTableName,strClusteringKeyColumn,DBApp.csvPath);
-								//String serName = t.serialiseTable();
-								String serName = Serialize.serializeTable(t);
-								this.getTablesFileNames().add(serName);
+                 
+								Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+								T.addTable(strTableName,strClusteringKeyColumn,csvPath);
+								Serialize.Table(T);			
+							
 	}
 
-
 	// following method creates a B+tree index 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void createIndex(String   strTableName,
 							String   strColName,
-							String   strIndexName) throws DBAppException{
+							String   strIndexName) throws DBAppException, IOException{
+		Table t = Deserialize.Table(strTableName);
+		String type =  t.addIndex(strTableName, strColName, strIndexName, csvPath);
+		bplustree btree = Table.btreeType(type);
+		ArrayList<String> pageName = new ArrayList<String>();
+		Serialize.Index(btree, strIndexName);
+		for(int i = 0;i<t.getPages().size();i++) {
+			 
+			Page p = Deserialize.Page(t.getPages().get(i).getName());
+			pageName.add(p.getName());
+			for(int j = 0 ;j<p.getTuplesInPage().size();j++) {
+				btree = Deserialize.Index(strIndexName);
+				Tuple T = p.getTuplesInPage().get(j);
+				btree.insert((Comparable) T.getAttributesInTuple().get(strColName) ,pageName);
+				Serialize.Index(btree, strIndexName);
+			}
+			
+			pageName.clear();
+		}
+	      
 		
-		throw new DBAppException("not implemented yet");
 	}
 
 
@@ -133,8 +98,24 @@ public class DBApp {
 	// htblColNameValue must include a value for the primary key
 	public void insertIntoTable(String strTableName, 
 								Hashtable<String,Object>  htblColNameValue) throws DBAppException{
+
+		Hashtable<String,String> indexes = null;
+		try {
+			 indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		Table T = Deserialize.Table(strTableName);
+		Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
+		try {
+			T = T.insertIntoTable(record,indexes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Serialize.Table(T);
 	
-		throw new DBAppException("not implemented yet");
 	}
 
 
@@ -156,10 +137,62 @@ public class DBApp {
 	// htblColNameValue enteries are ANDED together
 	public void deleteFromTable(String strTableName, 
 								Hashtable<String,Object> htblColNameValue) throws DBAppException{
-	
-		throw new DBAppException("not implemented yet");
+								
+		Hashtable<String,String> indexes = null;
+		try {
+			 indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		Table T = Deserialize.Table(strTableName);Page p = null;
+		if (htblColNameValue.size()==1) {
+			if (isPK(T,htblColNameValue)) {
+				String indexName = indexes.get(T.getStrClusteringKeyColumn());
+				Object key = htblColNameValue.get(T.getStrClusteringKeyColumn());
+				try {
+					p = searchPK(T,key,hasIndex(indexes,T.getStrClusteringKeyColumn()),indexName);
+				    //int index = 
+					//p.getTuplesInPage().remove(0);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			
+			}
+			}
 	}
 
+	public static boolean isPK(Table t, Hashtable<String,Object> h ) {
+		if(h.containsKey(t.getStrClusteringKeyColumn()))
+			return true;
+		return false;
+	}
+	
+	public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
+		if (indexes.containsKey(strFromHshTblCol))
+			return true;
+		return false ;
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Page searchPK(Table t,Object key, boolean hasIndex,String indexName) throws Exception {
+		Page p = null;
+		if (hasIndex) {
+			bplustree bTree= Deserialize.Index(indexName);
+			ArrayList<String> page = bTree.search((Comparable)key);
+			bTree.delete((Comparable)key, page);
+			p = Deserialize.Page(page.get(0));
+		}
+		else {
+			
+			int index = t.binarySearch(key);
+			 p = Deserialize.Page(t.getPages().get(index).getName());
+		}
+		return p ;
+	}
+	
+	
 
 	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, 
 									String[]  strarrOperators) throws DBAppException{
@@ -167,11 +200,10 @@ public class DBApp {
 		return null;
 	}
 
-
-	@SuppressWarnings({ "removal", "deprecation" })
+	@SuppressWarnings({ "removal" })
 	public static void main( String[] args ){
 	
-	try{
+		try{
 			String strTableName = "Student";
 			DBApp	dbApp = new DBApp( );
 			
@@ -232,7 +264,7 @@ public class DBApp {
 		}
 		catch(Exception exp){
 			exp.printStackTrace( );
-		}
+		}}
 	}
-
-}
+		
+	
