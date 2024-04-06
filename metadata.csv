@@ -5,3 +5,9 @@
 "TA","name","java.lang.String","False",,
 "TA","Office","java.lang.String","False",,
 "TA","id","java.lang.Integer","True",,
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
