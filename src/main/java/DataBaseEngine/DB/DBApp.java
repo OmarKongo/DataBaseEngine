@@ -75,6 +75,18 @@ public class DBApp {
 	}
 
 
+
+
+	public static void checkDataType(Hashtable<String,String> htblColNameType) throws DBAppException{
+		for(String s : htblColNameType.values()){
+			if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.Double"))){
+				throw new DBAppException("Column DataType invalid");
+			}
+		}
+
+	}
+
+
 	// following method inserts one row only. 
 	// htblColNameValue must include a value for the primary key
 	public void insertIntoTable(String strTableName, 
@@ -125,7 +137,9 @@ public class DBApp {
 
 	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, 
 									String[]  strarrOperators) throws DBAppException{
-										
+		//need to check if table is in MetaData File
+		
+
 		return null;
 	}
 
@@ -190,7 +204,7 @@ public class DBApp {
 
 			String[]strarrOperators = new String[1];
 			strarrOperators[0] = "OR";
-			// select * from Student where name = "John Noor" or gpa = 1.5;
+			// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 			Iterator<Object> resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);
 		}
 		catch(Exception exp){
