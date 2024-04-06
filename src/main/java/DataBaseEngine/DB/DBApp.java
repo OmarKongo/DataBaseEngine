@@ -126,24 +126,53 @@ public class DBApp {
 	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms,
 			String[] strarrOperators) throws DBAppException {
 
+		try {
+			checkValidSQLTerm(arrSQLTerms, strarrOperators);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public void checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		// need to check if SQLTerm tables are in MetaData File with correct data types
 		// Do I make this Hashtable global so as to decrease spatial complexity by not
 		// creating a hashtable everytime we select?
-		Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+
 		try {
+			/*
+			 * Checking if valid table and valid columns
+			 * Making sure that no joins are allowed
+			 * By this order
+			 */
+			Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+			ArrayList<String> temp = new ArrayList<>();
 			for (SQLTerm sqlTerm : arrSQLTerms) {
 				// should I say that if table names differ throw exception "joins not
 				// supported?"
 				htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
 				Table.checkData(sqlTerm._strTableName, htblColNameValue, csvPath);
 				htblColNameValue.clear();
-
+				if (arrSQLTerms[0].equals(sqlTerm)) {
+					temp.add(sqlTerm._strTableName);
+				} else {
+					if (!(sqlTerm._strTableName.equals(temp.get(0)))) {
+						throw new DBAppException("Joins are not supported on this engine.");
+					}
+				}
+			}
+			/*
+			 * Checking if valid operators
+			 */
+			for (String operator : strarrOperators) {
+				if (operator != "AND" && operator != "OR" && operator != "XOR") {
+					throw new DBAppException("Please enter a valid operator.\nOperators supported are AND, OR or XOR");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return null;
 	}
 
 	@SuppressWarnings({ "removal" })
@@ -210,11 +239,11 @@ public class DBApp {
 			// table]
 			// I think yes because no joins
 			Iterator<Object> resultSet = dbApp.selectFromTable(arrSQLTerms, strarrOperators);
-			
+
 			System.out.println("brolos");
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
-		
+
 	}
 }
