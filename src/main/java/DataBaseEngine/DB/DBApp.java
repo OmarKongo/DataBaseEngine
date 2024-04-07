@@ -55,151 +55,154 @@ public class DBApp {
 
 
 	public void createTable(String strTableName, 
-							String strClusteringKeyColumn,  
-							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
+			String strClusteringKeyColumn,  
+			Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
 
-								
-                 
-								Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-								T.addTable(strTableName,strClusteringKeyColumn,csvPath);
-								Serialize.Table(T);			
-							
-	}
-
-	// following method creates a B+tree index 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void createIndex(String   strTableName,
-							String   strColName,
-							String   strIndexName) throws DBAppException, IOException{
-		Table t = Deserialize.Table(strTableName);
-		String type =  t.addIndex(strTableName, strColName, strIndexName, csvPath);
-		bplustree btree = Table.btreeType(type);
-		ArrayList<String> pageName = new ArrayList<String>();
-		Serialize.Index(btree, strIndexName);
-		for(int i = 0;i<t.getPages().size();i++) {
-			 
-			Page p = Deserialize.Page(t.getPages().get(i).getName());
-			pageName.add(p.getName());
-			for(int j = 0 ;j<p.getTuplesInPage().size();j++) {
-				btree = Deserialize.Index(strIndexName);
-				Tuple T = p.getTuplesInPage().get(j);
-				btree.insert((Comparable) T.getAttributesInTuple().get(strColName) ,pageName);
-				Serialize.Index(btree, strIndexName);
-			}
-			
-			pageName.clear();
-		}
-	      
-		
-	}
-
-
-	// following method inserts one row only. 
-	// htblColNameValue must include a value for the primary key
-	public void insertIntoTable(String strTableName, 
-								Hashtable<String,Object>  htblColNameValue) throws DBAppException{
-
-		Hashtable<String,String> indexes = null;
-		try {
-			 indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-		}
-		Table T = Deserialize.Table(strTableName);
-		Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
-		try {
-			T = T.insertIntoTable(record,indexes);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Serialize.Table(T);
-	
-	}
-
-
-	// following method updates one row only
-	// htblColNameValue holds the key and new value 
-	// htblColNameValue will not include clustering key as column name
-	// strClusteringKeyValue is the value to look for to find the row to update.
-	public void updateTable(String strTableName, 
-							String strClusteringKeyValue,
-							Hashtable<String,Object> htblColNameValue   )  throws DBAppException{
-	
-		throw new DBAppException("not implemented yet");
-	}
-
-
-	// following method could be used to delete one or more rows.
-	// htblColNameValue holds the key and value. This will be used in search 
-	// to identify which rows/tuples to delete. 	
-	// htblColNameValue enteries are ANDED together
-	public void deleteFromTable(String strTableName, 
-								Hashtable<String,Object> htblColNameValue) throws DBAppException{
-								
-		Hashtable<String,String> indexes = null;
-		try {
-			 indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-		}
-		Table T = Deserialize.Table(strTableName);Page p = null;
-		if (htblColNameValue.size()==1) {
-			if (isPK(T,htblColNameValue)) {
-				String indexName = indexes.get(T.getStrClusteringKeyColumn());
-				Object key = htblColNameValue.get(T.getStrClusteringKeyColumn());
-				try {
-					p = searchPK(T,key,hasIndex(indexes,T.getStrClusteringKeyColumn()),indexName);
-				    //int index = 
-					//p.getTuplesInPage().remove(0);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				
+ 
+				Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+				T.addTable(strTableName,strClusteringKeyColumn,csvPath);
+				Serialize.Table(T,strTableName);			
 			
-			}
-			}
-	}
+}
 
-	public static boolean isPK(Table t, Hashtable<String,Object> h ) {
-		if(h.containsKey(t.getStrClusteringKeyColumn()))
-			return true;
-		return false;
-	}
-	
-	public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
-		if (indexes.containsKey(strFromHshTblCol))
-			return true;
-		return false ;
-	}
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static Page searchPK(Table t,Object key, boolean hasIndex,String indexName) throws Exception {
-		Page p = null;
-		if (hasIndex) {
-			bplustree bTree= Deserialize.Index(indexName);
-			ArrayList<String> page = bTree.search((Comparable)key);
-			bTree.delete((Comparable)key, page);
-			p = Deserialize.Page(page.get(0));
-		}
-		else {
-			
-			int index = t.binarySearch(key);
-			 p = Deserialize.Page(t.getPages().get(index).getName());
-		}
-		return p ;
-	}
-	
-	
+// following method creates a B+tree index 
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public void createIndex(String   strTableName,
+			String   strColName,
+			String   strIndexName) throws DBAppException, IOException{
 
-	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, 
-									String[]  strarrOperators) throws DBAppException{
-										
-		return null;
-	}
+Table t = Deserialize.Table(strTableName);
+String type =  t.addIndex(strTableName, strColName, strIndexName, csvPath);
+bplustree btree = Table.btreeType(type);
+ArrayList<String> pageName = new ArrayList<String>();
+Serialize.Index(btree, strIndexName);
+for(int i = 0;i<t.getPages().size();i++) {
 
+Page p = Deserialize.Page(t.getPages().get(i).getName());
+pageName.add(p.getName());
+for(int j = 0 ;j<p.getTuplesInPage().size();j++) {
+btree = Deserialize.Index(strIndexName);
+Tuple T = p.getTuplesInPage().get(j);
+btree.insert((Comparable) T.getAttributesInTuple().get(strColName) ,pageName);
+Serialize.Index(btree, strIndexName);
+}
+
+pageName.clear();
+}
+
+
+}
+
+
+// following method inserts one row only. 
+// htblColNameValue must include a value for the primary key
+public void insertIntoTable(String strTableName, 
+				Hashtable<String,Object>  htblColNameValue) throws DBAppException{
+
+Hashtable<String,String> indexes = null;
+try {
+indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
+} catch (Exception e) {
+
+e.printStackTrace();
+}
+Table T = Deserialize.Table(strTableName);
+Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
+try {
+T = Table.insertIntoTable(record,indexes,strTableName);
+} catch (Exception e) {
+// TODO Auto-generated catch block
+e.printStackTrace();
+}
+Serialize.Table(T,strTableName);
+
+}
+
+
+// following method updates one row only
+// htblColNameValue holds the key and new value 
+// htblColNameValue will not include clustering key as column name
+// strClusteringKeyValue is the value to look for to find the row to update.
+public void updateTable(String strTableName, 
+			String strClusteringKeyValue,
+			Hashtable<String,Object> htblColNameValue   )  throws DBAppException{
+
+throw new DBAppException("not implemented yet");
+}
+
+
+// following method could be used to delete one or more rows.
+// htblColNameValue holds the key and value. This will be used in search 
+// to identify which rows/tuples to delete. 	
+// htblColNameValue enteries are ANDED together
+public void deleteFromTable(String strTableName, 
+				Hashtable<String,Object> htblColNameValue) throws DBAppException{
+				
+Hashtable<String,String> indexes = null;
+try {
+indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
+} catch (Exception e) {
+
+e.printStackTrace();
+}
+Table T = Deserialize.Table(strTableName);Page p = null;
+if (htblColNameValue.size()==1 & isPK(T,htblColNameValue)) {
+//Tuple.deleteTuple(indexes);
+String indexName = indexes.get(T.getStrClusteringKeyColumn());
+Object key = htblColNameValue.get(T.getStrClusteringKeyColumn());
+p = searchPK(T,key,hasIndex(indexes,T.getStrClusteringKeyColumn()),indexName);
+p = T.deleteTupleUsingPk(p, key);
+if(p.getTuplesInPage().size()==0)
+ T = T.updatepages(p);
+
+}
+
+
+
+}
+
+public static boolean isPK(Table t, Hashtable<String,Object> h ) {
+if(h.containsKey(t.getStrClusteringKeyColumn()))
+return true;
+return false;
+}
+
+public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
+if (indexes.containsKey(strFromHshTblCol))
+return true;
+return false ;
+}
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public static Page searchPK(Table t,Object key, boolean hasIndex,String indexName) throws DBAppException {
+Page p = null;
+if (hasIndex) {
+bplustree bTree= Deserialize.Index(indexName);
+ArrayList<String> page = bTree.search((Comparable)key);
+bTree.delete((Comparable)key, page);
+p = Deserialize.Page(page.get(0));
+}
+else {
+
+int index = 0;
+try {
+//index = t.binarySearch(key);
+} catch (Exception e) {
+// TODO Auto-generated catch block
+e.printStackTrace();
+}
+// p = Deserialize.Page(t.getPages().get(index).getName());
+}
+return p ;
+}
+
+
+
+public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, 
+					String[]  strarrOperators) throws DBAppException{
+						
+return null;
+}
 	@SuppressWarnings({ "removal" })
 	public static void main( String[] args ){
 	

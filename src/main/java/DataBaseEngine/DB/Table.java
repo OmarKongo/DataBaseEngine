@@ -1,5 +1,6 @@
 package DataBaseEngine.DB;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,8 +28,8 @@ import com.opencsv.CSVWriter;
 public class Table implements Serializable{
     //Is it correct that only the pageFileName are persistent?
 
-    
-	private Vector<Page> pages ;
+    private Hashtable<String,Pair> props;
+	private Vector<Page> pages;
     private String strTableName;
     private String strClusteringKeyColumn;
     //tranisent since already in metadata?
@@ -52,12 +53,16 @@ public class Table implements Serializable{
             Hashtable<String, String> htblColNameType) {
         pagesCounter = 1;
         pages = new Vector<Page>();
+        props = new Hashtable<String,Pair>();
         this.strTableName = strTableName;
         this.strClusteringKeyColumn = strClusteringKeyColumn;
         this.htblColNameType = htblColNameType;
 
     }
-    public Vector<Page> getPages() {
+    public Hashtable<String, Pair> getProps() {
+		return props;
+	}
+	public Vector<Page> getPages() {
 		return pages;
 	}
 
@@ -273,8 +278,8 @@ public class Table implements Serializable{
 		this.setPagesCounter(++counter);
 		return pageName;
     }
-     public static Object baseType(Tuple T) {
-    	 Object key = T.getPK();
+     public static Object baseType(Object key) {
+    	 
     	 if((key instanceof String)) {
     		 return "";
     	 }
@@ -324,35 +329,48 @@ public class Table implements Serializable{
     	 }
      }
      
-    public  Table insertIntoTable(Tuple T,Hashtable<String,String> indexes) throws Exception {
+    public  static Table insertIntoTable(Tuple T,Hashtable<String,String> indexes,String tableName) throws Exception {
+        
+    	Table table = Deserialize.Table(tableName);
+        //System.out.println(table.getProps());
     	Page p = null;String pageName;boolean flag = false;
            Object maxKeyInPreviousPage;// this attribute connect the pages with each other maxLastpage = minNextPage
     	//Base Case
     
-    	if(this.getPages().size()==0) {
-    		 p = new Page(this.setNameForpage());
-    		 p.getPageProp().put(p.getName(),new Pair(baseType(T)));
-    		 this.getPages().add(p);
+    	if(table.getPages().size()==0) {
+    		 p = new Page(table.setNameForpage());
+    		 p.getPageProp().put(p.getName(),new Pair(baseType(T.getPK())));
+    		// table.getProps().put(p.getName(),new Pair(baseType(T.getPK())));
+    		
     		 T.addTuple(p);
     		 p = p.updateMax();
+    		 table.getPages().add(p);
+     		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+     		Serialize.Table(table, tableName);
     		 addInBtree(T,p,indexes);
-    		 Serialize.Page(p);
+    		
+    		 pageName = p.getName();
+    		 Serialize.Page(p,pageName);
     		 
     	}
     	
     	else {  // Search for the right page to insert in
-    		
-    		int index = this.binarySearch(T.getPK());
-    		 pageName = this.getPages().get(index).getName();
+    		//table = Deserialize.Table(tableName);
+    		int index = table.binarySearch(T.getPK());
+    		 pageName = table.getPages().elementAt(index).getName();
     		 p = Deserialize.Page(pageName);
-    	
+    		 //p = table.getPages().elementAt(index);
     		if(p.tupleFounded(T))
     	        	throw new DBAppException("Duplicate Tuple");
     		p = T.addTuple(p);
     		if(!p.overFlowed()) {
     			p = p.updateMax();
+    			
+    			table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+         		Serialize.Table(table, tableName);
     			addInBtree(T,p,indexes);
-    			Serialize.Page(p);
+    			Serialize.Page(p,pageName);
+    			
     	    	//ADDED SUCCESSFULLY
     	    }
     	    else {
@@ -361,26 +379,44 @@ public class Table implements Serializable{
     	    	T = p.getTuplesInPage().remove(p.getMaxCount());
     	    	deleteFromIndex(T,p,indexes);
     	    	p = p.updateMax();
+    	    	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+         		Serialize.Table(table, tableName);
+    	    	pageName = p.getName();
           maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
-                   Serialize.Page(p);
+                   Serialize.Page(p,pageName);
+                 
                  //OVERFLOW ON THE LAST PAGE
-                if(index == this.getPages().size()-1) { // if the overflow in the last page, I will create a new page without going through any loops
-                	p = new Page(this.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T))); 
-                	this.getPages().add(p);p = p.updateMin(maxKeyInPreviousPage);	
-                	T.addTuple(p);addInBtree(T,p,indexes);p = p.updateMax();Serialize.Page(p);
+                if(index == table.getPages().size()-1) { // if the overflow in the last page, I will create a new page without going through any loops
+                	 table = Deserialize.Table(tableName);
+                	p = new Page(table.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T))); 
+                	
+            		
+            		
+                	p = p.updateMin(maxKeyInPreviousPage);	
+                	T.addTuple(p);addInBtree(T,p,indexes);p = p.updateMax();
+                	table.getPages().add(p);
+                	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+             		Serialize.Table(table, tableName);
+                	pageName = p.getName();Serialize.Page(p,pageName);
                 }
                 
                 else { // handle the overflow of pages by setting flag = true 
                 	 /// if flag is still false this means that the last page has an overflow 
-                	while(index!=this.getPages().size()-1) {
-                	pageName = this.getPages().get(index+1).getName();
+                	while(index!=table.getPages().size()-1) {
+                		  table = Deserialize.Table(tableName);
+                	pageName = table.getPages().elementAt(index+1).getName();
                 	//System.out.println(pageName);
                 	p = Deserialize.Page(pageName);
                 	T.addTuple(p);
                 	if(!p.overFlowed()) {
                 		addInBtree(T,p,indexes);
+                		
                 		p = p.updateMin(maxKeyInPreviousPage);p = p.updateMax();
-                		Serialize.Page(p);
+                		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+                 		Serialize.Table(table, tableName);
+                		pageName = p.getName();
+                		Serialize.Page(p,pageName);
+                		
                 		flag = true;
                 		break;
                 	}
@@ -389,21 +425,33 @@ public class Table implements Serializable{
                 		T = p.getTuplesInPage().remove(p.getMaxCount());
                 		deleteFromIndex(T,p,indexes);
                 		p = p.updateMax();p = p.updateMin(maxKeyInPreviousPage);
+                		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+                 		Serialize.Table(table, tableName);
                         maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
-                        Serialize.Page(p);
+                        pageName = p.getName();
+                        Serialize.Page(p,pageName);
+                     
                 	}
                 	index++;
                 }
                 	if(!flag) { // this if handles the last overflow can happen
-                		p = new Page(this.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T)));
-                		this.getPages().add(p);p = p.updateMin(maxKeyInPreviousPage);	
-                    	T.addTuple(p); addInBtree(T,p,indexes);p = p.updateMax();Serialize.Page(p);
+                		  table = Deserialize.Table(tableName);
+                		p = new Page(table.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T)));
+                		p = p.updateMin(maxKeyInPreviousPage);	
+                    	T.addTuple(p); addInBtree(T,p,indexes);p = p.updateMax();
+                    	table.getPages().add(p);
+                    	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+                 		Serialize.Table(table, tableName);
+                    	
+                	
+                    	pageName = p.getName();
+                    	Serialize.Page(p,pageName);
                 	}
                 }
     	    	
     	    }
     	}
-    	return this;
+    	return table;
     	
     }
     
@@ -414,9 +462,77 @@ public class Table implements Serializable{
     public void deleteRow(){
 
     }
-
+    public  void deletePage(String pageName) {
+		String path = "Pages/"+pageName+".ser";
+		File file = new File(path);
+		if(file.delete())
+			System.out.println(pageName+" deleted");
+		else
+			System.out.println("file cannot be deleted");
+		
+		
+	}
+    public  Page deleteTupleUsingPk(Page p,Object key) throws DBAppException {
+		     String pageName = null;Page prevPage = null;Page nextPage = null;int pageIndex = this.getPages().indexOf(p);
+		  String tableName = this.getStrTableName();
+		     int index = Collections.binarySearch(p.getTuplesInPage(),key);
+		    if(index<0)
+		    	throw new DBAppException("Key not Found");
+		    p =  p.getTuplesInPage().remove(index);
+		    if(p.getTuplesInPage().size()>0) {
+		    	p.updateMax();
+		    	this.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+	     		Serialize.Table(this, tableName);
+		    	if(!(pageIndex==this.getPages().size()-1)) {
+		    	    nextPage = this.getPages().get(pageIndex+1);
+		    	    nextPage = Deserialize.Page(nextPage.getName());
+		    	    nextPage.updateMin(p.getPageProp().get(p.getName()).getMax());
+		    	    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
+		     		Serialize.Table(this, tableName);
+		    	    pageName = nextPage.getName();
+		    	    Serialize.Page(nextPage,pageName);
+		    	}
+		    	
+		    }
+		    else {
+		    	if(pageIndex==0 & !(pageIndex==this.getPages().size()-1)) {
+		    		nextPage = this.getPages().get(pageIndex+1);
+		    	    nextPage = Deserialize.Page(nextPage.getName());
+		    	    nextPage.updateMin(baseType(key));pageName = nextPage.getName();
+		    	    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
+		     		Serialize.Table(this, tableName);
+		    	    Serialize.Page(nextPage,pageName);
+		    	}
+		    	else {
+		    		if(!(pageIndex==this.getPages().size()-1)) {
+	prevPage = this.getPages().get(pageIndex-1);prevPage = Deserialize.Page(prevPage.getName());
+	pageName = prevPage.getName();Serialize.Page(prevPage,pageName);
+	nextPage = this.getPages().get(pageIndex+1);nextPage = Deserialize.Page(nextPage.getName());
+                    nextPage.updateMin(prevPage.getPageProp().get(prevPage.getName()).getMax());
+                    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
+		     		Serialize.Table(this, tableName);
+                    pageName = nextPage.getName();             
+                    Serialize.Page(nextPage,pageName);
+		    			
+		    		}
+		    		
+		    	}
+		    	
+		    }
+		    	return p;
+		
+	}
     public void selectRow(){
 
+    }
+    public Table updatepages(Page p) {
+    	
+		this.getPages().remove(p);
+		this.getProps().remove(p.getName());
+		this.deletePage(p.getName());
+		String tableName = this.getStrTableName();
+    	Serialize.Table(this,tableName);
+    	return this;
     }
     // this method return the index of the right page to insert in
     public int binarySearch(Object key) throws Exception
@@ -432,13 +548,14 @@ public class Table implements Serializable{
              mid = (l + r) / 2;
              
  
-            
-           // Page P = Deserialize.Page(v.get(mid).getName());
-            Page P = this.getPages().get(mid);
+            Pair p = this.getProps().get(this.getPages().elementAt(mid).getName());
+           // Page P = Deserialize.Page(v.elementAt(mid).getName());
+           // Page P = this.getPages().elementAt(mid);
+           // P.display();
              if(key instanceof Integer) {
             	//int min = this.getPages().get(mid).getPageProp().get()
-            int min = (int) P.getPageProp().get(P.getName()).getMin();
-            int max = (int) P.getPageProp().get(P.getName()).getMax();
+            int min = (int) p.getMin();
+            int max = (int) p.getMax();
             if (min == (int)key || max == (int)key) 
                 throw new Exception("Duplicate Key");
              
@@ -455,8 +572,8 @@ public class Table implements Serializable{
             }
              else 
             	 if(key instanceof Double) {
-            		 Double min = (Double) P.getPageProp().get(P.getName()).getMin();
-                     Double max = (Double) P.getPageProp().get(P.getName()).getMax();
+            		 Double min = (Double) p.getMin();
+                     Double max = (Double) p.getMax();
                      if (min == (Double)key || max == (Double)key) 
                          throw new Exception("Duplicate Key");
                       
@@ -473,8 +590,8 @@ public class Table implements Serializable{
             	 }
              
              else {
-            	 String min = (String) P.getPageProp().get(P.getName()).getMin();
-                 String max = (String) P.getPageProp().get(P.getName()).getMax();
+            	 String min = (String) p.getMin();
+                 String max = (String) p.getMax();
                  if (min.equals(key) || max.equals(key)) 
                      throw new Exception("Duplicate Key");
                   
