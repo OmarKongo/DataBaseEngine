@@ -144,22 +144,20 @@ public class Page implements Serializable, Comparable<Object> {
 
 		return res;
 	}
-
 	public ArrayList<Object> selectRangeNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
-		ArrayList<Object> res = new ArrayList<Object>();
-		System.out.println("hii"+this.getTuplesInPage());
-		String searchedColumn = arrSQLTerms[0]._strColumnName;
-		Object searchedValue = arrSQLTerms[0]._objValue;
-		System.out.println(this.getTuplesInPage().size());
-		for (Tuple t : this.getTuplesInPage()) {
-			Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
-			if (DBApp.compareValue(tupleObjectValue, searchedValue) > 0) {
-				res.add(t);
-			}
-		}
-		return res;
-	}
+        ArrayList<Object> res = new ArrayList<Object>();
+        String searchedColumn = arrSQLTerms[0]._strColumnName;
+        Object searchedValue = arrSQLTerms[0]._objValue;
+        for (Tuple t : this.getTuplesInPage()) {
+            Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+            if (DBApp.compareValue(tupleObjectValue, searchedValue) > 0) {
+                res.add(t);
+            }
+        }
+        return res;
+    }
 }
+
 
 	class Pair implements Serializable {
 

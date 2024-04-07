@@ -81,6 +81,8 @@ public class DBApp {
 	// htblColNameValue will have the column name as key and the data
 	// type as value
 
+
+
 	public void createTable(String strTableName,
 			String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
@@ -169,9 +171,9 @@ public class DBApp {
 		try {
 			boolean withIndex = Table.checkIndex(tableName, csvPath);
 			if (!(withIndex)) {
-				resList = t.selectFromTableNoIndex(arrSQLTerms, strarrOperators);
+				resList.add(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 			} else {
-				resList = t.selectFromTableWithIndex(arrSQLTerms, strarrOperators);
+				resList.add(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

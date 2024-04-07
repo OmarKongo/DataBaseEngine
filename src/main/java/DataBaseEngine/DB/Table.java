@@ -416,28 +416,30 @@ public class Table implements Serializable {
 					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
 					if (arrSQLTerms[0]._strOperator.equals("=")) {
 						String pageName = this.getPages().elementAt(pageIndex).getName();
-
+						
 						Page p = Deserialize.Page(pageName);
+
+						System.out.println(p.getTuplesInPage());
+
 						// Tuple record = new Tuple(t.getStrClusteringKeyColumn(),
 						// htblColNameValue.keys(), htblColNameValue.elements());
 						res = p.selectDistinctNoIndex(arrSQLTerms, strarrOperators);
 
 						Serialize.Page(p);
 					}
-				} else {
-					// unfortunately have to iterate through all records since we are searching on a
-					// (non-sorted column)
-					// for sorted, can be done in O(N/3)
-					if (arrSQLTerms[0]._strOperator.equals(">")) {
-						for (Page p : this.getPages()) {
-							Deserialize.Page(p.getName());
-							System.out.println("table: "+p.getTuplesInPage());
-							res.add(p.selectRangeNoIndex(arrSQLTerms,strarrOperators));
-							Serialize.Page(p);
-						}
-					}
 				}
-
+				else {
+                    // unfortunately have to iterate through all records since we are searching on a
+                    // (non-sorted column)
+                    // for sorted, can be done in O(N/3)
+                    if (arrSQLTerms[0]._strOperator.equals(">")) {
+                        for (Page p : this.getPages()) {
+                            Page p1 = Deserialize.Page(p.getName());
+                            res.add(p1.selectRangeNoIndex(arrSQLTerms,strarrOperators));
+                            Serialize.Page(p1);
+                        }
+                    }
+                }
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
