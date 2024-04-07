@@ -37,10 +37,11 @@ public class Test {
 
 	@SuppressWarnings({ "removal", "deprecation" })
 	public static void main(String[] args) throws Exception {
-
+		/* 
 		Test T = new Test();
 		int max = T.getMaxCount();
 		System.out.println(max); // 200
+		*/
 		/*
 		 * Page p = new Page("Student");
 		 * Page p1 = new Page("Student");
@@ -122,30 +123,54 @@ public class Test {
 		 */
 
 		DBApp d = new DBApp();
-
-		String strTableName = "TestingTable";
-
+		Hashtable<String,Object> attributesInTuple = new Hashtable<String,Object>();
+		Hashtable<String,Object> attributesInTuple2 = new Hashtable<String,Object>();
 		/*
+		String strTableName = "Mac";
+
+		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+		htblColNameType.put("id", "java.lang.Integer");
+		htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("gpa", "java.lang.Double");
+		d.createTable(strTableName, "id", htblColNameType);
+		/* 
+		
 		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 		htblColNameType.put("id", "java.lang.Integer");
 		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("gpa", "java.lang.Double");
 		d.createTable(strTableName, "id", htblColNameType);
 
-		Hashtable<String,Object> attributesInTuple = new Hashtable<String,Object>();
+		*/
+
+		/* 
+
 		attributesInTuple.put("id", new Integer( 3 ));
 		attributesInTuple.put("name", new String("John Noor" ) );
 		attributesInTuple.put("gpa", new Double( 1.5 ) );
 		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
 		d.insertIntoTable("TestingTable",attributesInTuple);
-		attributesInTuple.clear();
-		attributesInTuple.put("id", new Integer( 2 ));
-		attributesInTuple.put("name", new String("Brolos" ) );
-		attributesInTuple.put("gpa", new Double( 1.2 ) );
-		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
-		d.insertIntoTable("TestingTable",attributesInTuple);
+		*/
+		String strTableName = "Mac";
 
-		 */
+		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+		htblColNameType.put("id", "java.lang.Integer");
+		htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("gpa", "java.lang.Double");
+		d.createTable(strTableName, "id", htblColNameType);
+		attributesInTuple.put("id", new Integer( 3 ));
+		attributesInTuple.put("name", new String("big mac combo" ) );
+		attributesInTuple.put("gpa", new Double( 1.5 ) );
+		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
+		d.insertIntoTable("Mac",attributesInTuple);
+
+		attributesInTuple2.put("id", new Integer( 4 ));
+		attributesInTuple2.put("name", new String("big mac combo large" ) );
+		attributesInTuple2.put("gpa", new Double( 1.7 ) );
+		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
+		d.insertIntoTable("Mac",attributesInTuple2);
+
+
 
 
 
@@ -157,10 +182,10 @@ public class Test {
 		SQLTerm[] arrSQLTerms;
 		arrSQLTerms = new SQLTerm[1];
 		arrSQLTerms[0] = new SQLTerm();
-		arrSQLTerms[0]._strTableName = "TestingTable";
-		arrSQLTerms[0]._strColumnName = "id";
-		arrSQLTerms[0]._strOperator = "=";
-		arrSQLTerms[0]._objValue = new Integer(1);
+		arrSQLTerms[0]._strTableName = "Mac";
+		arrSQLTerms[0]._strColumnName = "gpa";
+		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._objValue = new Double(1);
 
 
 		String[] strarrOperators = new String[0];

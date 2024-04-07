@@ -44,6 +44,35 @@ public class DBApp {
 		}
 
 	}
+	public static int compareValue(Object o1, Object o2) {
+		//System.out.println(o1.getClass()+""+o2.getClass());
+		if (o1 instanceof Integer && o2 instanceof Integer) {
+			int first = (int) o1;
+			int second = (int) o2;
+			// the first is greater than return >0 if equal 0 if less <0
+			return  first - second;
+
+		} else {
+			if (o1 instanceof Double && o2 instanceof Double) {
+				Double first = (Double) o1;
+				Double second = (Double) o2;
+				// the first is greater than return 1
+				return (int) Math.ceil(first - second);
+			} else {
+				String first = (String) o1;
+				String second = (String) o2;
+				/*
+				 * An int value: 0 if the string is equal to the other string, ignoring case
+				 * differences.
+				 * < 0 if the string is lexicographically less than the other string
+				 * > 0 if the string is lexicographically greater than the other string (more
+				 * characters)
+				 */
+				return first.compareToIgnoreCase(second);
+			}
+
+		}
+	}
 
 	// following method creates one table only
 	// strClusteringKeyColumn is the name of the column that will be the primary

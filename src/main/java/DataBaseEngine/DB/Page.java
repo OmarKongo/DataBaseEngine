@@ -74,22 +74,7 @@ public class Page implements Serializable, Comparable<Object> {
 		Object fMin = this.getPageProp().get(this.getName()).getMin();
 		Object sMin = P.getPageProp().get(P.getName()).getMin();
 
-		if (fMin instanceof Integer) {
-			int first = (int) fMin;
-			int second = (int) sMin;
-			return first - second;
-		} else {
-			if (fMin instanceof Double) {
-				Double first = (Double) fMin;
-				Double second = (Double) sMin;
-				return (int) Math.ceil(first - second);
-			} else {
-				String first = (String) fMin;
-				String second = (String) sMin;
-				return first.compareToIgnoreCase(second);
-			}
-
-		}
+		return DBApp.compareValue(fMin, sMin);
 	}
 
 	public boolean tupleFounded(Tuple T) {
@@ -160,37 +145,51 @@ public class Page implements Serializable, Comparable<Object> {
 		return res;
 	}
 
+	public ArrayList<Object> selectRangeNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>();
+		System.out.println("hii"+this.getTuplesInPage());
+		String searchedColumn = arrSQLTerms[0]._strColumnName;
+		Object searchedValue = arrSQLTerms[0]._objValue;
+		System.out.println(this.getTuplesInPage().size());
+		for (Tuple t : this.getTuplesInPage()) {
+			Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+			if (DBApp.compareValue(tupleObjectValue, searchedValue) > 0) {
+				res.add(t);
+			}
+		}
+		return res;
+	}
 }
 
-class Pair implements Serializable {
+	class Pair implements Serializable {
 
-	Object min, max;
+		Object min, max;
 
-	public Pair(Object start) {
+		public Pair(Object start) {
 
-		// this.max = max;
-		this.min = start;
+			// this.max = max;
+			this.min = start;
+		}
+
+		public Object getMin() {
+			return min;
+		}
+
+		public void setMin(Object min) {
+			this.min = min;
+		}
+
+		@Override
+		public String toString() {
+			return "Pair [min=" + min + ", max=" + max + "]";
+		}
+
+		public Object getMax() {
+			return max;
+		}
+
+		public void setMax(Object max) {
+			this.max = max;
+		}
+
 	}
-
-	public Object getMin() {
-		return min;
-	}
-
-	public void setMin(Object min) {
-		this.min = min;
-	}
-
-	@Override
-	public String toString() {
-		return "Pair [min=" + min + ", max=" + max + "]";
-	}
-
-	public Object getMax() {
-		return max;
-	}
-
-	public void setMax(Object max) {
-		this.max = max;
-	}
-
-}

@@ -55,21 +55,7 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 		Tuple T = (Tuple) o;
 		Object x = this.getAttributesInTuple().get(this.getStrPrimaryKey());
 		Object y =  (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
-		if(x instanceof Integer) {
-		  int first = (int) x; int second = (int) y;
-		return  first - second;
-		}
-		else {
-			if(x instanceof Double) {
-				Double first = (Double) x;Double second = (Double) y;
-				return (int)Math.ceil(first - second);
-			}
-			else {
-				String first = (String) x;String second = (String) y;
-				return first.compareToIgnoreCase(second);
-			}
-			
-		}
+		return DBApp.compareValue(x, y);
 	}
 	
 	public Object getPK() {
@@ -87,7 +73,10 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 	public Page addTuple(Page page) throws IOException {
 		
 	    int index = this.getIndex(page.getTuplesInPage());
+		System.out.println(index);
+		System.out.println("h"+page.getTuplesInPage());
 	    page.getTuplesInPage().add(index,this);
+		System.out.println("hi"+page.getTuplesInPage());
 	    return page;
 	}
 
