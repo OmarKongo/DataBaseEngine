@@ -116,45 +116,6 @@ public class Table implements Serializable{
         }
     
     }
-    public String addIndex(String tableName,String column, String indexName,String filePath) {
-                String type= "";
-    	try {
-    		
-            
-    		CSVReader reader2 = new CSVReaderBuilder(new FileReader(filePath))
-    				.withSkipLines(0) 
-                    .build();
-    	    List<String[]> allElements = reader2.readAll();
-    	    CSVWriter writer = new CSVWriter(new FileWriter(filePath));
-    	    
-            
-            CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-                    .withSkipLines(1) 
-                    .build();
-    		//String[] nextRecord;
-            boolean flag = false;
-    		for(String[] nextRecord : allElements) {
-    			if(nextRecord[0].equals(tableName) & nextRecord[1].equals(column) ) {
-                	nextRecord[4] = indexName;nextRecord[5] = "B+ tree"; type = nextRecord[2];
-                	writer.writeAll(allElements);
-            	    writer.flush();
-                     flag = true;
-                	break;
-                }
-                
-    		}
-            
-    		if(!flag)
-    			throw new DBAppException("Invalid Table or Column");
-           
-        }
-        catch(Exception ex) {
-            ex.printStackTrace();
-        }
-    	return type;
-    
-    }	
-    	
     
 
     public static void checkDataType(Hashtable<String,String> htblColNameType,String filePath,String tableName) throws DBAppException, IOException{
@@ -290,20 +251,7 @@ public class Table implements Serializable{
     			 return 0;
     	 
      }
-     public static bplustree btreeType(String type){
-    	 bplustree btree = null;
- 		
-         if(type.equals("java.lang.Integer")) 
-      	  btree = new bplustree<Integer>(Integer.class,3);    
-         
-         else
-      	   if(type.equals("java.lang.String")) 
-      	   btree = new bplustree<String>(String.class,3);
-      	   
-      	   else 
-      	      btree = new bplustree<Double>(Double.class,3);
-         return btree;
-     }
+    
      @SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void addInBtree(Tuple T,Page p,Hashtable<String,String> indexes) {
     	 ArrayList<String> pages = new ArrayList<String>();                                        
@@ -454,86 +402,8 @@ public class Table implements Serializable{
     	return table;
     	
     }
+ 
     
-	public void updateRow(){
-        
-    }
-
-    public void deleteRow(){
-
-    }
-    public  void deletePage(String pageName) {
-		String path = "Pages/"+pageName+".ser";
-		File file = new File(path);
-		if(file.delete())
-			System.out.println(pageName+" deleted");
-		else
-			System.out.println("file cannot be deleted");
-		
-		
-	}
-    public  Page deleteTupleUsingPk(Page p,Object key) throws DBAppException {
-		     String pageName = null;Page prevPage = null;Page nextPage = null;int pageIndex = this.getPages().indexOf(p);
-		  String tableName = this.getStrTableName();
-		     int index = Collections.binarySearch(p.getTuplesInPage(),key);
-		    if(index<0)
-		    	throw new DBAppException("Key not Found");
-		    p =  p.getTuplesInPage().remove(index);
-		    if(p.getTuplesInPage().size()>0) {
-		    	p.updateMax();
-		    	this.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-	     		Serialize.Table(this, tableName);
-		    	if(!(pageIndex==this.getPages().size()-1)) {
-		    	    nextPage = this.getPages().get(pageIndex+1);
-		    	    nextPage = Deserialize.Page(nextPage.getName());
-		    	    nextPage.updateMin(p.getPageProp().get(p.getName()).getMax());
-		    	    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
-		     		Serialize.Table(this, tableName);
-		    	    pageName = nextPage.getName();
-		    	    Serialize.Page(nextPage,pageName);
-		    	}
-		    	
-		    }
-		    else {
-		    	if(pageIndex==0 & !(pageIndex==this.getPages().size()-1)) {
-		    		nextPage = this.getPages().get(pageIndex+1);
-		    	    nextPage = Deserialize.Page(nextPage.getName());
-		    	    nextPage.updateMin(baseType(key));pageName = nextPage.getName();
-		    	    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
-		     		Serialize.Table(this, tableName);
-		    	    Serialize.Page(nextPage,pageName);
-		    	}
-		    	else {
-		    		if(!(pageIndex==this.getPages().size()-1)) {
-	prevPage = this.getPages().get(pageIndex-1);prevPage = Deserialize.Page(prevPage.getName());
-	pageName = prevPage.getName();Serialize.Page(prevPage,pageName);
-	nextPage = this.getPages().get(pageIndex+1);nextPage = Deserialize.Page(nextPage.getName());
-                    nextPage.updateMin(prevPage.getPageProp().get(prevPage.getName()).getMax());
-                    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
-		     		Serialize.Table(this, tableName);
-                    pageName = nextPage.getName();             
-                    Serialize.Page(nextPage,pageName);
-		    			
-		    		}
-		    		
-		    	}
-		    	
-		    }
-		    	return p;
-		
-	}
-    public void selectRow(){
-
-    }
-    public Table updatepages(Page p) {
-    	
-		this.getPages().remove(p);
-		this.getProps().remove(p.getName());
-		this.deletePage(p.getName());
-		String tableName = this.getStrTableName();
-    	Serialize.Table(this,tableName);
-    	return this;
-    }
     // this method return the index of the right page to insert in
     public int binarySearch(Object key) throws Exception
     {

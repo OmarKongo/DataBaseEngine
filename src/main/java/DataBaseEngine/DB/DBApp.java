@@ -72,26 +72,6 @@ public void createIndex(String   strTableName,
 			String   strColName,
 			String   strIndexName) throws DBAppException, IOException{
 
-Table t = Deserialize.Table(strTableName);
-String type =  t.addIndex(strTableName, strColName, strIndexName, csvPath);
-bplustree btree = Table.btreeType(type);
-ArrayList<String> pageName = new ArrayList<String>();
-Serialize.Index(btree, strIndexName);
-for(int i = 0;i<t.getPages().size();i++) {
-
-Page p = Deserialize.Page(t.getPages().get(i).getName());
-pageName.add(p.getName());
-for(int j = 0 ;j<p.getTuplesInPage().size();j++) {
-btree = Deserialize.Index(strIndexName);
-Tuple T = p.getTuplesInPage().get(j);
-btree.insert((Comparable) T.getAttributesInTuple().get(strColName) ,pageName);
-Serialize.Index(btree, strIndexName);
-}
-
-pageName.clear();
-}
-
-
 }
 
 
@@ -139,62 +119,13 @@ throw new DBAppException("not implemented yet");
 public void deleteFromTable(String strTableName, 
 				Hashtable<String,Object> htblColNameValue) throws DBAppException{
 				
-Hashtable<String,String> indexes = null;
-try {
-indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
-} catch (Exception e) {
 
-e.printStackTrace();
-}
-Table T = Deserialize.Table(strTableName);Page p = null;
-if (htblColNameValue.size()==1 & isPK(T,htblColNameValue)) {
-//Tuple.deleteTuple(indexes);
-String indexName = indexes.get(T.getStrClusteringKeyColumn());
-Object key = htblColNameValue.get(T.getStrClusteringKeyColumn());
-p = searchPK(T,key,hasIndex(indexes,T.getStrClusteringKeyColumn()),indexName);
-p = T.deleteTupleUsingPk(p, key);
-if(p.getTuplesInPage().size()==0)
- T = T.updatepages(p);
-
-}
 
 
 
 }
 
-public static boolean isPK(Table t, Hashtable<String,Object> h ) {
-if(h.containsKey(t.getStrClusteringKeyColumn()))
-return true;
-return false;
-}
 
-public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
-if (indexes.containsKey(strFromHshTblCol))
-return true;
-return false ;
-}
-@SuppressWarnings({ "unchecked", "rawtypes" })
-public static Page searchPK(Table t,Object key, boolean hasIndex,String indexName) throws DBAppException {
-Page p = null;
-if (hasIndex) {
-bplustree bTree= Deserialize.Index(indexName);
-ArrayList<String> page = bTree.search((Comparable)key);
-bTree.delete((Comparable)key, page);
-p = Deserialize.Page(page.get(0));
-}
-else {
-
-int index = 0;
-try {
-//index = t.binarySearch(key);
-} catch (Exception e) {
-// TODO Auto-generated catch block
-e.printStackTrace();
-}
-// p = Deserialize.Page(t.getPages().get(index).getName());
-}
-return p ;
-}
 
 
 
