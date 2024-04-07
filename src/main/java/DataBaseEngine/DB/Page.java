@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -144,9 +145,19 @@ public class Page implements Serializable, Comparable<Object> {
 
 	}
 
-	public void selectFromPage() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'selectFromPage'");
+	public ArrayList<Object> selectDistinctNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>();
+
+		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
+		attributesInTuple.put(arrSQLTerms[0]._strColumnName, arrSQLTerms[0]._objValue);
+
+		int tupleIndex = Collections.binarySearch(this.getTuplesInPage(),
+				new Tuple(arrSQLTerms[0]._strColumnName, attributesInTuple.keys(),
+						attributesInTuple.elements()));
+		if (tupleIndex != -1)
+			res.add(this.getTuplesInPage().elementAt(tupleIndex));
+
+		return res;
 	}
 
 }

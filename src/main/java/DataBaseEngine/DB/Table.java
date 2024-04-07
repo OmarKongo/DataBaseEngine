@@ -384,13 +384,8 @@ public class Table implements Serializable {
 
 		return mid;
 	}
-	//can be ommitted  becaues the default compare is by default implemented comparing clustering pk keys
-
-	transient Comparator<Tuple> c = new Comparator<Tuple>() {
-		public int compare(Tuple t1, Tuple t2) {
-			return t1.compareTo(t2);
-		}
-	};
+	// can be ommitted becaues the default compare is by default implemented
+	// comparing clustering pk keys
 
 	public ArrayList<Object> selectFromTableNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
@@ -421,18 +416,12 @@ public class Table implements Serializable {
 					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
 					if (arrSQLTerms[0]._strOperator.equals("=")) {
 						String pageName = this.getPages().elementAt(pageIndex).getName();
+
 						Page p = Deserialize.Page(pageName);
 						// Tuple record = new Tuple(t.getStrClusteringKeyColumn(),
 						// htblColNameValue.keys(), htblColNameValue.elements());
-						Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
-						attributesInTuple.put(arrSQLTerms[0]._strColumnName, arrSQLTerms[0]._objValue);
-						System.out.println("Tuples in Page: " + p.getTuplesInPage());
-						int tupleIndex = Collections.binarySearch(p.getTuplesInPage(),
-								new Tuple(arrSQLTerms[0]._strColumnName, attributesInTuple.keys(),
-										attributesInTuple.elements()),
-								c);
-						if (tupleIndex != -1)
-							res.add(p.getTuplesInPage().elementAt(tupleIndex));
+						res = p.selectDistinctNoIndex(arrSQLTerms, strarrOperators);
+
 						Serialize.Page(p);
 					}
 				}

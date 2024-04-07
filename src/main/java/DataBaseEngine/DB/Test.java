@@ -160,7 +160,7 @@ public class Test {
 		arrSQLTerms[0]._strTableName = "TestingTable";
 		arrSQLTerms[0]._strColumnName = "id";
 		arrSQLTerms[0]._strOperator = "=";
-		arrSQLTerms[0]._objValue = new Integer(3);
+		arrSQLTerms[0]._objValue = new Integer(1);
 
 
 		String[] strarrOperators = new String[0];
