@@ -3,14 +3,14 @@ package DataBaseEngine.DB;
 import java.io.*;
 
 import java.util.*;
-
+import java.io.Serializable;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
 public class Table implements Serializable {
 	// Is it correct that only the pageFileName are persistent?
-
+	private Hashtable<String, Pair> props;
 	private Vector<Page> pages;
 	private String strTableName;
 	private String strClusteringKeyColumn;
@@ -30,6 +30,10 @@ public class Table implements Serializable {
 		this.strClusteringKeyColumn = strClusteringKeyColumn;
 		this.htblColNameType = htblColNameType;
 
+	}
+
+	public Hashtable<String, Pair> getProps() {
+		return props;
 	}
 
 	public Vector<Page> getPages() {
@@ -235,8 +239,8 @@ public class Table implements Serializable {
 		}
 
 		else { // Search for the right page to insert in
-
-			int index = this.binarySearch(T);
+			Object key = T.getPK();
+			int index = this.binarySearch(key);
 			pageName = this.getPages().get(index).getName();
 			p = Deserialize.Page(pageName);
 
@@ -317,8 +321,8 @@ public class Table implements Serializable {
 	}
 
 	// this method return the index of the right page to insert in
-	public int binarySearch(Tuple T) throws Exception {
-		Object key = T.getPK();
+	public int binarySearch(Object key) throws Exception {
+		// Object key = T.getPK();
 		int mid = 0;
 		Vector<Page> v = this.getPages();
 		int l = 0;
@@ -329,12 +333,14 @@ public class Table implements Serializable {
 		while (l <= r) {
 			mid = (l + r) / 2;
 
-			// Page P = Deserialize.Page(v.get(mid).getName());
-			Page P = this.getPages().get(mid);
+			Pair p = this.getProps().get(this.getPages().elementAt(mid).getName());
+			// Page P = Deserialize.Page(v.elementAt(mid).getName());
+			// Page P = this.getPages().elementAt(mid);
+			// P.display();
 			if (key instanceof Integer) {
 				// int min = this.getPages().get(mid).getPageProp().get()
-				int min = (int) P.getPageProp().get(P.getName()).getMin();
-				int max = (int) P.getPageProp().get(P.getName()).getMax();
+				int min = (int) p.getMin();
+				int max = (int) p.getMax();
 				if (min == (int) key || max == (int) key)
 					throw new Exception("Duplicate Key");
 
@@ -346,8 +352,8 @@ public class Table implements Serializable {
 					l = mid + 1;
 
 			} else if (key instanceof Double) {
-				Double min = (Double) P.getPageProp().get(P.getName()).getMin();
-				Double max = (Double) P.getPageProp().get(P.getName()).getMax();
+				Double min = (Double) p.getMin();
+				Double max = (Double) p.getMax();
 				if (min == (Double) key || max == (Double) key)
 					throw new Exception("Duplicate Key");
 
@@ -361,8 +367,8 @@ public class Table implements Serializable {
 			}
 
 			else {
-				String min = (String) P.getPageProp().get(P.getName()).getMin();
-				String max = (String) P.getPageProp().get(P.getName()).getMax();
+				String min = (String) p.getMin();
+				String max = (String) p.getMax();
 				if (min.equals(key) || max.equals(key))
 					throw new Exception("Duplicate Key");
 
@@ -379,27 +385,70 @@ public class Table implements Serializable {
 		return mid;
 	}
 
-	public static void main(String[] args) throws Exception {
+	transient Comparator<Tuple> c = new Comparator<Tuple>() {
+		public int compare(Tuple t1, Tuple t2) {
+			return t1.compareTo(t2);
+		}
+	};
 
-	}
+	public ArrayList<Object> selectFromTableNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>(); 
 
-	public Iterator<Object> selectFromTableNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		/*
 		 * First case: Only one SQL term and no strarrOperators
-		 * Implementing on: 		
+		 * Implementing on:
 		 * arrSQLTerms[0]._strTableName = "Student";
 		 * arrSQLTerms[0]._strColumnName = "name";
 		 * arrSQLTerms[0]._strOperator = "=";
 		 * arrSQLTerms[0]._objValue = "John Noor";
 		 */
-		if(strarrOperators.length == 0){
+		try {
+			if (strarrOperators.length == 0 && arrSQLTerms.length == 1) {
+				/*
+				 * Check if the strColumn is a pk(clustering key) if yes --> Binarysearch
+				 * (useful for =, >, >=)
+				 * I think that for the operation !=, no binary search is needed, go through all
+				 * records and include it except that one
+				 */
 
+				// make list iterator, give index, iterate forward and backwards
+				// iterate through pages (for range queries) and within those iterations iterate
+				// within the pages (through the tuples)
+				
+
+				
+				if (arrSQLTerms[0]._strColumnName.equals(this.getStrClusteringKeyColumn())) {
+					int pageIndex = this.binarySearch(arrSQLTerms[0]._objValue);
+					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
+					if (arrSQLTerms[0]._strOperator.equals("=")) {
+						String pageName = this.getPages().elementAt(pageIndex).getName();
+						Page p = Deserialize.Page(pageName);
+						// Tuple record = new Tuple(t.getStrClusteringKeyColumn(),
+						// htblColNameValue.keys(), htblColNameValue.elements());
+						Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
+						attributesInTuple.put(arrSQLTerms[0]._strColumnName, arrSQLTerms[0]._objValue);
+						System.out.println("Tuples in Page: "+p.getTuplesInPage());
+						int tupleIndex = Collections.binarySearch(p.getTuplesInPage(),
+								new Tuple(arrSQLTerms[0]._strColumnName, attributesInTuple.keys(),
+										attributesInTuple.elements()),c);
+						if(tupleIndex!=-1)
+							res.add(p.getTuplesInPage().elementAt(tupleIndex));
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
+		return res;
+	}
+
+	public ArrayList<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		return null;
 	}
 
-	public Iterator<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
-		return null;
+	public static void main(String[] args) throws Exception {
+
 	}
 
 }

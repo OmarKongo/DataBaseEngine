@@ -9,6 +9,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -119,22 +120,67 @@ public class Test {
 		 * System.out.println(res2);
 		 * 
 		 */
-		DBApp d = new DBApp();
-		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[2];
-		arrSQLTerms[0] = new SQLTerm();
-		arrSQLTerms[0]._strTableName = "Student";
-		arrSQLTerms[0]._strColumnName = "name";
-		arrSQLTerms[0]._strOperator = "=";
-		arrSQLTerms[0]._objValue = "John Noor";
-		arrSQLTerms[1] = new SQLTerm();
-		arrSQLTerms[1]._strTableName = "Student";
-		arrSQLTerms[1]._strColumnName = "gpa";
-		arrSQLTerms[1]._strOperator = "=";
-		arrSQLTerms[1]._objValue = new Double(1.5);
 
-		String[] strarrOperators = new String[1];
-		strarrOperators[0] = "OR";
-		d.selectFromTable(arrSQLTerms,strarrOperators);
+		DBApp d = new DBApp();
+
+		String strTableName = "TestingTable";
+
+		/*
+		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+		htblColNameType.put("id", "java.lang.Integer");
+		htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("gpa", "java.lang.Double");
+		d.createTable(strTableName, "id", htblColNameType);
+
+		Hashtable<String,Object> attributesInTuple = new Hashtable<String,Object>();
+		attributesInTuple.put("id", new Integer( 3 ));
+		attributesInTuple.put("name", new String("John Noor" ) );
+		attributesInTuple.put("gpa", new Double( 1.5 ) );
+		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
+		d.insertIntoTable("TestingTable",attributesInTuple);
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer( 2 ));
+		attributesInTuple.put("name", new String("Brolos" ) );
+		attributesInTuple.put("gpa", new Double( 1.2 ) );
+		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
+		d.insertIntoTable("TestingTable",attributesInTuple);
+
+		 */
+
+
+
+
+
+
+
+
+		SQLTerm[] arrSQLTerms;
+		arrSQLTerms = new SQLTerm[1];
+		arrSQLTerms[0] = new SQLTerm();
+		arrSQLTerms[0]._strTableName = "TestingTable";
+		arrSQLTerms[0]._strColumnName = "id";
+		arrSQLTerms[0]._strOperator = "=";
+		arrSQLTerms[0]._objValue = new Integer(3);
+
+
+		String[] strarrOperators = new String[0];
+
+		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
+		// will they all be from the same table? [ie all sql terms will have the same
+		// table]
+		// I think yes because no joins
+		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
+
+		System.out.println("Result Set: ");
+
+		while(resultSet.hasNext()){
+			System.out.println(resultSet.next().toString());
+		}
+
+
+
+
+
+
 	}
 }

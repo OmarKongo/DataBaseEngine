@@ -136,18 +136,18 @@ public class DBApp {
 		String tableName = arrSQLTerms[0]._strTableName;
 		Table t = Deserialize.Table(tableName);
 		ArrayList<Object> resList = new ArrayList<>();
-		Iterator<Object> result = resList.iterator();
+
 		try {
 			boolean withIndex = Table.checkIndex(tableName, csvPath);
 			if (!(withIndex)) {
-				result = t.selectFromTableNoIndex(arrSQLTerms, strarrOperators);
+				resList = t.selectFromTableNoIndex(arrSQLTerms, strarrOperators);
 			} else {
-				result = t.selectFromTableWithIndex(arrSQLTerms, strarrOperators);
+				resList = t.selectFromTableWithIndex(arrSQLTerms, strarrOperators);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		Iterator<Object> result = resList.iterator();
 		Serialize.Table(t);
 		return result;
 	}
@@ -247,22 +247,19 @@ public class DBApp {
 			arrSQLTerms = new SQLTerm[2];
 			arrSQLTerms[0] = new SQLTerm();
 			arrSQLTerms[0]._strTableName = "Student";
-			arrSQLTerms[0]._strColumnName = "name";
+			arrSQLTerms[0]._strColumnName = "id";
 			arrSQLTerms[0]._strOperator = "=";
-			arrSQLTerms[0]._objValue = "John Noor";
-			arrSQLTerms[1] = new SQLTerm();
-			arrSQLTerms[1]._strTableName = "Student";
-			arrSQLTerms[1]._strColumnName = "gpa";
-			arrSQLTerms[1]._strOperator = "k";
-			arrSQLTerms[1]._objValue = new Double(1.5);
+			arrSQLTerms[0]._objValue = new Integer(1);
+
 
 			String[] strarrOperators = new String[1];
-			strarrOperators[0] = "OR";
+
 			// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 			// will they all be from the same table? [ie all sql terms will have the same
 			// table]
 			// I think yes because no joins
 			Iterator<Object> resultSet = dbApp.selectFromTable(arrSQLTerms, strarrOperators);
+			System.out.println(resultSet.next());
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}

@@ -1,10 +1,10 @@
 "Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
-"Student","gpa","java.lang.Double","False",,
-"Student","name","java.lang.String","False",,
-"Student","id","java.lang.Integer","True",,
-"TA","name","java.lang.String","False",,
-"TA","Office","java.lang.String","False",,
-"TA","id","java.lang.Integer","True",,
+"TestingTable","gpa","java.lang.Double","False",,
+"TestingTable","name","java.lang.String","False",,
+"TestingTable","id","java.lang.Integer","True",,
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
+"Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
 "Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
 "Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
 "Table Name","Column Name","Column Type","Clustering Key","IndexName","IndexType"
