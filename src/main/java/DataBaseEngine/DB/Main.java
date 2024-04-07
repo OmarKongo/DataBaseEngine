@@ -13,15 +13,15 @@ public class Main {
 			htblColNameType.put("name", "java.lang.String");
 			htblColNameType.put("gpa", "java.lang.Double");
 			dbApp.createTable( strTableName1, "id", htblColNameType );
-			// dbApp.createIndex( strTableName, "gpa", "gpaIndex" );
+			dbApp.createIndex( strTableName1, "gpa", "gpaIndex" );
 
-			String strTableName2 = "Doctor";
+			// String strTableName2 = "Doctor";
 
-			htblColNameType.clear();
-			htblColNameType.put("id", "java.lang.Integer");
-			htblColNameType.put("name", "java.lang.String");
-			htblColNameType.put("Faculty", "java.lang.Double");
-			dbApp.createTable( strTableName2, "id", htblColNameType );
+			// htblColNameType.clear();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("name", "java.lang.String");
+			// htblColNameType.put("Faculty", "java.lang.Double");
+			// dbApp.createTable( strTableName2, "id", htblColNameType );
 
 			// Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
 			// htblColNameValue.put("id", new Integer( 2343432 ));

@@ -1,11 +1,12 @@
 package DataBaseEngine.DB;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class bplustree<K extends Comparable<K>> {
-	private Class<K> clazz;
+public class bplustree<K extends Comparable<K> & Serializable> implements Serializable{
+	Class<K> clazz;
 	int m;
 	InternalNode root;
 	LeafNode firstLeaf;
@@ -753,7 +754,7 @@ public class bplustree<K extends Comparable<K>> {
 	 * This class represents a general node within the B+ tree and serves as a
 	 * superclass of InternalNode and LeafNode.
 	 */
-	public class Node {
+	public class Node implements Serializable{
 		InternalNode parent;
 	}
 
@@ -1057,7 +1058,7 @@ public class bplustree<K extends Comparable<K>> {
 	 * leaf nodes of the B+ tree. The class implements the Comparable interface
 	 * so that the DictionaryPair objects can be sorted later on.
 	 */
-	public class DictionaryPair implements Comparable<DictionaryPair> {
+	public class DictionaryPair implements Comparable<DictionaryPair>, Serializable {
 		private K key;
 		ArrayList<String> value;
 	
@@ -1086,7 +1087,6 @@ public class bplustree<K extends Comparable<K>> {
 			return this.key.compareTo(o.getKey());
 		}
 
-	public static void main(String[] args) {
-		}
+	
 	}
 }

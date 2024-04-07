@@ -4,6 +4,7 @@ package DataBaseEngine.DB;
 
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Vector;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,8 +17,11 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
+import DataBaseEngine.DB.bplustree.Node;
+
 public class DBApp {
 	final static String csvPath = "metadata.csv";
+	final static int NodeSize = 5;
 
 	public DBApp( ){
 		this.init();
@@ -69,25 +73,30 @@ public class DBApp {
 	// following method creates a B+tree index 
 	public void createIndex(String   strTableName,
 							String   strColName,
-							String   strIndexName) throws DBAppException{
+							String   strIndexName) throws DBAppException, ClassNotFoundException{
 		
-		/*
-		 * Validates method arguments
-		 */
-		//if strTableName and strColName don't exist in a row of csv, return
-		if(CSV.getTableColumnRow(strTableName, strIndexName).length == 0) {
-			System.err.println("Row to create index on doesn't exist!");
-			return;
-		}
-			
-		//if there already exists a previous index over the specified column
-		if(!CSV.getcell(strTableName, strColName, CSV.INDEX_NAME_INDEX).isBlank()) {
-			System.err.println("There already exists an index over this column");
-			return;
+		//writes to index IF conditions are valid -- conditions state inside function				
+		if(!CSV.writeIndex(strTableName, strColName, strIndexName))
+			throw new DBAppException("Index Couldn't be created");
+		
+		//Insert all tuples previosly created inside of table
+		String type = CSV.getcell(strTableName, strIndexName, CSV.COLUMN_TYPE_INDEX);
+		bplustree tree = new bplustree(Class.forName(type), NodeSize);
+		ArrayList<String> pageNames = new ArrayList<>();
+		Table table = Deserialize.Table(strTableName);
+		Page[] pages = (Page[])table.getPages().toArray();
+		for(int i = 0; i < pages.length; i++) {
+			Tuple[] tuples = (Tuple[]) pages[i].getTuplesInPage().toArray();
+			for(int j = 0; j < tuples.length; i++) {
+				Hashtable<String, Object> tupleAtt = tuples[j].getAttributesInTuple();
+				Object value = tupleAtt.get(strColName);
+				pageNames.add(pages[i].getName());
+				tree.insert((Comparable) value, pageNames);
+				pageNames.clear();
+			}
 		}
 
-		//Insert all tuples previosly created
-		//Serialize index using strIndexName
+		Serialize.bplustree(tree, strIndexName);
 
 	}
 
@@ -109,7 +118,6 @@ public class DBApp {
 		try {
 			T = T.insertIntoTable(record);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Serialize.Table(T);

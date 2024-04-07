@@ -5,13 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
-
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -22,7 +17,7 @@ public class CSV {
     private CSV() {
     }
 
-    public static final String FILE_PATH = "C:\\Users\\paula\\Documents\\Workspace\\Java\\CSV\\metadata.csv";
+    public static final String FILE_PATH = "metadata.csv";
     /*
      * column headers + indices of csv file to enhance readability and to introduce flexibility
      */
@@ -117,7 +112,7 @@ public class CSV {
         }
 
         //Create a new csv file to move data to
-        File tempCSV = new File("C:\\Users\\paula\\Documents\\Workspace\\Java\\CSV\\tempmetadata.csv");
+        File tempCSV = new File("tempmetadata.csv");
 
         //used when checking for valid conditions
         boolean rowExists = false;

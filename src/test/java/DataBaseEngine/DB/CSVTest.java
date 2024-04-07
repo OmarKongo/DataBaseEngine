@@ -25,7 +25,7 @@ public class CSVTest {
 		//Get a cell provided a tableName, columnName, and index are given
 		//final static variables are defined in csv to indicate what each index maps to in csv
 		System.out.println(
-			CSV.getcell("Doctor", "id", CSV.TABLE_NAME_INDEX)
+			CSV.getcell("TA", "id", CSV.TABLE_NAME_INDEX)
 		);
 
 		ArrayList<String[]> rows = CSV.getTableRows("Student");
@@ -66,8 +66,8 @@ public class CSVTest {
          * tests CSV.writeCell method
          */
 
-        boolean result = CSV.writeIndex("Student", "id", "StudentIndex");
-        System.out.println(result);
+        // boolean result = CSV.writeIndex("Student", "id", "StudentIndex");
+        // System.out.println(result);
 
         // boolean exists = Serialize.checkExisting(Main.INDEX_DIRECTORY_PATH, "StudentIndex");
         // System.out.println(exists);
@@ -77,5 +77,7 @@ public class CSVTest {
          */
         System.out.println(Serialize.indexPath + "StudentIndex" + ".ser");
         // System.out.println(File.separatorChar);
+
+        System.out.println(CSV.getcell("Student", "gpa", CSV.COLUMN_TYPE_INDEX));
     }
 }

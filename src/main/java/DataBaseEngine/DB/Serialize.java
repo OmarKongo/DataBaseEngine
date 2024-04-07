@@ -6,13 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 public class Serialize {
 	static String pagesPath = "Pages";
 	static String tablesPath = "Tables";
 	static String indexPath = "Indices";
-	
-	
+
 	public static void  Page(Page p) {
 		//System.out.println(p.getName());
 		String path = pagesPath+"/"+p.getName()+".ser";
@@ -71,12 +71,29 @@ public class Serialize {
 	        }
 		 //return path;
 	}
+
+	public static <K extends Comparable<K> & Serializable> boolean bplustree(bplustree<K> tree, String indexName) {
+
+		String path = indexPath + File.separator + indexName + ".ser";
+
+		try(FileOutputStream outFile = new FileOutputStream(path);
+		ObjectOutputStream outObject = new ObjectOutputStream(outFile)){
+
+			outObject.writeObject(tree);
+			return true;
+
+		} catch(IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 	
 	
 }
 class Deserialize{
 	static String pagesPath = "Pages";
 	static String tablesPath = "Tables";
+	static String indexPath = "Indices";
 	
 	/**
      * @author Brolosy
@@ -147,6 +164,22 @@ class Deserialize{
 		return p;
 	}
 	
-	
+	public static bplustree<?> bplustree(String indexName) {
+		
+		String path = indexPath + File.separator + indexName + ".ser";
+
+		try(FileInputStream inFile = new FileInputStream(path);
+		ObjectInputStream inObject = new ObjectInputStream(inFile)){
+
+			return (bplustree<?>) inObject.readObject();
+
+		} catch(IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) { 
+			e.printStackTrace();
+			return null;
+		}
+		}
 	
 }
