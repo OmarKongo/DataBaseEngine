@@ -125,7 +125,7 @@ public class Test {
 
 		String strTableName = "TestingTable";
 
-		/*
+		
 		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 		htblColNameType.put("id", "java.lang.Integer");
 		htblColNameType.put("name", "java.lang.String");
@@ -139,13 +139,27 @@ public class Test {
 		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
 		d.insertIntoTable("TestingTable",attributesInTuple);
 		attributesInTuple.clear();
-		attributesInTuple.put("id", new Integer( 2 ));
+		attributesInTuple.put("id", new Integer( 1 ));
 		attributesInTuple.put("name", new String("Brolos" ) );
 		attributesInTuple.put("gpa", new Double( 1.2 ) );
 		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
 		d.insertIntoTable("TestingTable",attributesInTuple);
 
-		 */
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer( 2 ));
+		attributesInTuple.put("name", new String("Brolos" ) );
+		attributesInTuple.put("gpa", new Double( 1.7 ) );
+		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
+		d.insertIntoTable("TestingTable",attributesInTuple);
+
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer( 4 ));
+		attributesInTuple.put("name", new String("Brolos" ) );
+		attributesInTuple.put("gpa", new Double( 1.9 ) );
+		//Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>) attributesInTuple.values());
+		d.insertIntoTable("TestingTable",attributesInTuple);
+
+		
 
 
 
@@ -158,9 +172,9 @@ public class Test {
 		arrSQLTerms = new SQLTerm[1];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = "TestingTable";
-		arrSQLTerms[0]._strColumnName = "id";
-		arrSQLTerms[0]._strOperator = "=";
-		arrSQLTerms[0]._objValue = new Integer(1);
+		arrSQLTerms[0]._strColumnName = "gpa";
+		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._objValue = new Double(1.6);
 
 
 		String[] strarrOperators = new String[0];

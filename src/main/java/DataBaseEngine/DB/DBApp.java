@@ -52,6 +52,37 @@ public class DBApp {
 	// htblColNameValue will have the column name as key and the data
 	// type as value
 
+	public static int compareValue(Object o1, Object o2) {
+        //System.out.println(o1.getClass()+""+o2.getClass());
+        if (o1 instanceof Integer && o2 instanceof Integer) {
+            int first = (int) o1;
+            int second = (int) o2;
+            // the first is greater than return >0 if equal 0 if less <0
+            return  first - second;
+
+        } else {
+            if (o1 instanceof Double && o2 instanceof Double) {
+                Double first = (Double) o1;
+                Double second = (Double) o2;
+                // the first is greater than return 1
+                return (int) Math.ceil(first - second);
+            } else {
+                String first = (String) o1;
+                String second = (String) o2;
+                /*
+                 * An int value: 0 if the string is equal to the other string, ignoring case
+                 * differences.
+                 * < 0 if the string is lexicographically less than the other string
+                 * > 0 if the string is lexicographically greater than the other string (more
+                 * characters)
+                 */
+                return first.compareToIgnoreCase(second);
+            }
+
+        }
+    }
+
+
 	public void createTable(String strTableName,
 			String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
@@ -140,9 +171,9 @@ public class DBApp {
 		try {
 			boolean withIndex = Table.checkIndex(tableName, csvPath);
 			if (!(withIndex)) {
-				resList = t.selectFromTableNoIndex(arrSQLTerms, strarrOperators);
+				resList.add(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 			} else {
-				resList = t.selectFromTableWithIndex(arrSQLTerms, strarrOperators);
+				resList.add(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
