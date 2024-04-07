@@ -60,9 +60,7 @@ public class DBApp {
 
 				
  
-				Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-				T.addTable(strTableName,strClusteringKeyColumn,csvPath);
-				Serialize.Table(T,strTableName);			
+						
 			
 }
 
@@ -72,6 +70,25 @@ public void createIndex(String   strTableName,
 			String   strColName,
 			String   strIndexName) throws DBAppException, IOException{
 
+	
+	Table t = Deserialize.Table(strTableName);
+	String type =  t.addIndex(strTableName, strColName, strIndexName, csvPath);
+	bplustree btree = Table.btreeType(type);
+	ArrayList<String> pageName = new ArrayList<String>();
+	Serialize.Index(btree, strIndexName);
+	for(int i = 0;i<t.getPages().size();i++) {
+		 
+		Page p = Deserialize.Page(t.getPages().get(i).getName());
+		pageName.add(p.getName());
+		for(int j = 0 ;j<p.getTuplesInPage().size();j++) {
+			btree = Deserialize.Index(strIndexName);
+			Tuple T = p.getTuplesInPage().get(j);
+			btree.insert((Comparable) T.getAttributesInTuple().get(strColName) ,pageName);
+			Serialize.Index(btree, strIndexName);
+		}
+		
+		pageName.clear();
+	}
 }
 
 
@@ -80,26 +97,9 @@ public void createIndex(String   strTableName,
 public void insertIntoTable(String strTableName, 
 				Hashtable<String,Object>  htblColNameValue) throws DBAppException{
 
-Hashtable<String,String> indexes = null;
-try {
-indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
-} catch (Exception e) {
 
-e.printStackTrace();
-}
-Table T = Deserialize.Table(strTableName);
-Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
-try {
-T = Table.insertIntoTable(record,indexes,strTableName);
-} catch (Exception e) {
-// TODO Auto-generated catch block
-e.printStackTrace();
-}
-Serialize.Table(T,strTableName);
 
 }
-
-
 // following method updates one row only
 // htblColNameValue holds the key and new value 
 // htblColNameValue will not include clustering key as column name
