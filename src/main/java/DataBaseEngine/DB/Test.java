@@ -125,14 +125,15 @@ public class Test {
 		DBApp d = new DBApp();
 		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
 
+		
+		/* 
 		String strTableName = "TestingTable";
-
 		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 		htblColNameType.put("id", "java.lang.Integer");
 		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("gpa", "java.lang.Double");
 		d.createTable(strTableName, "id", htblColNameType);
-
+		*/
 		/*
 		 * Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 		 * htblColNameType.put("id", "java.lang.Integer");
@@ -141,6 +142,12 @@ public class Test {
 		 * d.createTable(strTableName, "id", htblColNameType);
 		 */
 
+
+
+
+		//INSERTIONSSSSS
+
+		 /*
 		attributesInTuple.put("id", new Integer(3));
 		attributesInTuple.put("name", new String("John Noor"));
 		attributesInTuple.put("gpa", new Double(1.5));
@@ -170,6 +177,10 @@ public class Test {
 		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 		// attributesInTuple.values());
 		d.insertIntoTable("TestingTable", attributesInTuple);
+		*/
+
+
+
 
 		SQLTerm[] arrSQLTerms;
 		arrSQLTerms = new SQLTerm[1];
@@ -177,7 +188,7 @@ public class Test {
 		arrSQLTerms[0]._strTableName = "TestingTable";
 		arrSQLTerms[0]._strColumnName = "id";
 		arrSQLTerms[0]._strOperator = "!=";
-		arrSQLTerms[0]._objValue = new Integer(2);
+		arrSQLTerms[0]._objValue = new Integer(5);
 
 		String[] strarrOperators = new String[0];
 

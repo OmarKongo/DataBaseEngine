@@ -213,23 +213,30 @@ public class Page implements Serializable, Comparable<Object> {
 				}
 			}
 			case "<":
-			case "<=": {
+			case "<=":
+			case "!=": {
 
-				for (int i = 0; i < this.getTuplesInPage().size(); i++) {
+				for (Tuple t : this.getTuplesInPage()) {
 					testCount++;
-					Tuple t = this.getTuplesInPage().elementAt(i);
 					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
 					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
 					if (comparison != 0) {
 						res.add(t);
 					} else {
-						if (arrSQLTerms[0]._strOperator.equals("<="))
+						if (arrSQLTerms[0]._strOperator.equals("<=")) {
 							res.add(t);
-						break;
+							break;
+						} else {
+							if (arrSQLTerms[0]._strOperator.equals("<")) {
+								break;
+							}
+						}
+
 					}
 				}
 
 			}
+
 		}
 
 		System.out.println("test count is: " + testCount + " tuples in page is: " + this.getTuplesInPage().size());

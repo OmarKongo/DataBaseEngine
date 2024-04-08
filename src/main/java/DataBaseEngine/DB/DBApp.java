@@ -104,15 +104,6 @@ public class DBApp {
 		throw new DBAppException("not implemented yet");
 	}
 
-	public static void checkDataType(Hashtable<String, String> htblColNameType) throws DBAppException {
-		for (String s : htblColNameType.values()) {
-			if (!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.Double"))) {
-				throw new DBAppException("Column DataType invalid");
-			}
-		}
-
-	}
-
 	// following method inserts one row only.
 	// htblColNameValue must include a value for the primary key
 	public void insertIntoTable(String strTableName,

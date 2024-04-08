@@ -438,7 +438,8 @@ public class Table implements Serializable {
 						}
 						// O(N/3)
 						case "<=":
-						case "<": {
+						case "<":
+						case "!=": {
 							int firstLoopMarker = 0;
 							for (Page page : this.getPages()) {
 								Page p2 = Deserialize.Page(page.getName());
@@ -448,9 +449,6 @@ public class Table implements Serializable {
 							}
 							break;
 						}
-
-						case "!=":
-							break;
 
 					}
 
