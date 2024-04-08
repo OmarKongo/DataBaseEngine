@@ -44,13 +44,14 @@ public class DBApp {
 		}
 
 	}
+
 	public static int compareValue(Object o1, Object o2) {
-		//System.out.println(o1.getClass()+""+o2.getClass());
+		// System.out.println(o1.getClass()+""+o2.getClass());
 		if (o1 instanceof Integer && o2 instanceof Integer) {
 			int first = (int) o1;
 			int second = (int) o2;
 			// the first is greater than return >0 if equal 0 if less <0
-			return  first - second;
+			return first - second;
 
 		} else {
 			if (o1 instanceof Double && o2 instanceof Double) {
@@ -80,8 +81,6 @@ public class DBApp {
 	// be passed in htblColNameType
 	// htblColNameValue will have the column name as key and the data
 	// type as value
-
-
 
 	public void createTable(String strTableName,
 			String strClusteringKeyColumn,
@@ -281,7 +280,6 @@ public class DBApp {
 			arrSQLTerms[0]._strColumnName = "id";
 			arrSQLTerms[0]._strOperator = "=";
 			arrSQLTerms[0]._objValue = new Integer(1);
-
 
 			String[] strarrOperators = new String[1];
 

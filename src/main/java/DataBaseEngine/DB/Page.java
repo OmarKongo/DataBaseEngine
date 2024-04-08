@@ -122,14 +122,6 @@ public class Page implements Serializable, Comparable<Object> {
 
 	}
 
-	public static void main(String[] args) {
-		Page p = new Page("s");
-		int r = (int) (Math.random() * 5021100);
-
-		System.out.print(r);
-
-	}
-
 	public ArrayList<Object> selectDistinctNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
 
@@ -144,20 +136,60 @@ public class Page implements Serializable, Comparable<Object> {
 
 		return res;
 	}
-	public ArrayList<Object> selectRangeNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
-        ArrayList<Object> res = new ArrayList<Object>();
-        String searchedColumn = arrSQLTerms[0]._strColumnName;
-        Object searchedValue = arrSQLTerms[0]._objValue;
-        for (Tuple t : this.getTuplesInPage()) {
-            Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
-            if (DBApp.compareValue(tupleObjectValue, searchedValue) > 0) {
-                res.add(t);
-            }
-        }
-        return res;
-    }
-}
 
+	public ArrayList<Object> selectNoIndexNoPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>();
+		String searchedColumn = arrSQLTerms[0]._strColumnName;
+		Object searchedValue = arrSQLTerms[0]._objValue;
+		for (Tuple t : this.getTuplesInPage()) {
+			Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+			int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+			switch (arrSQLTerms[0]._strOperator) {
+				case ">":
+					if (comparison > 0) {
+						res.add(t);
+					}
+					break;
+				case ">=":
+					if (comparison >= 0) {
+						res.add(t);
+					}
+					break;
+				case "<":
+					if (comparison < 0) {
+						res.add(t);
+					}
+					break;
+				case "<=":
+					if (comparison <= 0) {
+						res.add(t);
+					}
+					break;
+				case "!=":
+					if (comparison != 0) {
+						res.add(t);
+					}
+					break;
+				case "=":
+					if (comparison == 0) {
+						res.add(t);
+					}
+					break;
+
+			}
+		}
+		return res;
+	}
+
+	public static void main(String[] args) {
+		Page p = new Page("s");
+		int r = (int) (Math.random() * 5021100);
+
+		System.out.print(r);
+
+	}
+
+}
 
 class Pair implements Serializable {
 

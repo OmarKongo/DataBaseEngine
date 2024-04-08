@@ -90,7 +90,7 @@ class Deserialize {
 			ObjectInputStream in = new ObjectInputStream(file);
 
 			// Method for deserialization of object
-			t = (Table)in.readObject();
+			t = (Table) in.readObject();
 
 			in.close();
 			file.close();
