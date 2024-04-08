@@ -89,8 +89,8 @@ public class Page  implements Serializable,Comparable<Object>{
 				
 			}
 	}
-    public boolean tupleFounded(Tuple T) {
-    	int index = Collections.binarySearch(this.getTuplesInPage(),T);
+    public boolean tupleFounded(Object key) {
+    	int index = Collections.binarySearch(this.getTuplesInPage(),key);
     	if(index <0)
     		return false;
     	

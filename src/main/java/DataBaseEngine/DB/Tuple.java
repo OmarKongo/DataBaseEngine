@@ -90,7 +90,35 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 	    page.getTuplesInPage().add(index,this);
 	    return page;
 	}
-
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Tuple updateTuple(String pageName,Hashtable<String,String> indexes,Hashtable<String,Object> htblColNameValue) {
+		   String indexName = null;Object newKey = null;bplustree btree = null;String indx =null;
+		   Enumeration<String> keys = null;Object oldKey = null;   ArrayList<String> pageNames = null;
+		   ArrayList<String> currPage = new ArrayList<String>();currPage.add(pageName);
+			     keys = htblColNameValue.keys();
+				while(keys.hasMoreElements()) {
+					  indx = keys.nextElement();
+					  indexName = indexes.get(indx);
+					  oldKey = this.getAttributesInTuple().get(indx);
+					  newKey = htblColNameValue.get(indx);
+					  if(indexName!=null) {
+					  btree = Deserialize.Index(indexName);
+			          
+			          btree.update((Comparable)oldKey,currPage,(Comparable)newKey);
+			          Serialize.Index(btree, indexName);
+			         
+					  }
+					  this.getAttributesInTuple().put(indx,newKey);
+					  
+				}	
+		   
+		   return this;
+	   }
+	public int getActualIndex(Vector<Tuple> v) {
+		int index = Collections.binarySearch(v,this.getPK());
+		return index;
+		
+	}
 	
 	
     
