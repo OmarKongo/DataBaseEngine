@@ -419,8 +419,6 @@ public class Table implements Serializable {
 						
 						Page p = Deserialize.Page(pageName);
 
-						System.out.println(p.getTuplesInPage());
-
 						// Tuple record = new Tuple(t.getStrClusteringKeyColumn(),
 						// htblColNameValue.keys(), htblColNameValue.elements());
 						res = p.selectDistinctNoIndex(arrSQLTerms, strarrOperators);

@@ -73,10 +73,7 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 	public Page addTuple(Page page) throws IOException {
 		
 	    int index = this.getIndex(page.getTuplesInPage());
-		System.out.println(index);
-		System.out.println("h"+page.getTuplesInPage());
 	    page.getTuplesInPage().add(index,this);
-		System.out.println("hi"+page.getTuplesInPage());
 	    return page;
 	}
 

@@ -159,35 +159,35 @@ public class Page implements Serializable, Comparable<Object> {
 }
 
 
-	class Pair implements Serializable {
+class Pair implements Serializable {
 
-		Object min, max;
+	Object min, max;
 
-		public Pair(Object start) {
+	public Pair(Object start) {
 
-			// this.max = max;
-			this.min = start;
-		}
-
-		public Object getMin() {
-			return min;
-		}
-
-		public void setMin(Object min) {
-			this.min = min;
-		}
-
-		@Override
-		public String toString() {
-			return "Pair [min=" + min + ", max=" + max + "]";
-		}
-
-		public Object getMax() {
-			return max;
-		}
-
-		public void setMax(Object max) {
-			this.max = max;
-		}
-
+		// this.max = max;
+		this.min = start;
 	}
+
+	public Object getMin() {
+		return min;
+	}
+
+	public void setMin(Object min) {
+		this.min = min;
+	}
+
+	@Override
+	public String toString() {
+		return "Pair [min=" + min + ", max=" + max + "]";
+	}
+
+	public Object getMax() {
+		return max;
+	}
+
+	public void setMax(Object max) {
+		this.max = max;
+	}
+
+}
