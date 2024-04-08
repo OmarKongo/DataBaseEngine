@@ -412,31 +412,50 @@ public class Table implements Serializable {
 				if (arrSQLTerms[0]._strColumnName.equals(this.getStrClusteringKeyColumn())) {
 					int pageIndex = this.binarySearch(arrSQLTerms[0]._objValue);
 					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
-					if (arrSQLTerms[0]._strOperator.equals("=")) {
-						String pageName = this.getPages().elementAt(pageIndex).getName();
 
-						Page p = Deserialize.Page(pageName);
+					switch (arrSQLTerms[0]._strOperator) {
+						// O(log(log(n)))
+						case "=":
+							String pageName = this.getPages().elementAt(pageIndex).getName();
+							Page p = Deserialize.Page(pageName);
+							res.add(p.selectDistinctNoIndex(arrSQLTerms, strarrOperators));
+							Serialize.Page(p);
+							break;
 
-						res = p.selectDistinctNoIndex(arrSQLTerms, strarrOperators);
 
-						Serialize.Page(p);
-					} else {
-						// since querie is on clustering key, range queries such as ">,>=,<,<=" are done
-						// in O(N/3)
-						// e:g if greater than, starts at first tuple and keeps prinitng UNTIL tuple is
-						// found then stops
-						// != is done in O(N) (kinda ineviteble?)
-						if (arrSQLTerms[0]._strOperator.equals("!=")) {
-							//trying to find != in O(log(n))
-							//idea: directly include in resultSet all tuples, then use BS to find tuple you need to exclude
-						} else {
-							for (Page p : this.getPages()) {
-								Page p1 = Deserialize.Page(p.getName());
-								res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators));
+						// O(log(log(n))* N/3)
+						case ">=":
+						case ">": {
+							int firstLoopMarker = 0;
+							for (int i = pageIndex; i < this.getPages().size(); i++) {
+								// I want to start printing from the tuple index (or not, if >) to the end
+								Page p1 = Deserialize.Page(this.getPages().elementAt(i).getName());
+								res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p1);
+								firstLoopMarker++;
 							}
+							break;
 						}
+						// O(N/3)
+						case "<=":
+						case "<": {
+							int firstLoopMarker = 0;
+							for (Page page : this.getPages()) {
+								Page p2 = Deserialize.Page(page.getName());
+								res.add(p2.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
+								Serialize.Page(p2);
+								firstLoopMarker++;
+							}
+							break;
+						}
+						
+						case "!=":
+							break;
+
 					}
+
+					
+
 				} else {
 					// unfortunately have to iterate through all records since we are searching on a
 					// (non-sorted column)

@@ -125,16 +125,20 @@ public class Page implements Serializable, Comparable<Object> {
 	public ArrayList<Object> selectDistinctNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
 
-		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
-		attributesInTuple.put(arrSQLTerms[0]._strColumnName, arrSQLTerms[0]._objValue);
-
-		int tupleIndex = Collections.binarySearch(this.getTuplesInPage(),
-				new Tuple(arrSQLTerms[0]._strColumnName, attributesInTuple.keys(),
-						attributesInTuple.elements()));
+		int tupleIndex = this.getTupleIndexUsingBS(arrSQLTerms);
 		if (tupleIndex != -1)
 			res.add(this.getTuplesInPage().elementAt(tupleIndex));
 
 		return res;
+	}
+
+	public int getTupleIndexUsingBS(SQLTerm[] arrSQLTerms) {
+		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
+		attributesInTuple.put(arrSQLTerms[0]._strColumnName, arrSQLTerms[0]._objValue);
+		int tupleIndex = Collections.binarySearch(this.getTuplesInPage(),
+				new Tuple(arrSQLTerms[0]._strColumnName, attributesInTuple.keys(),
+						attributesInTuple.elements()));
+		return tupleIndex;
 	}
 
 	public ArrayList<Object> selectNoIndexNoPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
@@ -181,23 +185,28 @@ public class Page implements Serializable, Comparable<Object> {
 		return res;
 	}
 
-	public ArrayList<Object> selectRangeNoIndexPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+	public ArrayList<Object> selectRangeNoIndexPK(SQLTerm[] arrSQLTerms, String[] strarrOperators, int firstLoopMarker) {
 		ArrayList<Object> res = new ArrayList<Object>();
 		String searchedColumn = arrSQLTerms[0]._strColumnName;
 		Object searchedValue = arrSQLTerms[0]._objValue;
 		int testCount = 0;
 		if (arrSQLTerms[0]._strOperator.equals(">") | arrSQLTerms[0]._strOperator.equals(">=")) {
-			for (int i = this.getTuplesInPage().size() - 1; i >= 0; i--) {
+			int j  = 0;
+			if (firstLoopMarker == 0){
+				j = this.getTupleIndexUsingBS(arrSQLTerms);
+			}
+			for (int i = j; i < this.getTuplesInPage().size(); i++) {
 				testCount++;
 				Tuple t = this.getTuplesInPage().elementAt(i);
 				Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
 				int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+
+
 				if (comparison != 0) {
 					res.add(t);
 				} else {
 					if (arrSQLTerms[0]._strOperator.equals(">="))
 						res.add(t);
-					break;
 				}
 			}
 		} else {
