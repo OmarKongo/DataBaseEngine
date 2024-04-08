@@ -54,11 +54,15 @@ public class DBApp {
 			return first - second;
 
 		} else {
-			if (o1 instanceof Double && o2 instanceof Double) {
-				Double first = (Double) o1;
-				Double second = (Double) o2;
-				// the first is greater than return 1
-				return (int) Math.ceil(first - second);
+            if (o1 instanceof Double && o2 instanceof Double) {
+                Double first = (Double) o1;
+                Double second = (Double) o2;
+                // the first is greater than return 1
+				Double res = first - second;
+				if (res > 0)
+                	return (int) Math.ceil(res);
+				else	
+					return (int) Math.floor(res);
 			} else {
 				String first = (String) o1;
 				String second = (String) o2;
