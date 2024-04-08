@@ -60,10 +60,6 @@ public class DBApp {
 
 				
  
-				Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-				T.addTable(strTableName,strClusteringKeyColumn,csvPath);
-				Serialize.Table(T,strTableName);			
-			
 }
 
 // following method creates a B+tree index 
@@ -80,22 +76,6 @@ public void createIndex(String   strTableName,
 public void insertIntoTable(String strTableName, 
 				Hashtable<String,Object>  htblColNameValue) throws DBAppException{
 
-Hashtable<String,String> indexes = null;
-try {
-indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
-} catch (Exception e) {
-
-e.printStackTrace();
-}
-Table T = Deserialize.Table(strTableName);
-Tuple record = new Tuple(T.getStrClusteringKeyColumn(),htblColNameValue.keys(),htblColNameValue.elements());	
-try {
-T = Table.insertIntoTable(record,indexes,strTableName);
-} catch (Exception e) {
-// TODO Auto-generated catch block
-e.printStackTrace();
-}
-Serialize.Table(T,strTableName);
 
 }
 
@@ -119,7 +99,21 @@ throw new DBAppException("not implemented yet");
 public void deleteFromTable(String strTableName, 
 				Hashtable<String,Object> htblColNameValue) throws DBAppException{
 				
-
+	Hashtable<String,String> indexes = null;
+	try {
+		 indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
+	} catch (Exception e) {
+		
+		e.printStackTrace();
+	}
+	Table T = Deserialize.Table(strTableName);
+	try {
+		T.deleteFromTable(htblColNameValue,indexes);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
 
 
 

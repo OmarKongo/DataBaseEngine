@@ -14,10 +14,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
+
+import javax.print.attribute.standard.PDLOverrideSupported;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -96,97 +100,22 @@ public class Table implements Serializable{
         return htblColNameType;
     }
 
-    public void addTable(String tableName,String pK,String filePath) {
-        try {
-            checkDataType(this.htblColNameType,filePath,tableName);
-            CSVWriter writer = new CSVWriter(new FileWriter(filePath,true));
-            Enumeration<String> types = this.htblColNameType.elements();
-            Enumeration<String> keys = this.htblColNameType.keys();
-            String []line =  new String[6];
-            
-            while(types.hasMoreElements()) {
-                line = insertLine(line,tableName,keys.nextElement(),types.nextElement(),pK);
-                writer.writeNext(line);
-            }
-            writer.flush();
-            writer.close();
-        }
-        catch(Exception ex) {
-            ex.printStackTrace();
-        }
     
-    }
     
-
-    public static void checkDataType(Hashtable<String,String> htblColNameType,String filePath,String tableName) throws DBAppException, IOException{
-		for(String s : htblColNameType.values()){
-			if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.Double"))){
-				throw new DBAppException("Column DataType invalid");
-			}
-		}
-		CSVReader csvReader = null;
-		try {
-			csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-			        .withSkipLines(1) 
-			        .build();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String[] nextRecord;boolean flag = false;
-		
-        // this loop iterate over the csv file untill the table is founded
-        // if it's  founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) { 
-            
-            if(nextRecord[0].equals(tableName))
-            	throw new DBAppException("Duplicate Table");
-            	
-            else
-            	continue;
-        
-
-	}
+    public static Object baseType(Object key) {
+   	 
+   	 if((key instanceof String)) {
+   		 return "";
+   	 }
+   	 else
+   		 if(key instanceof Double)
+   			 return 0.0;
+   		 else
+   			 return 0;
+   	 
     }
-    public static String[] insertLine(String []line,String tableName,String name, String type,String primaryKey) {
-		
-		line[0] = tableName;line[1] = name; line[2] = type;
-		if(primaryKey.equals(name))
-			line[3] = "True";
-		else
-			line[3] = "False";
-		line[4] = null;line[5] = null;
-	
-        return line;
-    }
-    public static boolean tableFounded(String tableName,String filePath) throws DBAppException, IOException {
-    	CSVReader csvReader = null;
-		try {
-			csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-			        .withSkipLines(1) 
-			        .build();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String[] nextRecord;boolean flag = false;
-		
-        // this loop iterate over the csv file untill the table is founded
-        // if it's  founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) { 
-            
-            if(nextRecord[0].equals(tableName))
-            	return true;
-            	
-            else
-            	continue;
-        
-
-	}
-		return false;
-    	
-    }
-    
+   
+   
     public static Hashtable<String,String> checkData(String tableName,Hashtable<String,Object> data,String filePath) throws Exception {
 		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
                 .withSkipLines(1) 
@@ -233,24 +162,6 @@ public class Table implements Serializable{
 		return indexes;
 	}
    
-    public String setNameForpage() {
-    	int counter = this.getPagesCounter();
-		String pageName = this.getStrTableName()+counter;
-		this.setPagesCounter(++counter);
-		return pageName;
-    }
-     public static Object baseType(Object key) {
-    	 
-    	 if((key instanceof String)) {
-    		 return "";
-    	 }
-    	 else
-    		 if(key instanceof Double)
-    			 return 0.0;
-    		 else
-    			 return 0;
-    	 
-     }
     
      @SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void addInBtree(Tuple T,Page p,Hashtable<String,String> indexes) {
@@ -277,212 +188,320 @@ public class Table implements Serializable{
     	 }
      }
      
-    public  static Table insertIntoTable(Tuple T,Hashtable<String,String> indexes,String tableName) throws Exception {
-        
-    	Table table = Deserialize.Table(tableName);
-        //System.out.println(table.getProps());
-    	Page p = null;String pageName;boolean flag = false;
-           Object maxKeyInPreviousPage;// this attribute connect the pages with each other maxLastpage = minNextPage
-    	//Base Case
     
-    	if(table.getPages().size()==0) {
-    		 p = new Page(table.setNameForpage());
-    		 p.getPageProp().put(p.getName(),new Pair(baseType(T.getPK())));
-    		// table.getProps().put(p.getName(),new Pair(baseType(T.getPK())));
-    		
-    		 T.addTuple(p);
-    		 p = p.updateMax();
-    		 table.getPages().add(p);
-     		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-     		Serialize.Table(table, tableName);
-    		 addInBtree(T,p,indexes);
-    		
-    		 pageName = p.getName();
-    		 Serialize.Page(p,pageName);
-    		 
-    	}
-    	
-    	else {  // Search for the right page to insert in
-    		//table = Deserialize.Table(tableName);
-    		int index = table.binarySearch(T.getPK());
-    		 pageName = table.getPages().elementAt(index).getName();
-    		 p = Deserialize.Page(pageName);
-    		 //p = table.getPages().elementAt(index);
-    		if(p.tupleFounded(T))
-    	        	throw new DBAppException("Duplicate Tuple");
-    		p = T.addTuple(p);
-    		if(!p.overFlowed()) {
-    			p = p.updateMax();
-    			
-    			table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-         		Serialize.Table(table, tableName);
-    			addInBtree(T,p,indexes);
-    			Serialize.Page(p,pageName);
-    			
-    	    	//ADDED SUCCESSFULLY
-    	    }
-    	    else {
-    	    	//OVERFLOW ON PAGE BUT STILL ADDED
-    	    	addInBtree(T,p,indexes);
-    	    	T = p.getTuplesInPage().remove(p.getMaxCount());
-    	    	deleteFromIndex(T,p,indexes);
-    	    	p = p.updateMax();
-    	    	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-         		Serialize.Table(table, tableName);
-    	    	pageName = p.getName();
-          maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
-                   Serialize.Page(p,pageName);
-                 
-                 //OVERFLOW ON THE LAST PAGE
-                if(index == table.getPages().size()-1) { // if the overflow in the last page, I will create a new page without going through any loops
-                	 table = Deserialize.Table(tableName);
-                	p = new Page(table.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T))); 
-                	
-            		
-            		
-                	p = p.updateMin(maxKeyInPreviousPage);	
-                	T.addTuple(p);addInBtree(T,p,indexes);p = p.updateMax();
-                	table.getPages().add(p);
-                	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-             		Serialize.Table(table, tableName);
-                	pageName = p.getName();Serialize.Page(p,pageName);
-                }
-                
-                else { // handle the overflow of pages by setting flag = true 
-                	 /// if flag is still false this means that the last page has an overflow 
-                	while(index!=table.getPages().size()-1) {
-                		  table = Deserialize.Table(tableName);
-                	pageName = table.getPages().elementAt(index+1).getName();
-                	//System.out.println(pageName);
-                	p = Deserialize.Page(pageName);
-                	T.addTuple(p);
-                	if(!p.overFlowed()) {
-                		addInBtree(T,p,indexes);
-                		
-                		p = p.updateMin(maxKeyInPreviousPage);p = p.updateMax();
-                		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-                 		Serialize.Table(table, tableName);
-                		pageName = p.getName();
-                		Serialize.Page(p,pageName);
-                		
-                		flag = true;
-                		break;
-                	}
-                	else {
-                		addInBtree(T,p,indexes);
-                		T = p.getTuplesInPage().remove(p.getMaxCount());
-                		deleteFromIndex(T,p,indexes);
-                		p = p.updateMax();p = p.updateMin(maxKeyInPreviousPage);
-                		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-                 		Serialize.Table(table, tableName);
-                        maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
-                        pageName = p.getName();
-                        Serialize.Page(p,pageName);
-                     
-                	}
-                	index++;
-                }
-                	if(!flag) { // this if handles the last overflow can happen
-                		  table = Deserialize.Table(tableName);
-                		p = new Page(table.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T)));
-                		p = p.updateMin(maxKeyInPreviousPage);	
-                    	T.addTuple(p); addInBtree(T,p,indexes);p = p.updateMax();
-                    	table.getPages().add(p);
-                    	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-                 		Serialize.Table(table, tableName);
-                    	
-                	
-                    	pageName = p.getName();
-                    	Serialize.Page(p,pageName);
-                	}
-                }
-    	    	
-    	    }
-    	}
-    	return table;
-    	
-    }
- 
     
-    // this method return the index of the right page to insert in
-    public int binarySearch(Object key) throws Exception
-    {
-    	//Object key = T.getPK();
-    	int mid = 0;
-    	Vector<Page> v =this.getPages();
-	  int l = 0; int r = v.size()-1;
-	  if(r == 0)
-		return 0;
-	                                                                              
-        while (l <= r) {
-             mid = (l + r) / 2;
-             
- 
-            Pair p = this.getProps().get(this.getPages().elementAt(mid).getName());
-           // Page P = Deserialize.Page(v.elementAt(mid).getName());
-           // Page P = this.getPages().elementAt(mid);
-           // P.display();
-             if(key instanceof Integer) {
-            	//int min = this.getPages().get(mid).getPageProp().get()
-            int min = (int) p.getMin();
-            int max = (int) p.getMax();
-            if (min == (int)key || max == (int)key) 
-                throw new Exception("Duplicate Key");
-             
- 
-          
-            if((int)key>min & (int)key<max)
-            	return mid;
-            else
-            	if(max>(int)key)
-            		r = mid - 1;
-            	else
-            		l = mid + 1;
-            	
-            }
-             else 
-            	 if(key instanceof Double) {
-            		 Double min = (Double) p.getMin();
-                     Double max = (Double) p.getMax();
-                     if (min == (Double)key || max == (Double)key) 
-                         throw new Exception("Duplicate Key");
-                      
-          
-                   
-                     if((Double)key>min & (Double)key<max)
-                     	return mid;
-                     else
-                     	if(max>(Double)key)
-                     		r = mid - 1;
-                     	else
-                     		l = mid + 1;
-            		 
-            	 }
-             
-             else {
-            	 String min = (String) p.getMin();
-                 String max = (String) p.getMax();
-                 if (min.equals(key) || max.equals(key)) 
-                     throw new Exception("Duplicate Key");
-                  
-      
+     public  boolean hasPK( Hashtable<String,Object> h ) {
+  		if(h.containsKey(this.getStrClusteringKeyColumn()))
+  			return true;
+  		return false;
+  	}
+  
+  	public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
+  		
+  		if (indexes.containsKey(strFromHshTblCol))
+  			return true;
+  		return false ;
+  	}
+  	@SuppressWarnings({ "unchecked", "rawtypes" })
+  	public Page searchPK(Object key, boolean hasIndex,String indexName) throws DBAppException {
+  		Page p = null;
+  		if (hasIndex) {
+  			bplustree bTree= Deserialize.Index(indexName);
+  			ArrayList<String> page = bTree.search((Comparable)key);
+  			bTree.delete((Comparable)key, page);
+  			p = Deserialize.Page(page.get(0));
+  		}
+  		else {
+  			
+  			int index = 0;
+  			try {
+  				//index = t.binarySearch(key);
+  			} catch (Exception e) {
+  				// TODO Auto-generated catch block
+  				e.printStackTrace();
+  			}
+  			// p = Deserialize.Page(t.getPages().get(index).getName());
+  		}
+  		return p ;
+  	}
+  	
+  	public  void deleteTupleUsingKey(Page p,Tuple t) throws Exception {
+ 	     String pageName = null;Page prevPage = null;Page nextPage = null;int pageIndex = this.binarySearch(t.getPK(),false);
+ 	  String tableName = this.getStrTableName();
+ 	   //  int index = Collections.binarySearch(p.getTuplesInPage(),key);
+ 	    //if(index<0)
+ 	  Object key = t.getPK();
+ 	    //	throw new DBAppException("Key not Found");
+ 	     p.getTuplesInPage().remove(t);
+ 	    if(p.getTuplesInPage().size()>0) {
+ 	    	p.updateMax();
+ 	    	this.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
+     		Serialize.Table(this, tableName);
+     		Serialize.Page(p,p.getName());
+ 	    	if(!(pageIndex==this.getPages().size()-1)) {
+ 	    	    nextPage = this.getPages().get(pageIndex+1);
+ 	    	    pageName = nextPage.getName();
+ 	    	    nextPage = Deserialize.Page(pageName);
+ 	    	    nextPage.updateMin(p.getPageProp().get(p.getName()).getMax());
+ 	    	    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
+ 	     		Serialize.Table(this, tableName);
+ 	    	    Serialize.Page(nextPage,pageName);
+ 	    	}
+ 	    	
+ 	    }
+ 	    else {
+ 	    	if(pageIndex==0 & !(pageIndex==this.getPages().size()-1)) {
+ 	    		nextPage = this.getPages().get(pageIndex+1);
+ 	    		pageName = nextPage.getName();
+ 	    	    nextPage = Deserialize.Page(pageName);
+ 	    	    nextPage.updateMin(baseType(t.getPK()));
+ 	    	    this.getProps().put(pageName,nextPage.getPageProp().get(pageName));
+ 	     		Serialize.Table(this, tableName);
+ 	    	    Serialize.Page(nextPage,pageName);
+ 	    	}
+ 	    	else {
+ 	    		if(!(pageIndex==this.getPages().size()-1)) {
+ 	    			
+ 	    			
+        prevPage = this.getPages().get(pageIndex-1);pageName = prevPage.getName();
+                           prevPage = Deserialize.Page(pageName);
                
-                 if(((String)key).compareTo(min)>0 & ((String)key).compareTo(max)<0)
-                 	return mid;
-                 else
-                 	if(((String)key).compareTo(max)<0)
-                 		r = mid - 1;
-                 	else
-                 		l = mid + 1;
-            	 
-            	 
+                           
+        nextPage = this.getPages().get(pageIndex+1);pageName = nextPage.getName();
+                           nextPage = Deserialize.Page(pageName);
+                           
+                           
+                nextPage.updateMin(prevPage.getPageProp().get(prevPage.getName()).getMax());
+                this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
+ 	     		Serialize.Table(this, tableName);            
+                Serialize.Page(nextPage,pageName);
+ 	    			
+ 	    		}
+ 	    		
+ 	    	}
+ 	    	this.updatepages(p,pageIndex);
+ 	    
+ 	    }
+ 	    System.out.println(key + "  deleted");	
+ 	
+ }
+  	 public void updatepages(Page p,int pageIndex) {
+  
+      	String pageName = p.getName();
+  		this.getPages().remove(pageIndex);
+  		this.getProps().remove(pageName);
+  		
+  		this.deleteFile(pageName);
+  		String tableName = this.getStrTableName();
+      	Serialize.Table(this,tableName);
+      	//return this;
+      }
+  	public  void deleteFile(String pageName) {
+ 		String path = "Pages/"+pageName+".ser";
+ 		File file = new File(path);
+ 		if(file.delete())
+ 			System.out.println(pageName+" deleted");
+ 		else
+ 			System.out.println("file cannot be deleted");
+ 		
+ 		
+ 	}
+  	public static boolean tupleMatched(Tuple t,Hashtable<String,Object> htblColNameValue) {
+  		Enumeration<String> attributes = htblColNameValue.keys();
+   	  while(attributes.hasMoreElements()) {
+   		  
+   		  if(!(t.getAttributesInTuple().contains(htblColNameValue.get(attributes.nextElement()))))
+   		 	  return false;
+   		 
+   	  }
+   	  return true;
+  	}
+  	public  void iterateOverChosenPages(Set<String> pageNames,Hashtable<String,Object> htblColNameValue,Hashtable<String,String> indexes) throws DBAppException {
+  		  Page p = null;//Tuple t = null;//Vector<Tuple> v = new Vector<Tuple>();
+  		  
+  		  for(String name : pageNames) {
+  			  p = Deserialize.Page(name);
+  			  List<Tuple> tuples = new ArrayList<Tuple>(p.getTuplesInPage());
+  			  //Iterator<Tuple> iter = v.iterator();
+  			  for(Tuple t : tuples) {
+  				  //t = iter.next();
+  				  if(tupleMatched(t,htblColNameValue)) {
+  					  try {
+ 						this.deleteTupleUsingKey(p, t);
+ 					} catch (Exception e) {
+ 						// TODO Auto-generated catch block
+ 						e.printStackTrace();
+ 					}
+  					if(indexes.size()!=0)
+  			      deleteFromIndex(t,p, indexes);
+  			  }}
+  			  
+  		  }
+  		
+  	}
+  	public static boolean hasAnyIndex(Hashtable <String,Object> htblColNameValue,Hashtable<String,String> indexes ) {
+  		
+  		for(String key : htblColNameValue.keySet()) {
+  			if(indexes.containsKey(key))
+  				return true;
+  		}
+  		return false;
+  	}
+  	
+     @SuppressWarnings({  "rawtypes", "unchecked" })
+ 	public void deleteFromTable(Hashtable<String,Object> htblColNameValue,Hashtable<String,String>indexes) throws Exception {
+     	Page p =null;String pageName = null;int index;Tuple t = null;boolean flag =false;
+     	bplustree btree = null;String indexName = null;
+     	 ArrayList<String> tuples = new ArrayList<String>();Object key = null;String indx = null;
+     	 ArrayList<String> currIndex = null;Set<String> finalTuples = null;
+     	//First Case
+     	if(this.hasPK(htblColNameValue)) {
+     		 key = htblColNameValue.get(this.getStrClusteringKeyColumn());
+     	    if(!hasIndex(indexes,this.getStrClusteringKeyColumn())) {
+     		index = this.binarySearch(htblColNameValue.get(this.getStrClusteringKeyColumn()),false);
+     	  pageName = this.getPages().elementAt(index).getName();
+     	    }
+     	 else {
+     		 flag = true;
+     		 indexName = indexes.get(this.getStrClusteringKeyColumn());
+     		 btree = Deserialize.Index(indexName);
+     		 pageName = (String) btree.search((Comparable)key).get(0); 
+     	 }
+     	  p = Deserialize.Page(pageName);
+     	  index = Collections.binarySearch(p.getTuplesInPage(),key);
+     	  if(index<0)
+     		  throw new DBAppException("key not found");
+     	  t = p.getTuplesInPage().elementAt(index);
+     	   
+     	  
+     	  if(tupleMatched(t,htblColNameValue)) {
+     		  deleteFromIndex(t,p,indexes);
+     		  this.deleteTupleUsingKey(p, t);  
+     	  
+     	  }
+     	  else
+     		  throw new DBAppException("Record not found");
+     	}
+     	//second case
+     	else
+     		if(indexes.size()!=0 & hasAnyIndex(htblColNameValue,indexes)) {
+     			Enumeration<String> keys = htblColNameValue.keys();
+     			while(keys.hasMoreElements()) {
+     				  indx = keys.nextElement();
+     				  indexName = indexes.get(indx);
+     				  if(indexName!=null) {
+     				  btree = Deserialize.Index(indexName);
+     		          key = htblColNameValue.get(indx);
+     		          if(tuples.isEmpty())
+     		        	  tuples = btree.search((Comparable)key);
+     		          else {
+     		        	  currIndex = btree.search((Comparable)key);
+     		        	  tuples.retainAll(currIndex);
+     		          }
+     				  }
+     			}
+     			
+     			if(tuples.size()==0)
+     				throw new DBAppException("Invalid Enteries");
+     			 finalTuples = new HashSet<String>(tuples);
+     			 this.iterateOverChosenPages(finalTuples, htblColNameValue,indexes);
+     		}
+     	 // Third case
+     		else {
+     			finalTuples = new HashSet<String>(this.getProps().keySet());
+     			this.iterateOverChosenPages(finalTuples, htblColNameValue,indexes);
+     		}
+     }
+     // this method return the index of the right page to insert in
+     public int binarySearch(Object key,Boolean insert) throws Exception
+     {
+     	//Object key = T.getPK();
+     	int mid = 0;
+     	Vector<Page> v =this.getPages();
+ 	  int l = 0; int r = v.size()-1;
+ 	  if(r == 0)
+ 		return 0;
+ 	                                                                              
+         while (l <= r) {
+              mid = (l + r) / 2;
+              
+  
+             Pair p = this.getProps().get(this.getPages().elementAt(mid).getName());
+            // Page P = Deserialize.Page(v.elementAt(mid).getName());
+            // Page P = this.getPages().elementAt(mid);
+            // P.display();
+              if(key instanceof Integer) {
+             	//int min = this.getPages().get(mid).getPageProp().get()
+             int min = (int) p.getMin();
+             int max = (int) p.getMax();
+             if (min == (int)key || max == (int)key) {
+             	if(insert)
+                    throw new Exception("Duplicate Key");
+             	else {
+             		if(max == (int)key || mid==0)
+             		  return mid;
+             		else 
+             			 return mid-1;
+             			
+             	
+             		}
+             	}
+  
+           
+             if((int)key>min & (int)key<max)
+             	return mid;
+             else
+             	if(max>(int)key)
+             		r = mid - 1;
+             	else
+             		l = mid + 1;
+             	
              }
-        }
- 
-     
-        return mid;
-    }
-	
+              else 
+             	 if(key instanceof Double) {
+             		 Double min = (Double) p.getMin();
+                      Double max = (Double) p.getMax();
+                      if (min == (Double)key || max == (Double)key) 
+                          throw new Exception("Duplicate Key");
+                       
+           
+                    
+                      if((Double)key>min & (Double)key<max)
+                      	return mid;
+                      else
+                      	if(max>(Double)key)
+                      		r = mid - 1;
+                      	else
+                      		l = mid + 1;
+             		 
+             	 }
+              
+              else {
+             	 String min = (String) p.getMin();
+                  String max = (String) p.getMax();
+                  if (min.equals(key) || max.equals(key)) 
+                      throw new Exception("Duplicate Key");
+                   
+       
+                
+                  if(((String)key).compareTo(min)>0 & ((String)key).compareTo(max)<0)
+                  	return mid;
+                  else
+                  	if(((String)key).compareTo(max)<0)
+                  		r = mid - 1;
+                  	else
+                  		l = mid + 1;
+             	 
+             	 
+              }
+         }
+  
+      
+         return mid;
+     }
+    
+    
+    
 	public static void main(String[]args) throws Exception {
 		
 		
