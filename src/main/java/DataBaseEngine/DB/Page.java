@@ -185,32 +185,36 @@ public class Page implements Serializable, Comparable<Object> {
 		return res;
 	}
 
-	public ArrayList<Object> selectRangeNoIndexPK(SQLTerm[] arrSQLTerms, String[] strarrOperators, int firstLoopMarker) {
+	public ArrayList<Object> selectRangeNoIndexPK(SQLTerm[] arrSQLTerms, String[] strarrOperators,
+			int firstLoopMarker) {
 		ArrayList<Object> res = new ArrayList<Object>();
 		String searchedColumn = arrSQLTerms[0]._strColumnName;
 		Object searchedValue = arrSQLTerms[0]._objValue;
 		int testCount = 0;
-		if (arrSQLTerms[0]._strOperator.equals(">") | arrSQLTerms[0]._strOperator.equals(">=")) {
-			int j  = 0;
-			if (firstLoopMarker == 0){
-				j = this.getTupleIndexUsingBS(arrSQLTerms);
-			}
-			for (int i = j; i < this.getTuplesInPage().size(); i++) {
-				testCount++;
-				Tuple t = this.getTuplesInPage().elementAt(i);
-				Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
-				int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+		switch (arrSQLTerms[0]._strOperator) {
+			case ">":
+			case ">=": {
+				int j = 0;
+				if (firstLoopMarker == 0) {
+					j = this.getTupleIndexUsingBS(arrSQLTerms);
+				}
+				for (int i = j; i < this.getTuplesInPage().size(); i++) {
+					testCount++;
+					Tuple t = this.getTuplesInPage().elementAt(i);
+					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
 
-
-				if (comparison != 0) {
-					res.add(t);
-				} else {
-					if (arrSQLTerms[0]._strOperator.equals(">="))
+					if (comparison != 0) {
 						res.add(t);
+					} else {
+						if (arrSQLTerms[0]._strOperator.equals(">="))
+							res.add(t);
+					}
 				}
 			}
-		} else {
-			if (arrSQLTerms[0]._strOperator.equals("<") | arrSQLTerms[0]._strOperator.equals("<=")) {
+			case "<":
+			case "<=": {
+
 				for (int i = 0; i < this.getTuplesInPage().size(); i++) {
 					testCount++;
 					Tuple t = this.getTuplesInPage().elementAt(i);
@@ -224,8 +228,10 @@ public class Page implements Serializable, Comparable<Object> {
 						break;
 					}
 				}
+
 			}
 		}
+
 		System.out.println("test count is: " + testCount + " tuples in page is: " + this.getTuplesInPage().size());
 		return res;
 	}
