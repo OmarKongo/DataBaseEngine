@@ -1,92 +1,216 @@
 package DataBaseEngine.DB;
 
-
 import java.io.FileInputStream;
-
 import java.io.FileOutputStream;
-
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-
 public class Serialize {
+	static String pagesPath = "Pages";
+	static String tablesPath = "Tables";
+	static String indexesPath = "Indexes";
 	
-
-    public static String serializeTable(Table t) {
-    	String filePath = t.getStrTableName()+".ser";
-    	try {
-    		
-    		 //Saving of object in a file
-            FileOutputStream file = new FileOutputStream(filePath);
-            ObjectOutputStream out = new ObjectOutputStream(file);
-            // Method for serialization of object
-            out.writeObject(t);
+	
+	
+	public static void  Index(bplustree btree,String indexName) {
+		//System.out.println(p.getName());
+		String path = indexesPath+"/"+indexName+".ser";
+		
+		try
+	        {   
+	            //Saving of object in a file
+			 
+	            FileOutputStream file = new FileOutputStream(path);
+	            ObjectOutputStream out = new ObjectOutputStream(file);
+	             
+	            // Method for serialization of object
+	            out.writeObject(btree);
+	             
+	            out.close();
+	            file.close();
+	             
+	          //  System.out.println("Object has been serialized ff");
+	 
+	        }
+	         
+	        catch(IOException ex)
+	        {
+	            System.out.println("IOException is caught qq");
+	        }
+		//return path;
+	}
+	
+	
+	
+	
+	
+	public static void  Page(Page p) {
+		//System.out.println(p.getName());
+		String path = pagesPath+"/"+p.getName()+".ser";
+		
+		try
+	        {   
+	            //Saving of object in a file
+			 
+	            FileOutputStream file = new FileOutputStream(path);
+	            ObjectOutputStream out = new ObjectOutputStream(file);
+	             
+	            // Method for serialization of object
+	            out.writeObject(p);
+	             
+	            out.close();
+	            file.close();
+	             
+	          //  System.out.println("Object has been serialized ff");
+	 
+	        }
+	         
+	        catch(IOException ex)
+	        {
+	            System.out.println("IOException is caught qq");
+	        }
+		//return path;
+	}
+	/**
+     * @author Brolosy
+     * @param p the table to be serialised
+     * serialises table
+     */
+	public static void Table(Table t) {
+		  String path = tablesPath+"/"+t.getStrTableName()+".ser"; 
+		  //System.out.print(path);
+		try
+	        {   
+	            //Saving of object in a file
+			
+	            FileOutputStream file = new FileOutputStream(path);
+	            ObjectOutputStream out = new ObjectOutputStream(file);
+	             
+	            // Method for serialization of object
+	            out.writeObject(t);
+	             
+	            out.close();
+	            file.close();
+	             
+	           // System.out.println("Object has been serialized");
+	 
+	        }
+	         
+	        catch(IOException ex)
+	        {
+	            System.out.println("IOException is caught yy");
+	        }
+		 //return path;
+	}
+	
+	
+}
+class Deserialize{
+	static String pagesPath = "Pages";
+	static String tablesPath = "Tables";
+	static String indexesPath = "Indexes";
+	
+	/**
+     * @author Brolosy
+     * @param tableFileName the .ser filename of a page
+     * @return the table after deserialisation
+     * @throws Exception either FileNotFoundException or IOException (i think)
+     * Deserialises the specified table.
+     */
+	public static Table Table(String tableName) {
+		Table t = null;
+		String path = tablesPath+"/"+tableName+".ser";
+		try
+        {   
+            // Reading the object from a file
+            FileInputStream file = new FileInputStream(path);
+            ObjectInputStream in = new ObjectInputStream(file);
              
-            out.close();
+            // Method for deserialization of object
+             t = (Table)in.readObject();
+             
+            in.close();
             file.close();
              
-            System.out.println("Object has been serialized");
-    		
-    	}
-    	catch(Exception ex) {
-    		ex.printStackTrace();
-    	}
-    	return filePath;
+            //System.out.println("Object has been deserialized ");
+       
+        }
+         
+        catch(IOException ex)
+        {
+            System.out.println("IOException is caught zz");
+        }
+         
+        catch(ClassNotFoundException ex)
+        {
+            System.out.println("ClassNotFoundException is caught");
+        }
+		return t;
 	}
-    public static String serializePage(Page P) {
-    	String filePath = P.getName()+".ser";
-    	try {
-    		
-   		 //Saving of object in a file
-           FileOutputStream file = new FileOutputStream(filePath);
-           ObjectOutputStream out = new ObjectOutputStream(file);
-            
-           // Method for serialization of object
-           out.writeObject(P);
-            
-           out.close();
-           file.close();
-            
-           System.out.println("Object has been serialized");
-   		
-   	}
-   	catch(Exception ex) {
-   		ex.printStackTrace();
-   	}
-   	return filePath;
-    	/// serialize page
-    	
-    }
-
-    /**
-     * @author Brolosy
-     * @param pageFileName the .ser filename of a page
-     * @return the page after deserialisation
-     * @throws Exception either FileNotFoundException or IOException (i think)
-     * Deserialises the specified page.
-     */
-    public static Page deserializePage(String pageFileName) throws Exception{
-		// Deserialize a string and date from a file.
-        //must make try catch statement when calling this
-		FileInputStream in = new FileInputStream(pageFileName);
-		ObjectInputStream s = new ObjectInputStream(in);
-
-		Page p = (Page)s.readObject();
-		s.close();
-
-        return p;
-    }
-
-    public static Table deserializeTable(String tableFileName) throws Exception{
-		// Deserialize a string and date from a file.
-        //must make try catch statement when calling this
-		FileInputStream in = new FileInputStream(tableFileName);
-		ObjectInputStream s = new ObjectInputStream(in);
-
-		Table t = (Table)s.readObject();
-		s.close();
-
-        return t;
-    }
+	
+	public static Page Page(String pageName) {
+		Page p = null;
+		String path = pagesPath+"/"+pageName+".ser";
+		try
+        {   
+            // Reading the object from a file
+            FileInputStream file = new FileInputStream(path);
+            ObjectInputStream in = new ObjectInputStream(file);
+             
+            // Method for deserialization of object
+             p = (Page)in.readObject();
+             
+            in.close();
+            file.close();
+             
+           // System.out.println("Object has been deserialized ");
+       
+        }
+         
+        catch(IOException ex)
+        {
+            System.out.println("IOException is caught xx");
+        }
+         
+        catch(ClassNotFoundException ex)
+        {
+            System.out.println("ClassNotFoundException is caught");
+        }
+		return p;
+	}
+	@SuppressWarnings({ "rawtypes" })
+	public static bplustree Index(String indexName) {
+		bplustree btree = null;
+		String path = indexesPath+"/"+indexName+".ser";
+		try
+        {   
+            // Reading the object from a file
+            FileInputStream file = new FileInputStream(path);
+            ObjectInputStream in = new ObjectInputStream(file);
+             
+            // Method for deserialization of object
+             btree = (bplustree)in.readObject();
+             
+            in.close();
+            file.close();
+             
+            //System.out.println("Object has been deserialized ");
+       
+        }
+         
+        catch(IOException ex)
+        {
+            System.out.println("IOException is caught zz");
+        }
+         
+        catch(ClassNotFoundException ex)
+        {
+            System.out.println("ClassNotFoundException is caught");
+        }
+		return btree;
+	}
+	
+	
 	
 }

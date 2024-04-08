@@ -3,6 +3,7 @@ package DataBaseEngine.DB;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -12,9 +13,14 @@ import java.util.Properties;
 import java.util.Vector;
 
 public class Test {
-	private String filename = "DBApp.config";
-	Properties prop;
+	//private 
+	//Properties prop;
 	public Test()  throws Exception{
+		
+	}
+	public int getMaxCount() throws IOException {
+		String filename = "DBApp.config";
+		Properties prop = null;
 		try(FileInputStream fis = new FileInputStream(filename) ){
 			prop = new Properties();
 			prop.load(fis);
@@ -22,8 +28,6 @@ public class Test {
 		}catch(FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
-	}
-	public int getMaxCount() {
 	  String num = prop.getProperty("MaximumRowsCountinPage");
 	  return Integer.parseInt(num);
 		
@@ -43,7 +47,7 @@ public class Test {
 		System.out.println(p1.getName());
 		System.out.println(p2.getName());
 		*/
-		try{
+	/*	try{
 			
 			Page p = new Page("PC");
 			// Serialize created table to a file and appending to array of tables.
@@ -112,5 +116,5 @@ public class Test {
 	//makes all separated by commas
 	System.out.println(res2);
 
-
+*/
 	}}
