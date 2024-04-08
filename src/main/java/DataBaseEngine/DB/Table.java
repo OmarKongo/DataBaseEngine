@@ -417,16 +417,23 @@ public class Table implements Serializable {
 
 						Page p = Deserialize.Page(pageName);
 
-						// Tuple record = new Tuple(t.getStrClusteringKeyColumn(),
-						// htblColNameValue.keys(), htblColNameValue.elements());
 						res = p.selectDistinctNoIndex(arrSQLTerms, strarrOperators);
 
 						Serialize.Page(p);
 					}
+					else{
+						//since querie is on clustering key, range queries such as ">,>=,<,<=" are done in O(N/3)
+						//e:g if greater than, starts at first tuple and keeps prinitng UNTIL tuple is found then stops
+						//!= is done in O(N) (kinda ineviteble?)
+						for (Page p : this.getPages()) {
+							Page p1 = Deserialize.Page(p.getName());
+							res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators));
+							Serialize.Page(p1);
+						}
+					}
 				} else {
 					// unfortunately have to iterate through all records since we are searching on a
 					// (non-sorted column)
-					// for sorted, can be done in O(N/3)
 					for (Page p : this.getPages()) {
 						Page p1 = Deserialize.Page(p.getName());
 						res.add(p1.selectNoIndexNoPK(arrSQLTerms, strarrOperators));

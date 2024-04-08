@@ -181,6 +181,57 @@ public class Page implements Serializable, Comparable<Object> {
 		return res;
 	}
 
+	public ArrayList<Object> selectRangeNoIndexPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>();
+		String searchedColumn = arrSQLTerms[0]._strColumnName;
+		Object searchedValue = arrSQLTerms[0]._objValue;
+		int testCount = 0;
+		if (arrSQLTerms[0]._strOperator.equals(">") | arrSQLTerms[0]._strOperator.equals(">=")) {
+			for (int i = this.getTuplesInPage().size() - 1; i >= 0; i--) {
+				testCount++;
+				Tuple t = this.getTuplesInPage().elementAt(i);
+				Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+				int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+				if (comparison != 0) {
+					res.add(t);
+				} else {
+					if (arrSQLTerms[0]._strOperator.equals(">="))
+						res.add(t);
+					break;
+				}
+			}
+		} else {
+			if (arrSQLTerms[0]._strOperator.equals("<") | arrSQLTerms[0]._strOperator.equals("<=")) {
+				for (int i = 0; i < this.getTuplesInPage().size(); i++) {
+					testCount++;
+					Tuple t = this.getTuplesInPage().elementAt(i);
+					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+					if (comparison != 0) {
+						res.add(t);
+					} else {
+						if (arrSQLTerms[0]._strOperator.equals("<="))
+							res.add(t);
+						break;
+					}
+				}
+			} else {
+				if (arrSQLTerms[0]._strOperator.equals("!=")) {
+					for (Tuple t : this.getTuplesInPage()) {
+						// testCount++;
+						Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+						int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+						if (comparison != 0) {
+							res.add(t);
+						}
+					}
+				}
+			}
+		}
+		System.out.println("test count is: " + testCount + " tuples in page is: " + this.getTuplesInPage().size());
+		return res;
+	}
+
 	public static void main(String[] args) {
 		Page p = new Page("s");
 		int r = (int) (Math.random() * 5021100);
