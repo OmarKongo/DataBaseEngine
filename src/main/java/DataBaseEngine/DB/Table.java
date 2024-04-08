@@ -304,7 +304,7 @@ public class Table implements Serializable{
     	
     	else {  // Search for the right page to insert in
     		//table = Deserialize.Table(tableName);
-    		int index = table.binarySearch(T.getPK());
+    		int index = table.binarySearch(T.getPK(),true);
     		 pageName = table.getPages().elementAt(index).getName();
     		 p = Deserialize.Page(pageName);
     		 //p = table.getPages().elementAt(index);
@@ -405,7 +405,7 @@ public class Table implements Serializable{
  
     
     // this method return the index of the right page to insert in
-    public int binarySearch(Object key) throws Exception
+    public int binarySearch(Object key,Boolean insert) throws Exception
     {
     	//Object key = T.getPK();
     	int mid = 0;
@@ -426,9 +426,18 @@ public class Table implements Serializable{
             	//int min = this.getPages().get(mid).getPageProp().get()
             int min = (int) p.getMin();
             int max = (int) p.getMax();
-            if (min == (int)key || max == (int)key) 
-                throw new Exception("Duplicate Key");
-             
+            if (min == (int)key || max == (int)key) {
+            	if(insert)
+                   throw new Exception("Duplicate Key");
+            	else {
+            		if(max == (int)key || mid==0)
+            		  return mid;
+            		else 
+            			 return mid-1;
+            			
+            	
+            		}
+            	}
  
           
             if((int)key>min & (int)key<max)
