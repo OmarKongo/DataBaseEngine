@@ -420,15 +420,21 @@ public class Table implements Serializable {
 						res = p.selectDistinctNoIndex(arrSQLTerms, strarrOperators);
 
 						Serialize.Page(p);
-					}
-					else{
-						//since querie is on clustering key, range queries such as ">,>=,<,<=" are done in O(N/3)
-						//e:g if greater than, starts at first tuple and keeps prinitng UNTIL tuple is found then stops
-						//!= is done in O(N) (kinda ineviteble?)
-						for (Page p : this.getPages()) {
-							Page p1 = Deserialize.Page(p.getName());
-							res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators));
-							Serialize.Page(p1);
+					} else {
+						// since querie is on clustering key, range queries such as ">,>=,<,<=" are done
+						// in O(N/3)
+						// e:g if greater than, starts at first tuple and keeps prinitng UNTIL tuple is
+						// found then stops
+						// != is done in O(N) (kinda ineviteble?)
+						if (arrSQLTerms[0]._strOperator.equals("!=")) {
+							//trying to find != in O(log(n))
+							//idea: directly include in resultSet all tuples, then use BS to find tuple you need to exclude
+						} else {
+							for (Page p : this.getPages()) {
+								Page p1 = Deserialize.Page(p.getName());
+								res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators));
+								Serialize.Page(p1);
+							}
 						}
 					}
 				} else {
