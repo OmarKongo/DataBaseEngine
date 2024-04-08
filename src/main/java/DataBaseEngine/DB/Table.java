@@ -414,7 +414,7 @@ public class Table implements Serializable {
 					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
 
 					switch (arrSQLTerms[0]._strOperator) {
-						// O(log(log(n)))
+						// O(log(n)*log(n))
 						case "=":
 							String pageName = this.getPages().elementAt(pageIndex).getName();
 							Page p = Deserialize.Page(pageName);
@@ -423,7 +423,7 @@ public class Table implements Serializable {
 							break;
 
 
-						// O(log(log(n))* N/3)
+						// O(log(n)*log(n) + N/3)
 						case ">=":
 						case ">": {
 							int firstLoopMarker = 0;
@@ -448,7 +448,7 @@ public class Table implements Serializable {
 							}
 							break;
 						}
-						
+
 						case "!=":
 							break;
 
