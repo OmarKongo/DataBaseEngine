@@ -103,7 +103,7 @@ public class Test {
 		Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
 		//htblColNameValue.put("name", new String( "Hassan" ) );
 		htblColNameValue.put("gpa", new Double( 2.44 ) );
-		//htblColNameValue.put("id", new Integer( 1) );
+	
 		D.updateTable("Student", "3030158", htblColNameValue);
 	    //D.deleteFromTable( "Student", htblColNameValue );
 	}
