@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.text.DecimalFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -32,89 +33,102 @@ public class Test {
 	  return Integer.parseInt(num);
 		
 	}
+	public static void test() throws DBAppException, IOException {
+		String strTableName = "Student";
+		
+			DBApp	dbApp = new DBApp( );
+			
+			Hashtable<String,String> htblColNameType = new Hashtable<String,String>( );
+			htblColNameType.put("id", "java.lang.Integer");
+			htblColNameType.put("name", "java.lang.String");
+			htblColNameType.put("gpa", "java.lang.Double");
+			dbApp.createTable( strTableName, "id", htblColNameType );
+			dbApp.createIndex( strTableName, "gpa", "gpaIndex" );
+			dbApp.createIndex( strTableName, "name", "nameIndex" );
+			Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
+			Double[]d = {2.0,1.3,1.2,4.0,3.1};
+			
+			for(int i = 0;i<25;i++) {
+				int key = (int)(Math.random()*5021100);
+				int dus  = (int)(Math.random()*5);
+				Double x = Math.random()*4.0;
+			    DecimalFormat df = new DecimalFormat("#.#");
+			    df.format(x);
+			 //   DecimalFormat df = new DecimalFormat("#.#");
+			  // String key =  getAlphaNumericString(5);
+			    // Double key = Double.parseDouble(df.format(x));
+				///int key = arr[i];
+				//System.out.println("id : "+key);
+				htblColNameValue.put("id", new Integer( key));
+				htblColNameValue.put("name", new String("Omar"+(i%5)) );
+				htblColNameValue.put("gpa", new Double( d[dus] ) );
+				dbApp.insertIntoTable( strTableName , htblColNameValue );
+				htblColNameValue.clear();
+			
+			}
+	}
+	public static void printAllPages() {
+		///Table t = Deserialize.Table("Student");
+	//	System.out.println(t.getPages());
+		   Page p = null;
+		   Table  t = Deserialize.Table("Student");
+			for(int i =0 ;i<t.getPages().size();i++) {
+				String pn = t.getPages().elementAt(i).getName();
+				System.out.println();
+				System.out.println("                           "+pn);                                             
+				System.out.println();
+			 p = Deserialize.Page(pn);
+	        System.out.println( "             "+p.toString());
+	        p.display();
+	        
+	        System.out.println();
+	       
+			}
+			
+		  
+		  
+			
+	}
+	public static void delete() throws DBAppException {
+		DBApp  D = new DBApp(); 
+		Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
+		//htblColNameValue.put("name", new String( "Omar4" ) );
+		//htblColNameValue.put("gpa", new Double( 1.2 ) );
+		htblColNameValue.put("id", new Integer( 652529) );
+		//D.updateTable("Student", "350321", htblColNameValue);
+	    D.deleteFromTable( "Student", htblColNameValue );
+	}
+	public static void update() throws DBAppException {
+		DBApp  D = new DBApp(); 
+		Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
+		//htblColNameValue.put("name", new String( "Hassan" ) );
+		htblColNameValue.put("gpa", new Double( 2.44 ) );
+		//htblColNameValue.put("id", new Integer( 1) );
+		D.updateTable("Student", "3030158", htblColNameValue);
+	    //D.deleteFromTable( "Student", htblColNameValue );
+	}
+	public static void insert() throws DBAppException {
+		DBApp  D = new DBApp(); 
+		Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
+		htblColNameValue.put("name", new String( "Brolosy" ) );
+		htblColNameValue.put("gpa", new Double( 1.0 ) );
+		htblColNameValue.put("id", new Integer( 15) );
+		D.insertIntoTable("Student", htblColNameValue);
+	    //D.deleteFromTable( "Student", htblColNameValue );
+	}
 
-	@SuppressWarnings({ "removal", "deprecation" })
+	@SuppressWarnings({ })
 	public static void main(String[] args) throws Exception {
 		
 		Test T = new Test();
 		int max = T.getMaxCount();
 		System.out.println(max); //200
-		/* 
-		Page p = new Page("Student");
-		Page p1 = new Page("Student");
-		Page p2 = new Page("Book");
-		System.out.println(p.getName());
-		System.out.println(p1.getName());
-		System.out.println(p2.getName());
-		*/
-	/*	try{
-			
-			Page p = new Page("PC");
-			// Serialize created table to a file and appending to array of tables.
-			FileOutputStream f = new FileOutputStream("PC.ser");
-
-			ObjectOutput s = new ObjectOutputStream(f);
-			s.writeObject(p);
-			s.close();
-			}
-			//or should be explicitly DBApp exception?
-			catch(Exception e){
-				System.out.println(e.getMessage());
-			}
-
-			// Deserialize a string and date from a file.
-		FileInputStream in = new FileInputStream("PC.ser");
-		ObjectInputStream s = new ObjectInputStream(in);
-
-		Page p = (Page)s.readObject();
-		s.close();
-		System.out.println(p.getName());
-
-
-
-	
-	Hashtable<String,Object> attributesInTuple = new Hashtable<String,Object>();
-	attributesInTuple.put("id", new Integer( 23498 ));
-	attributesInTuple.put("name", new String("John Noor" ) );
-	attributesInTuple.put("gpa", new Double( 1.5 ) );
-	
-	Tuple t1 = new Tuple(attributesInTuple);
-
-
-	Hashtable<String,Object> attributesInTuple2 = new Hashtable<String,Object>();
-	attributesInTuple2.put("id", new Integer( 2615 ));
-	attributesInTuple2.put("name", new String("brolo" ) );
-	attributesInTuple2.put("gpa", new Double( 1.2 ) );
-
-	Tuple t2 = new Tuple(attributesInTuple2);
-
-	String res = "";
-	Enumeration<Object> en = attributesInTuple.elements();
-
-	while (en.hasMoreElements()) {
-		Object val = en.nextElement();
-
-		res = val + res;
-		if(en.hasMoreElements()){
-			res = "," + res;
-		}
-	
-	}
-	System.out.println(res);
-	//testing the page toString()
-	Vector<Tuple> tuplesInPage = new Vector<Tuple>();
-	tuplesInPage.add(t1);
-	tuplesInPage.add(t2);
-	String res2 = "";
-	for(int i = 0; i<tuplesInPage.size(); i++){
-		res2 = res2 + tuplesInPage.elementAt(i).toString();
-		if(i!=tuplesInPage.size()-1){
-			res2 = res2 + ",";
-		}
-	}
-
-	//makes all separated by commas
-	System.out.println(res2);
-
-*/
+		//test();
+		//delete();
+		//update();
+		//insert();
+		//printAllPages();
+		
+		
+		
 	}}

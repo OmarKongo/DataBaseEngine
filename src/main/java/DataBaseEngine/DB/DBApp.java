@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -20,7 +21,7 @@ public class DBApp {
 	final static String csvPath = "metadata.csv";
 
 	public DBApp( ){
-		this.init();
+		//this.init();
 	}
 
 	// this does whatever initialization you would like 
@@ -43,7 +44,6 @@ public class DBApp {
 		catch(Exception ex) {
 			ex.printStackTrace();
 		}
-		
 	}
 	
 	// following method creates one table only
@@ -57,12 +57,13 @@ public class DBApp {
 	public void createTable(String strTableName, 
 							String strClusteringKeyColumn,  
 							Hashtable<String,String> htblColNameType) throws DBAppException, IOException{
-
-								
+		
+		
+		Table.addTable(strTableName,strClusteringKeyColumn,htblColNameType,csvPath);
+		Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
+		Serialize.Table(T,strTableName);
                  
-								Table T = new Table(strTableName,strClusteringKeyColumn,htblColNameType);
-								T.addTable(strTableName,strClusteringKeyColumn,csvPath);
-								Serialize.Table(T);			
+										
 							
 	}
 
@@ -78,7 +79,7 @@ public class DBApp {
 		Serialize.Index(btree, strIndexName);
 		for(int i = 0;i<t.getPages().size();i++) {
 			 
-			Page p = Deserialize.Page(t.getPages().get(i).getName());
+			Page p = Deserialize.Page(t.getPages().elementAt(i).getName());
 			pageName.add(p.getName());
 			for(int j = 0 ;j<p.getTuplesInPage().size();j++) {
 				btree = Deserialize.Index(strIndexName);
@@ -89,7 +90,6 @@ public class DBApp {
 			
 			pageName.clear();
 		}
-	      
 		
 	}
 
@@ -114,7 +114,7 @@ public class DBApp {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Serialize.Table(T);
+		Serialize.Table(T,strTableName);
 	
 	}
 
@@ -126,8 +126,21 @@ public class DBApp {
 	public void updateTable(String strTableName, 
 							String strClusteringKeyValue,
 							Hashtable<String,Object> htblColNameValue   )  throws DBAppException{
-	
-		throw new DBAppException("not implemented yet");
+		Hashtable<String, String> indexes = null; 
+		
+	     try {
+			indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
+			 Table T =  Deserialize.Table(strTableName);
+			 if(T.getPages().size()==0)
+		    	 throw new DBAppException("Empty Table");
+		     String pkType = T.getPkType(csvPath);
+		     Object key = Table.getOriginalKey(strClusteringKeyValue,pkType);
+		     T.updateTable(key,indexes,htblColNameValue);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 
@@ -145,52 +158,68 @@ public class DBApp {
 			
 			e.printStackTrace();
 		}
-		Table T = Deserialize.Table(strTableName);Page p = null;
-		if (htblColNameValue.size()==1) {
-			if (isPK(T,htblColNameValue)) {
-				String indexName = indexes.get(T.getStrClusteringKeyColumn());
-				Object key = htblColNameValue.get(T.getStrClusteringKeyColumn());
-				try {
-					p = searchPK(T,key,hasIndex(indexes,T.getStrClusteringKeyColumn()),indexName);
-				    //int index = 
-					//p.getTuplesInPage().remove(0);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		Table T = Deserialize.Table(strTableName);
+		try {
+			T.deleteFromTable(htblColNameValue,indexes);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	public Hashtable<String,String> checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+		// need to check if SQLTerm tables are in MetaData File with correct data types
+		// Do I make this Hashtable global so as to decrease spatial complexity by not
+		// creating a hashtable everytime we select?
+		Hashtable<String,String> indexes = null;
+		String tableName = "";
+		try {
+			/*
+			 * Checking if valid table and valid columns
+			 * Making sure that no joins are allowed
+			 * Making sure the operators inside the SQLTerm are supported
+			 * By this order
+			 */
+			Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+			ArrayList<String> checkForStrOperators = new ArrayList<>(Arrays.asList(">", ">=", "<", "<=", "!=", "="));
+			for (SQLTerm sqlTerm : arrSQLTerms) {
+				// should I say that if table names differ throw exception "joins not
+				// supported?"
+				
+				if(tableName.equals(""))
+					tableName = sqlTerm._strColumnName;
+				else {
+					if(!tableName.equals(sqlTerm._strColumnName))
+						throw new DBAppException("Multiple table queries are not supported on this engine.");
 				}
 				
-			
-			}
-			}
-	}
+				htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
+				
 
-	public static boolean isPK(Table t, Hashtable<String,Object> h ) {
-		if(h.containsKey(t.getStrClusteringKeyColumn()))
-			return true;
-		return false;
-	}
-	
-	public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
-		if (indexes.containsKey(strFromHshTblCol))
-			return true;
-		return false ;
-	}
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static Page searchPK(Table t,Object key, boolean hasIndex,String indexName) throws Exception {
-		Page p = null;
-		if (hasIndex) {
-			bplustree bTree= Deserialize.Index(indexName);
-			ArrayList<String> page = bTree.search((Comparable)key);
-			bTree.delete((Comparable)key, page);
-			p = Deserialize.Page(page.get(0));
-		}
-		else {
+				if (!(checkForStrOperators.contains(sqlTerm._strOperator))) {
+					throw new DBAppException(
+							"Please enter a valid string operator.\nSupported operators are >, >=, <, <=, != or =");
+				}
+			}
 			
-			int index = t.binarySearch(key);
-			 p = Deserialize.Page(t.getPages().get(index).getName());
+			indexes = Table.checkData(tableName, htblColNameValue, csvPath);
+			/*
+			 * Checking if valid operators
+			 */
+			for (String operator : strarrOperators) {
+				if (operator != "AND" && operator != "OR" && operator != "XOR") {
+					throw new DBAppException("Please enter a valid operator.\nOperators supported are AND, OR or XOR");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return p ;
-	}
+		return indexes;
+		                        // ex:  "gpa","gpaIndex"   
+	}                           //      "name","nameIndex"
+
+	
 	
 	
 
@@ -210,7 +239,7 @@ public class DBApp {
 			Hashtable<String,String> htblColNameType = new Hashtable<String,String>( );
 			htblColNameType.put("id", "java.lang.Integer");
 			htblColNameType.put("name", "java.lang.String");
-			htblColNameType.put("gpa", "java.lang.double");
+			htblColNameType.put("gpa", "java.lang.Double");
 			dbApp.createTable( strTableName, "id", htblColNameType );
 			dbApp.createIndex( strTableName, "gpa", "gpaIndex" );
 

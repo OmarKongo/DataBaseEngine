@@ -1,5 +1,6 @@
 package DataBaseEngine.DB;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,9 +46,9 @@ public class Serialize {
 	
 	
 	
-	public static void  Page(Page p) {
+	public static void  Page(Page p,String pageName) {
 		//System.out.println(p.getName());
-		String path = pagesPath+"/"+p.getName()+".ser";
+		String path = pagesPath+"/"+pageName+".ser";
 		
 		try
 	        {   
@@ -77,8 +78,8 @@ public class Serialize {
      * @param p the table to be serialised
      * serialises table
      */
-	public static void Table(Table t) {
-		  String path = tablesPath+"/"+t.getStrTableName()+".ser"; 
+	public static void Table(Table t,String tableName) {
+		  String path = tablesPath+"/"+tableName+".ser"; 
 		  //System.out.print(path);
 		try
 	        {   
@@ -118,6 +119,7 @@ class Deserialize{
      * @throws Exception either FileNotFoundException or IOException (i think)
      * Deserialises the specified table.
      */
+	
 	public static Table Table(String tableName) {
 		Table t = null;
 		String path = tablesPath+"/"+tableName+".ser";
@@ -126,7 +128,7 @@ class Deserialize{
             // Reading the object from a file
             FileInputStream file = new FileInputStream(path);
             ObjectInputStream in = new ObjectInputStream(file);
-             
+            
             // Method for deserialization of object
              t = (Table)in.readObject();
              

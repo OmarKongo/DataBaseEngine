@@ -52,20 +52,24 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
     
 	@Override
 	public int compareTo(Object o) {
-		Tuple T = (Tuple) o;
+		//Tuple T = (Tuple) o;
 		Object x = this.getAttributesInTuple().get(this.getStrPrimaryKey());
-		Object y =  (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
+		//Object y =  (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
 		if(x instanceof Integer) {
-		  int first = (int) x; int second = (int) y;
+		  int first = (int) x; int second = (int) o;
 		return  first - second;
 		}
 		else {
 			if(x instanceof Double) {
-				Double first = (Double) x;Double second = (Double) y;
-				return (int)Math.ceil(first - second);
+				Double first = (Double) x;Double second = (Double) o;
+				Double res = first - second;
+				if(res>0)
+				 return (int)Math.ceil(res);
+				else
+					return (int)Math.floor(res);
 			}
 			else {
-				String first = (String) x;String second = (String) y;
+				String first = (String) x;String second = (String) o;
 				return first.compareToIgnoreCase(second);
 			}
 			
@@ -78,7 +82,7 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 	}
 	
 	public int getIndex(Vector<Tuple> v) {
-		int index = Collections.binarySearch(v,this);
+		int index = Collections.binarySearch(v,this.getPK());
 		index = -1 * (index+1);
 		//System.out.println("index : "+index +" key : "+this.getPK());
 		return index;
@@ -90,8 +94,36 @@ public class Tuple extends Page implements Comparable<Object>,Serializable{
 	    page.getTuplesInPage().add(index,this);
 	    return page;
 	}
-
+	public int getActualIndex(Vector<Tuple> v) {
+		int index = Collections.binarySearch(v,this.getPK());
+		return index;
+		
+	}
 	
-	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Tuple updateTuple(String pageName,Hashtable<String,String> indexes,Hashtable<String,Object> htblColNameValue) {
+		   String indexName = null;Object newKey = null;bplustree btree = null;String indx =null;
+		   Enumeration<String> keys = null;Object oldKey = null;   ArrayList<String> pageNames = null;
+		   ArrayList<String> currPage = new ArrayList<String>();currPage.add(pageName);
+			     keys = htblColNameValue.keys();
+				while(keys.hasMoreElements()) {
+					  indx = keys.nextElement();
+					  indexName = indexes.get(indx);
+					  oldKey = this.getAttributesInTuple().get(indx);
+					  newKey = htblColNameValue.get(indx);
+					  if(indexName!=null) {
+					  btree = Deserialize.Index(indexName);
+			          
+			          btree.update((Comparable)oldKey,currPage,(Comparable)newKey);
+			          System.out.println(oldKey + " Updated to "+newKey+ " in "+indx + " index" );
+			          Serialize.Index(btree, indexName);
+			         
+					  }
+					  this.getAttributesInTuple().put(indx,newKey);
+					  
+				}	
+		   
+		   return this;
+	   }
     
 }

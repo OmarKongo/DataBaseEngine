@@ -1,5 +1,6 @@
 package DataBaseEngine.DB;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -36,26 +37,27 @@ public class Page  implements Serializable,Comparable<Object>{
 
 	
 	public void display() {
-	System.out.print("                      Page [pageProp=" + pageProp + "]");
+	System.out.println("                      Page [pageProp=" + pageProp + "]");
 	}
 	public String toString(){
         String res = "";
-        for(int i = 0; i<tuplesInPage.size(); i++){
+       for(int i = 0; i<tuplesInPage.size(); i++){
             res = res + tuplesInPage.elementAt(i).toString();
-            if(i!=tuplesInPage.size()-1){
-                res = res + ",";
-            }
+          if(i!=tuplesInPage.size()-1){
+             res = res + ",";
         }
+     }
         return res;
 		//return "Page [pageProp=" + pageProp + "]";
     }
 
    
-
+	
     public int getMaxCount() throws IOException {
 		String filename = "DBApp.config";
 		Properties prop = null;
 		try(FileInputStream fis = new FileInputStream(filename) ){
+		
 			prop = new Properties();
 			prop.load(fis);
 			
@@ -80,7 +82,12 @@ public class Page  implements Serializable,Comparable<Object>{
 			else {
 				if(fMin instanceof Double) {
 					Double first = (Double) fMin;Double second = (Double) sMin;
-					return (int)Math.ceil(first - second);
+					Double res = first - second;
+					if(res>0)
+					 return (int)Math.ceil(res);
+					else
+						return (int)Math.floor(res);
+						
 				}
 				else {
 					String first = (String) fMin;String second = (String) sMin;
@@ -89,8 +96,8 @@ public class Page  implements Serializable,Comparable<Object>{
 				
 			}
 	}
-    public boolean tupleFounded(Tuple T) {
-    	int index = Collections.binarySearch(this.getTuplesInPage(),T);
+    public boolean tupleFounded(Object key) {
+    	int index = Collections.binarySearch(this.getTuplesInPage(),key);
     	if(index <0)
     		return false;
     	
