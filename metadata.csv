@@ -2,3 +2,6 @@
 "Student","gpa","java.lang.Double","False","gpaIndex","B+ tree"
 "Student","name","java.lang.String","False","nameIndex","B+ tree"
 "Student","id","java.lang.Integer","True","",""
+"TestingTable","gpa","java.lang.Double","False",,
+"TestingTable","name","java.lang.String","False",,
+"TestingTable","id","java.lang.Integer","True",,

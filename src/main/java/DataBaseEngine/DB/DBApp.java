@@ -218,7 +218,7 @@ public class DBApp {
 			e.printStackTrace();
 		}
 		Iterator<Object> result = resList.iterator();
-		Serialize.Table(t,t.getStrTableName());
+		Serialize.Table(t, t.getStrTableName());
 		return result;
 	}
 

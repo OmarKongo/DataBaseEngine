@@ -143,6 +143,7 @@ public class Page implements Serializable, Comparable<Object> {
 		return this.getTuplesInPage().size() > this.getMaxCount();
 
 	}
+
 	public ArrayList<Object> selectDistinctNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
 

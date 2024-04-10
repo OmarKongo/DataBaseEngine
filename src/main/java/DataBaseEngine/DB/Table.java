@@ -250,6 +250,7 @@ public class Table implements Serializable {
 		}
 		return indexes;
 	}
+
 	public static boolean checkIndex(String tableName, String filePath) throws Exception {
 
 		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
@@ -393,7 +394,7 @@ public class Table implements Serializable {
 		}
 
 		else { // Search for the right page to insert in
-			// table = Deserialize.Table(tableName);
+				// table = Deserialize.Table(tableName);
 			int index = table.binarySearch(T.getPK(), true);
 			pageName = table.getPages().elementAt(index).getName();
 			p = Deserialize.Page(pageName);
@@ -859,6 +860,7 @@ public class Table implements Serializable {
 
 		return mid;
 	}
+
 	public ArrayList<Object> selectFromTableNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
 
@@ -884,7 +886,7 @@ public class Table implements Serializable {
 				// within the pages (through the tuples)
 
 				if (arrSQLTerms[0]._strColumnName.equals(this.getStrClusteringKeyColumn())) {
-					int pageIndex = this.binarySearch(arrSQLTerms[0]._objValue,false);
+					int pageIndex = this.binarySearch(arrSQLTerms[0]._objValue, false);
 					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
 
 					switch (arrSQLTerms[0]._strOperator) {
@@ -893,9 +895,8 @@ public class Table implements Serializable {
 							String pageName = this.getPages().elementAt(pageIndex).getName();
 							Page p = Deserialize.Page(pageName);
 							res.add(p.selectDistinctNoIndex(arrSQLTerms, strarrOperators));
-							Serialize.Page(p,p.getName());
+							Serialize.Page(p, p.getName());
 							break;
-
 
 						// O(log(n)*log(n) + N/3)
 						case ">=":
@@ -905,7 +906,7 @@ public class Table implements Serializable {
 								// I want to start printing from the tuple index (or not, if >) to the end
 								Page p1 = Deserialize.Page(this.getPages().elementAt(i).getName());
 								res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
-								Serialize.Page(p1,p1.getName());
+								Serialize.Page(p1, p1.getName());
 								firstLoopMarker++;
 							}
 							break;
@@ -918,7 +919,7 @@ public class Table implements Serializable {
 							for (Page page : this.getPages()) {
 								Page p2 = Deserialize.Page(page.getName());
 								res.add(p2.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
-								Serialize.Page(p,p2.getName());
+								Serialize.Page(p2, p2.getName());
 								firstLoopMarker++;
 							}
 							break;
@@ -926,15 +927,13 @@ public class Table implements Serializable {
 
 					}
 
-					
-
 				} else {
 					// unfortunately have to iterate through all records since we are searching on a
 					// (non-sorted column)
 					for (Page p : this.getPages()) {
 						Page p1 = Deserialize.Page(p.getName());
 						res.add(p1.selectNoIndexNoPK(arrSQLTerms, strarrOperators));
-						Serialize.Page(p1,p1.getName());
+						Serialize.Page(p1, p1.getName());
 					}
 
 				}
