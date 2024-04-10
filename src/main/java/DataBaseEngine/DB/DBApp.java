@@ -212,7 +212,8 @@ public class DBApp {
 			if (!(withIndex)) {
 				resList.add(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 			} else {
-				resList.add(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators));
+				ArrayList<Hashtable<String, String>> indicies = Table.outputIndicies(tableName, csvPath);
+				resList.add(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators,indicies));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

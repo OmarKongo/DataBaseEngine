@@ -207,11 +207,10 @@ public class Table implements Serializable {
 
 		Enumeration<Object> values = data.elements();
 		Enumeration<String> keys = data.keys();
-		
-		ArrayList<Hashtable<String, String>> res = outputIndicies(tableName,filePath);
+
+		ArrayList<Hashtable<String, String>> res = outputIndicies(tableName, filePath);
 		Hashtable<String, String> indexes = res.get(0);
 		Hashtable<String, String> collector = res.get(1);
-
 
 		// this loop checks the entered data and throws exception if anything mismatches
 		// the original attributes
@@ -228,7 +227,8 @@ public class Table implements Serializable {
 		return indexes;
 	}
 
-	public static ArrayList<Hashtable<String, String>> outputIndicies(String tableName, String filePath) throws Exception {
+	public static ArrayList<Hashtable<String, String>> outputIndicies(String tableName, String filePath)
+			throws Exception {
 		ArrayList<Hashtable<String, String>> res = new ArrayList<Hashtable<String, String>>();
 		String[] nextRecord;
 		boolean flag = false;
@@ -958,10 +958,20 @@ public class Table implements Serializable {
 		return res;
 	}
 
-	public ArrayList<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+	public ArrayList<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators,
+			ArrayList<Hashtable<String, String>> indicies) {
 		ArrayList<Object> res = new ArrayList<Object>();
+		// indexes contains {gpa:gpaIndex} which is inside tableName inside SQLTerm (it is always going to be the same table);
+		Hashtable<String, String> indexes = indicies.get(0);
+
 		try {
 			if (strarrOperators.length == 0 && arrSQLTerms.length == 1) {
+				if(indexes.containsKey(arrSQLTerms[0]._strColumnName)){
+					String indexName  = indexes.get(arrSQLTerms[0]._strColumnName);
+					
+				}
+
+
 				switch (arrSQLTerms[0]._strOperator) {
 
 					case "=":
