@@ -208,11 +208,10 @@ public class DBApp {
 		ArrayList<Object> resList = new ArrayList<>();
 
 		try {
-			boolean withIndex = Table.checkIndex(tableName, csvPath);
-			if (!(withIndex)) {
+			Hashtable<String, String> indicies = Table.outputIndicies(tableName, csvPath).get(0);
+			if (indicies.isEmpty()) {
 				resList.add(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 			} else {
-				ArrayList<Hashtable<String, String>> indicies = Table.outputIndicies(tableName, csvPath);
 				resList.add(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators,indicies));
 			}
 		} catch (Exception e) {

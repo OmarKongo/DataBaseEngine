@@ -265,31 +265,6 @@ public class Table implements Serializable {
 		return res;
 	}
 
-	public static boolean checkIndex(String tableName, String filePath) throws Exception {
-
-		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
-				.withSkipLines(1)
-				.build();
-		String[] nextRecord;
-		boolean flag = false;
-		boolean res = false;
-		while ((nextRecord = csvReader.readNext()) != null) {
-
-			if (nextRecord[0].equals(tableName)) {
-				flag = true;
-				if (!(nextRecord[4].equals(""))) {
-					res = true;
-				}
-				break;
-			} else
-				continue;
-		}
-		if (!flag)
-			throw new Exception("Invalid Table");
-
-		return res;
-	}
-
 	public String getPkType(String filePath) throws Exception {
 		String tableName = this.getStrTableName();
 		String pk = this.getStrClusteringKeyColumn();
@@ -959,15 +934,15 @@ public class Table implements Serializable {
 	}
 
 	public ArrayList<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators,
-			ArrayList<Hashtable<String, String>> indicies) {
+			Hashtable<String, String> indicies) {
 		ArrayList<Object> res = new ArrayList<Object>();
 		// indexes contains {gpa:gpaIndex} which is inside tableName inside SQLTerm (it is always going to be the same table);
-		Hashtable<String, String> indexes = indicies.get(0);
 
 		try {
+			//instead of this if should be a for loop iterating through the sql terms
 			if (strarrOperators.length == 0 && arrSQLTerms.length == 1) {
-				if(indexes.containsKey(arrSQLTerms[0]._strColumnName)){
-					String indexName  = indexes.get(arrSQLTerms[0]._strColumnName);
+				if(indicies.containsKey(arrSQLTerms[0]._strColumnName)){
+					String indexName  = indicies.get(arrSQLTerms[0]._strColumnName);
 					
 				}
 
