@@ -44,6 +44,40 @@ public class DBApp {
 		}
 	}
 
+	public static int compareValue(Object o1, Object o2) {
+		// System.out.println(o1.getClass()+""+o2.getClass());
+		if (o1 instanceof Integer && o2 instanceof Integer) {
+			int first = (int) o1;
+			int second = (int) o2;
+			// the first is greater than return >0 if equal 0 if less <0
+			return first - second;
+
+		} else {
+			if (o1 instanceof Double && o2 instanceof Double) {
+				Double first = (Double) o1;
+				Double second = (Double) o2;
+				// the first is greater than return 1
+				Double res = first - second;
+				if (res > 0)
+					return (int) Math.ceil(res);
+				else
+					return (int) Math.floor(res);
+			} else {
+				String first = (String) o1;
+				String second = (String) o2;
+				/*
+				 * An int value: 0 if the string is equal to the other string, ignoring case
+				 * differences.
+				 * < 0 if the string is lexicographically less than the other string
+				 * > 0 if the string is lexicographically greater than the other string (more
+				 * characters)
+				 */
+				return first.compareToIgnoreCase(second);
+			}
+
+		}
+	}
+
 	// following method creates one table only
 	// strClusteringKeyColumn is the name of the column that will be the primary
 	// key and the clustering column as well. The data type of that column will
@@ -159,13 +193,40 @@ public class DBApp {
 
 	}
 
-	public Hashtable<String, String> checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators)
-			throws DBAppException {
+	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms,
+			String[] strarrOperators) throws DBAppException {
+
+		try {
+			// if no exception is thrown, continue
+			checkValidSQLTerm(arrSQLTerms, strarrOperators);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		String tableName = arrSQLTerms[0]._strTableName;
+		Table t = Deserialize.Table(tableName);
+		ArrayList<Object> resList = new ArrayList<>();
+
+		try {
+			boolean withIndex = Table.checkIndex(tableName, csvPath);
+			if (!(withIndex)) {
+				resList.add(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
+			} else {
+				resList.add(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Iterator<Object> result = resList.iterator();
+		Serialize.Table(t,t.getStrTableName());
+		return result;
+	}
+
+	public void checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		// need to check if SQLTerm tables are in MetaData File with correct data types
 		// Do I make this Hashtable global so as to decrease spatial complexity by not
 		// creating a hashtable everytime we select?
-		Hashtable<String, String> indexes = null;
-		String tableName = "";
+
 		try {
 			/*
 			 * Checking if valid table and valid columns
@@ -174,27 +235,27 @@ public class DBApp {
 			 * By this order
 			 */
 			Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+			ArrayList<String> checkNoJoin = new ArrayList<>();
 			ArrayList<String> checkForStrOperators = new ArrayList<>(Arrays.asList(">", ">=", "<", "<=", "!=", "="));
 			for (SQLTerm sqlTerm : arrSQLTerms) {
 				// should I say that if table names differ throw exception "joins not
 				// supported?"
-
-				if (tableName.equals(""))
-					tableName = sqlTerm._strColumnName;
-				else {
-					if (!tableName.equals(sqlTerm._strColumnName))
-						throw new DBAppException("Multiple table queries are not supported on this engine.");
-				}
-
 				htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
+				Table.checkData(sqlTerm._strTableName, htblColNameValue, csvPath);
+				htblColNameValue.clear();
 
+				if (arrSQLTerms[0].equals(sqlTerm)) {
+					checkNoJoin.add(sqlTerm._strTableName);
+				} else {
+					if (!(sqlTerm._strTableName.equals(checkNoJoin.get(0)))) {
+						throw new DBAppException("Multiple table queries are not supported on this engine.");
+					}
+				}
 				if (!(checkForStrOperators.contains(sqlTerm._strOperator))) {
 					throw new DBAppException(
 							"Please enter a valid string operator.\nSupported operators are >, >=, <, <=, != or =");
 				}
 			}
-
-			indexes = Table.checkData(tableName, htblColNameValue, csvPath);
 			/*
 			 * Checking if valid operators
 			 */
@@ -206,14 +267,6 @@ public class DBApp {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return indexes;
-		// ex: "gpa","gpaIndex"
-	} // "name","nameIndex"
-
-	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms,
-			String[] strarrOperators) throws DBAppException {
-
-		return null;
 	}
 
 	@SuppressWarnings({ "removal" })
