@@ -144,7 +144,7 @@ public class Page implements Serializable, Comparable<Object> {
 
 	}
 
-	public ArrayList<Object> selectDistinctNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+	public ArrayList<Object> selectDistinctPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
 
 		int tupleIndex = this.getTupleIndexUsingBS(arrSQLTerms);
@@ -163,7 +163,7 @@ public class Page implements Serializable, Comparable<Object> {
 		return tupleIndex;
 	}
 
-	public ArrayList<Object> selectNoIndexNoPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+	public ArrayList<Object> selectNoPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
 		String searchedColumn = arrSQLTerms[0]._strColumnName;
 		Object searchedValue = arrSQLTerms[0]._objValue;
@@ -207,7 +207,7 @@ public class Page implements Serializable, Comparable<Object> {
 		return res;
 	}
 
-	public ArrayList<Object> selectRangeNoIndexPK(SQLTerm[] arrSQLTerms, String[] strarrOperators,
+	public ArrayList<Object> selectRangePK(SQLTerm[] arrSQLTerms, String[] strarrOperators,
 			int firstLoopMarker) {
 		ArrayList<Object> res = new ArrayList<Object>();
 		String searchedColumn = arrSQLTerms[0]._strColumnName;

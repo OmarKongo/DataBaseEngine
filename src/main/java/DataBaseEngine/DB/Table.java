@@ -220,8 +220,8 @@ public class Table implements Serializable {
 				if (!(values.nextElement().getClass().equals(Class.forName(collector.get(key)))))
 					throw new DBAppException("Mismatch type");
 
-			} else
-				throw new Exception("mismatch key  " + key);
+			} else{
+				throw new Exception("mismatch key  " + key);}
 
 		}
 		return indexes;
@@ -235,7 +235,7 @@ public class Table implements Serializable {
 		Hashtable<String, String> indexes = new Hashtable<String, String>();
 		Hashtable<String, String> collector = new Hashtable<String, String>();
 		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
-				.withSkipLines(1)
+				.withSkipLines(0)
 				.build();
 		// this loop iterate over the csv file untill the table is founded
 		// if it's not founded then an exception will be thrown
@@ -882,7 +882,7 @@ public class Table implements Serializable {
 						case "=":
 							String pageName = this.getPages().elementAt(pageIndex).getName();
 							Page p = Deserialize.Page(pageName);
-							res.add(p.selectDistinctNoIndex(arrSQLTerms, strarrOperators));
+							res.add(p.selectDistinctPK(arrSQLTerms, strarrOperators));
 							Serialize.Page(p, p.getName());
 							break;
 
@@ -893,7 +893,7 @@ public class Table implements Serializable {
 							for (int i = pageIndex; i < this.getPages().size(); i++) {
 								// I want to start printing from the tuple index (or not, if >) to the end
 								Page p1 = Deserialize.Page(this.getPages().elementAt(i).getName());
-								res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
+								res.add(p1.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p1, p1.getName());
 								firstLoopMarker++;
 							}
@@ -906,7 +906,7 @@ public class Table implements Serializable {
 							int firstLoopMarker = 0;
 							for (Page page : this.getPages()) {
 								Page p2 = Deserialize.Page(page.getName());
-								res.add(p2.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
+								res.add(p2.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p2, p2.getName());
 								firstLoopMarker++;
 							}
@@ -920,7 +920,7 @@ public class Table implements Serializable {
 					// (non-sorted column)
 					for (Page p : this.getPages()) {
 						Page p1 = Deserialize.Page(p.getName());
-						res.add(p1.selectNoIndexNoPK(arrSQLTerms, strarrOperators));
+						res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
 						Serialize.Page(p1, p1.getName());
 					}
 
@@ -933,39 +933,65 @@ public class Table implements Serializable {
 		return res;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ArrayList<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators,
 			Hashtable<String, String> indicies) {
 		ArrayList<Object> res = new ArrayList<Object>();
-		// indexes contains {gpa:gpaIndex} which is inside tableName inside SQLTerm (it is always going to be the same table);
-
+		// indexes contains {gpa:gpaIndex} which is inside tableName inside SQLTerm (it
+		// is always going to be the same table);
+		System.out.println("Hello from With Index!!");
 		try {
-			//instead of this if should be a for loop iterating through the sql terms
+			// instead of this if should be a for loop iterating through the sql terms
 			if (strarrOperators.length == 0 && arrSQLTerms.length == 1) {
-				if(indicies.containsKey(arrSQLTerms[0]._strColumnName)){
-					String indexName  = indicies.get(arrSQLTerms[0]._strColumnName);
-					
-				}
+				if (indicies.containsKey(arrSQLTerms[0]._strColumnName)) {
+					String indexName = indicies.get(arrSQLTerms[0]._strColumnName);
+					bplustree btree = Deserialize.Index(indexName);
+					// value or key
+					Object value = arrSQLTerms[0]._objValue;
+					ArrayList<String> arr = new ArrayList<String>();
 
+					switch (arrSQLTerms[0]._strOperator) {
 
-				switch (arrSQLTerms[0]._strOperator) {
+						case "=":
+							//must make sure of all pages output in arrayList
+							arr = btree.search((Comparable) value);
+							
 
-					case "=":
+							for (String pageName : arr) {
+								Page p1 = Deserialize.Page(pageName);
+								res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
+								Serialize.Page(p1, p1.getName());
+							}
+							break;
 
-						break;
+						case ">=":
+						case ">":
+						case "<=":
+						case "<":{
+							arr = btree.rangeSearch((Comparable) value,arrSQLTerms[0]._strOperator);
+							System.out.println("Hona men Kalb el 7adas "+arr.size());
+							for (String pageName : arr) {
+								System.out.println(pageName+" first element of arr");
+								Page p1 = Deserialize.Page(pageName);
+								res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
+								Serialize.Page(p1, p1.getName());
+							}
 
-					case ">=":
-					case ">": {
+							break;
+						}
+						//!= Does not benefift from B+tree so will iterate through everything
+						case "!=": {
+							for (Page p : this.getPages()) {
+								Page p1 = Deserialize.Page(p.getName());
+								res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
+								Serialize.Page(p1, p1.getName());
+							}
+							break;
+						}
 
-						break;
 					}
 
-					case "<=":
-					case "<":
-					case "!=": {
-
-						break;
-					}
-
+					Serialize.Index(btree, indexName);
 				}
 			}
 		} catch (Exception e) {

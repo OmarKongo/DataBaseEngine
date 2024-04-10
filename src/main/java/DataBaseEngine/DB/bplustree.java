@@ -747,6 +747,96 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		}
 	}
 
+	public ArrayList<String> rangeSearch(K key, String strarrOperator) {
+		// what if there are duplicates and multiple pages for a particular key
+		// Instantiate array to hold values
+		ArrayList<String> values = new ArrayList<String>();
+		LeafNode currNode = (this.root == null) ? this.firstLeaf : findLeafNode(key);
+		// Iterate through the doubly linked list of leaves
+		switch (strarrOperator) {
+			case ">":
+			case ">=": {
+				int countIter = 0;
+				while (currNode != null) {
+
+					// Iterate through the dictionary of each node
+					DictionaryPair dps[] = currNode.dictionary;
+					System.out.println(dps.length+" length of dict");
+					for (DictionaryPair dp : dps) {
+
+						/*
+						 * Stop searching the dictionary once a null value is encountered
+						 * as this the indicates the end of non-null values
+						 */
+						if (dp == null) {
+							break;
+						}
+
+						// Include value if its key fits within the provided range
+						if (strarrOperator.equals(">") && countIter == 0) {
+							countIter++;
+							continue;
+						}
+						// value is the array containing the pages (where dups may occur)
+						// values now contains all pages which include tuples > | >= the key
+						if (!(values.containsAll(dp.value)))
+							values.addAll(dp.value);
+						countIter++;
+
+					}
+					/*
+					 * Update the current node to be the right sibling,
+					 * leaf traversal is from left to right
+					 */
+
+					currNode = currNode.rightSibling;
+				}
+				break;
+			}
+
+			case "<":
+			case "<=": {
+				int countIter = 0;
+				while (currNode != null) {
+
+					// Iterate through the dictionary of each node
+					DictionaryPair dps[] = currNode.dictionary;
+					for (DictionaryPair dp : dps) {
+
+						/*
+						 * Stop searching the dictionary once a null value is encountered
+						 * as this the indicates the end of non-null values
+						 */
+						if (dp == null) {
+							break;
+						}
+
+						// Include value if its key fits within the provided range
+						if (strarrOperator.equals("<") && countIter == 0) {
+							countIter++;
+							continue;
+						}
+						// value is the array containing the pages (where dups may occur)
+						// values now contains all pages which include tuples > | >= the key
+						if (!(values.containsAll(dp.value)))
+							values.addAll(dp.value);
+						countIter++;
+
+					}
+					/*
+					 * Update the current node to be the left sibling,
+					 * leaf traversal is from right to left
+					 */
+					currNode = currNode.leftSibling;
+				}
+			}
+				break;
+		}
+
+		return values;
+
+	}
+
 	/**
 	 * This method traverses the doubly linked list of the B+ tree and records
 	 * all values whose associated keys are within the range specified by

@@ -122,8 +122,8 @@ public class Test {
 	}
 
 	@SuppressWarnings("removal")
-	public static void select() throws DBAppException,IOException {
-		DBApp d = new DBApp();
+	public static void select(DBApp d) throws DBAppException,IOException {
+
 		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
 		/*
 		String strTableName = "TestingTable";
@@ -132,7 +132,7 @@ public class Test {
 		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("gpa", "java.lang.Double");
 		d.createTable(strTableName, "id", htblColNameType);
-		*/
+		 */
 
 
 		// INSERTIONSSSSS
@@ -173,14 +173,21 @@ public class Test {
 		arrSQLTerms[0]._strTableName = "TestingTable";
 		arrSQLTerms[0]._strColumnName = "gpa";
 		arrSQLTerms[0]._strOperator = ">=";
-		arrSQLTerms[0]._objValue = new Double(1.3);
+		arrSQLTerms[0]._objValue = new Double(1.5);
 
 		String[] strarrOperators = new String[0];
 
+		
+		// d.createIndex("TestingTable", "gpa", "gpaIndex");
+		// d.createIndex("TestingTable", "name", "nameIndex");
+		
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
 		// table]
 		// I think yes because no joins
+
+		
+
 		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
 
 		System.out.println("Result Set: ");
@@ -193,11 +200,13 @@ public class Test {
 
 	@SuppressWarnings({})
 	public static void main(String[] args) throws Exception {
-
+		/*
 		Test T = new Test();
 		int max = T.getMaxCount();
 		System.out.println(max); // 200
-		select();
+		*/
+		DBApp d = new DBApp();
+		select(d);
 		// test();
 		// delete();
 		// update();
