@@ -250,6 +250,30 @@ public class Table implements Serializable {
 		}
 		return indexes;
 	}
+	public static boolean checkIndex(String tableName, String filePath) throws Exception {
+
+		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
+				.withSkipLines(1)
+				.build();
+		String[] nextRecord;
+		boolean flag = false;
+		boolean res = false;
+		while ((nextRecord = csvReader.readNext()) != null) {
+
+			if (nextRecord[0].equals(tableName)) {
+				flag = true;
+				if (!(nextRecord[4].equals(""))) {
+					res = true;
+				}
+				break;
+			} else
+				continue;
+		}
+		if (!flag)
+			throw new Exception("Invalid Table");
+
+		return res;
+	}
 
 	public String getPkType(String filePath) throws Exception {
 		String tableName = this.getStrTableName();
@@ -834,6 +858,96 @@ public class Table implements Serializable {
 		}
 
 		return mid;
+	}
+	public ArrayList<Object> selectFromTableNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>();
+
+		/*
+		 * First case: Only one SQL term and no strarrOperators
+		 * Implementing on:
+		 * arrSQLTerms[0]._strTableName = "Student";
+		 * arrSQLTerms[0]._strColumnName = "name";
+		 * arrSQLTerms[0]._strOperator = "=";
+		 * arrSQLTerms[0]._objValue = "John Noor";
+		 */
+		try {
+			if (strarrOperators.length == 0 && arrSQLTerms.length == 1) {
+				/*
+				 * Check if the strColumn is a pk(clustering key) if yes --> Binarysearch
+				 * (useful for =, >, >=)
+				 * I think that for the operation !=, no binary search is needed, go through all
+				 * records and include it except that one
+				 */
+
+				// make list iterator, give index, iterate forward and backwards
+				// iterate through pages (for range queries) and within those iterations iterate
+				// within the pages (through the tuples)
+
+				if (arrSQLTerms[0]._strColumnName.equals(this.getStrClusteringKeyColumn())) {
+					int pageIndex = this.binarySearch(arrSQLTerms[0]._objValue,false);
+					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
+
+					switch (arrSQLTerms[0]._strOperator) {
+						// O(log(n)*log(n))
+						case "=":
+							String pageName = this.getPages().elementAt(pageIndex).getName();
+							Page p = Deserialize.Page(pageName);
+							res.add(p.selectDistinctNoIndex(arrSQLTerms, strarrOperators));
+							Serialize.Page(p,p.getName());
+							break;
+
+
+						// O(log(n)*log(n) + N/3)
+						case ">=":
+						case ">": {
+							int firstLoopMarker = 0;
+							for (int i = pageIndex; i < this.getPages().size(); i++) {
+								// I want to start printing from the tuple index (or not, if >) to the end
+								Page p1 = Deserialize.Page(this.getPages().elementAt(i).getName());
+								res.add(p1.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
+								Serialize.Page(p1,p1.getName());
+								firstLoopMarker++;
+							}
+							break;
+						}
+						// O(N/3)
+						case "<=":
+						case "<":
+						case "!=": {
+							int firstLoopMarker = 0;
+							for (Page page : this.getPages()) {
+								Page p2 = Deserialize.Page(page.getName());
+								res.add(p2.selectRangeNoIndexPK(arrSQLTerms, strarrOperators, firstLoopMarker));
+								Serialize.Page(p,p2.getName());
+								firstLoopMarker++;
+							}
+							break;
+						}
+
+					}
+
+					
+
+				} else {
+					// unfortunately have to iterate through all records since we are searching on a
+					// (non-sorted column)
+					for (Page p : this.getPages()) {
+						Page p1 = Deserialize.Page(p.getName());
+						res.add(p1.selectNoIndexNoPK(arrSQLTerms, strarrOperators));
+						Serialize.Page(p1,p1.getName());
+					}
+
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return res;
+	}
+
+	public ArrayList<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		return null;
 	}
 
 	public static void main(String[] args) throws Exception {
