@@ -205,37 +205,14 @@ public class Table implements Serializable {
 	public static Hashtable<String, String> checkData(String tableName, Hashtable<String, Object> data, String filePath)
 			throws Exception {
 
-		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
-				.withSkipLines(1)
-				.build();
-		String[] nextRecord;
-		boolean flag = false;
-		Hashtable<String, String> indexes = new Hashtable<String, String>();
 		Enumeration<Object> values = data.elements();
 		Enumeration<String> keys = data.keys();
-		Hashtable<String, String> collector = new Hashtable<String, String>();
-		// this loop iterate over the csv file untill the table is founded
-		// if it's not founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) {
+		
+		ArrayList<Hashtable<String, String>> res = outputIndicies(tableName,filePath);
+		Hashtable<String, String> indexes = res.get(0);
+		Hashtable<String, String> collector = res.get(1);
 
-			if (nextRecord[0].equals(tableName)) {
-				flag = true;
-				break;
-			} else
-				continue;
-		}
-		if (!flag)
-			throw new Exception("Invalid Table");
-		// this loop insert all the original attributes of the table inside collector
-		// hashtable
-		while (nextRecord != null && nextRecord[0].equals(tableName)) {
-			collector.put(nextRecord[1], nextRecord[2]);
 
-			if (nextRecord[4] != "")
-				indexes.put(nextRecord[1], nextRecord[4]);
-			nextRecord = csvReader.readNext();
-
-		}
 		// this loop checks the entered data and throws exception if anything mismatches
 		// the original attributes
 		while (keys.hasMoreElements()) {
@@ -249,6 +226,43 @@ public class Table implements Serializable {
 
 		}
 		return indexes;
+	}
+
+	public static ArrayList<Hashtable<String, String>> outputIndicies(String tableName, String filePath) throws Exception {
+		ArrayList<Hashtable<String, String>> res = new ArrayList<Hashtable<String, String>>();
+		String[] nextRecord;
+		boolean flag = false;
+		Hashtable<String, String> indexes = new Hashtable<String, String>();
+		Hashtable<String, String> collector = new Hashtable<String, String>();
+		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
+				.withSkipLines(1)
+				.build();
+		// this loop iterate over the csv file untill the table is founded
+		// if it's not founded then an exception will be thrown
+		while ((nextRecord = csvReader.readNext()) != null) {
+
+			if (nextRecord[0].equals(tableName)) {
+				flag = true;
+				break;
+			} else
+				continue;
+		}
+		if (!flag)
+			throw new Exception("Invalid Table");
+
+		// this loop insert all the original attributes of the table inside collector
+		// hashtable
+		while (nextRecord != null && nextRecord[0].equals(tableName)) {
+			collector.put(nextRecord[1], nextRecord[2]);
+
+			if (nextRecord[4] != "")
+				indexes.put(nextRecord[1], nextRecord[4]);
+			nextRecord = csvReader.readNext();
+
+		}
+		res.add(indexes);
+		res.add(collector);
+		return res;
 	}
 
 	public static boolean checkIndex(String tableName, String filePath) throws Exception {
@@ -279,12 +293,11 @@ public class Table implements Serializable {
 	public String getPkType(String filePath) throws Exception {
 		String tableName = this.getStrTableName();
 		String pk = this.getStrClusteringKeyColumn();
-		String type = null;
+
 		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
 				.withSkipLines(1)
 				.build();
 		String[] nextRecord;
-		boolean flag = false;
 
 		// this loop iterate over the csv file untill the table is founded
 		// if it's not founded then an exception will be thrown
@@ -946,7 +959,35 @@ public class Table implements Serializable {
 	}
 
 	public ArrayList<Object> selectFromTableWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
-		return null;
+		ArrayList<Object> res = new ArrayList<Object>();
+		try {
+			if (strarrOperators.length == 0 && arrSQLTerms.length == 1) {
+				switch (arrSQLTerms[0]._strOperator) {
+
+					case "=":
+
+						break;
+
+					case ">=":
+					case ">": {
+
+						break;
+					}
+
+					case "<=":
+					case "<":
+					case "!=": {
+
+						break;
+					}
+
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return res;
+
 	}
 
 	public static void main(String[] args) throws Exception {

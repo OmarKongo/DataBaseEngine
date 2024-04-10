@@ -5,20 +5,18 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.io.*;
 
-
-
- @SuppressWarnings({ "serial" })
+@SuppressWarnings({ "serial" })
 public class bplustree<K extends Comparable<K>> implements Serializable {
 	private Class<K> clazz;
 	int m;
 	InternalNode root;
 	LeafNode firstLeaf;
 
-	/*~~~~~~~~~~~~~~~~ HELPER FUNCTIONS ~~~~~~~~~~~~~~~~*/
+	/* ~~~~~~~~~~~~~~~~ HELPER FUNCTIONS ~~~~~~~~~~~~~~~~ */
 	public String toString() {
-	    LeafNode n = this.firstLeaf;
-	    
-	    return n + "";
+		LeafNode n = this.firstLeaf;
+
+		return n + "";
 	}
 
 	/**
@@ -26,12 +24,13 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * DictionaryPair[] and returns the index of the dictionary pair
 	 * with target key t if found. Otherwise, this method returns a negative
 	 * value.
+	 * 
 	 * @param dps: list of dictionary pairs sorted by key within leaf node
-	 * @param t: target key value of dictionary pair being searched for
+	 * @param t:   target key value of dictionary pair being searched for
 	 * @return index of the target value if found, else a negative value
 	 */
-	private int  binarySearch(DictionaryPair[] dps, int numPairs, K key) {
-		
+	private int binarySearch(DictionaryPair[] dps, int numPairs, K key) {
+
 		return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(key, null), null);
 	}
 
@@ -39,7 +38,9 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * This method starts at the root of the B+ tree and traverses down the
 	 * tree via key comparisons to the corresponding leaf node that holds 'key'
 	 * within its dictionary.
-	 * @param key: the unique key that lies within the dictionary of a LeafNode object
+	 * 
+	 * @param key: the unique key that lies within the dictionary of a LeafNode
+	 *             object
 	 * @return the LeafNode object that contains the key within its dictionary
 	 */
 	private LeafNode findLeafNode(K key) {
@@ -50,17 +51,21 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		// Find next node on path to appropriate leaf node
 		for (i = 0; i < this.root.degree - 1; i++) {
-			if (key.compareTo(keys[i]) < 0) { break; }
+			if (key.compareTo(keys[i]) < 0) {
+				break;
+			}
 
 		}
 
-		/* Return node if it is a LeafNode object,
-		   otherwise repeat the search function a level down */
+		/*
+		 * Return node if it is a LeafNode object,
+		 * otherwise repeat the search function a level down
+		 */
 		Node child = this.root.childPointers[i];
 		if (child instanceof bplustree.LeafNode) {
-			return (LeafNode)child;
+			return (LeafNode) child;
 		} else {
-			return findLeafNode((InternalNode)child, key);
+			return findLeafNode((InternalNode) child, key);
 		}
 	}
 
@@ -72,30 +77,37 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		// Find next node on path to appropriate leaf node
 		for (i = 0; i < node.degree - 1; i++) {
-			if (key.compareTo(keys[i]) < 0) { break; }
+			if (key.compareTo(keys[i]) < 0) {
+				break;
+			}
 		}
 
-		/* Return node if it is a LeafNode object,
-		   otherwise repeat the search function a level down */
+		/*
+		 * Return node if it is a LeafNode object,
+		 * otherwise repeat the search function a level down
+		 */
 		Node childNode = node.childPointers[i];
 		if (childNode instanceof bplustree.LeafNode) {
-			return (LeafNode)childNode;
+			return (LeafNode) childNode;
 		} else {
-			return findLeafNode((InternalNode)node.childPointers[i], key);
+			return findLeafNode((InternalNode) node.childPointers[i], key);
 		}
 	}
 
 	/**
 	 * Given a list of pointers to Node objects, this method returns the index of
 	 * the pointer that points to the specified 'node' LeafNode object.
+	 * 
 	 * @param pointers: a list of pointers to Node objects
-	 * @param node: a specific pointer to a LeafNode
+	 * @param node:     a specific pointer to a LeafNode
 	 * @return (int) index of pointer in list of pointers
 	 */
 	private int findIndexOfPointer(Node[] pointers, LeafNode node) {
 		int i;
 		for (i = 0; i < pointers.length; i++) {
-			if (pointers[i] == node) { break; }
+			if (pointers[i] == node) {
+				break;
+			}
 		}
 		return i;
 	}
@@ -104,15 +116,17 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * This is a simple method that returns the midpoint (or lower bound
 	 * depending on the context of the method invocation) of the max degree m of
 	 * the B+ tree.
+	 * 
 	 * @return (int) midpoint/lower bound
 	 */
 	private int getMidpoint() {
-		return (int)Math.ceil((this.m + 1) / 2.0) - 1;
+		return (int) Math.ceil((this.m + 1) / 2.0) - 1;
 	}
 
 	/**
 	 * Given a deficient InternalNode in, this method remedies the deficiency
 	 * through borrowing and merging.
+	 * 
 	 * @param in: a deficient InternalNode
 	 */
 	private void handleDeficiency(InternalNode in) {
@@ -125,7 +139,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 			for (int i = 0; i < in.childPointers.length; i++) {
 				if (in.childPointers[i] != null) {
 					if (in.childPointers[i] instanceof bplustree.InternalNode) {
-						this.root = (InternalNode)in.childPointers[i];
+						this.root = (InternalNode) in.childPointers[i];
 						this.root.parent = null;
 					} else if (in.childPointers[i] instanceof bplustree.LeafNode) {
 						this.root = null;
@@ -194,6 +208,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 	/**
 	 * This is a simple method that determines if the B+ tree is empty or not.
+	 * 
 	 * @return a boolean indicating if the B+ tree is empty or not
 	 */
 	private boolean isEmpty() {
@@ -205,12 +220,15 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * DictionaryPair[] and returns the index of the first null entry found.
 	 * Otherwise, this method returns a -1. This method is primarily used in
 	 * place of binarySearch() when the target t = null.
+	 * 
 	 * @param dps: list of dictionary pairs sorted by key within leaf node
 	 * @return index of the target value if found, else -1
 	 */
 	private int linearNullSearch(DictionaryPair[] dps) {
-		for (int i = 0; i <  dps.length; i++) {
-			if (dps[i] == null) { return i; }
+		for (int i = 0; i < dps.length; i++) {
+			if (dps[i] == null) {
+				return i;
+			}
 		}
 		return -1;
 	}
@@ -220,12 +238,15 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * and returns the index of the first null entry found. Otherwise, this
 	 * method returns a -1. This method is primarily used in place of
 	 * binarySearch() when the target t = null.
+	 * 
 	 * @param pointers: list of Node[] pointers
 	 * @return index of the target value if found, else -1
 	 */
 	private int linearNullSearch(Node[] pointers) {
-		for (int i = 0; i <  pointers.length; i++) {
-			if (pointers[i] == null) { return i; }
+		for (int i = 0; i < pointers.length; i++) {
+			if (pointers[i] == null) {
+				return i;
+			}
 		}
 		return -1;
 	}
@@ -233,8 +254,9 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	/**
 	 * This method is used to shift down a set of pointers that are prepended
 	 * by null values.
+	 * 
 	 * @param pointers: the list of pointers that are to be shifted
-	 * @param amount: the amount by which the pointers are to be shifted
+	 * @param amount:   the amount by which the pointers are to be shifted
 	 */
 	private void shiftDown(Node[] pointers, int amount) {
 		Node[] newPointers = new bplustree.Node[this.m + 1];
@@ -247,15 +269,22 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	/**
 	 * This is a specialized sorting method used upon lists of DictionaryPairs
 	 * that may contain interspersed null values.
+	 * 
 	 * @param dictionary: a list of DictionaryPair objects
 	 */
 	private void sortDictionary(DictionaryPair[] dictionary) {
 		Arrays.sort(dictionary, new Comparator<DictionaryPair>() {
 			@Override
 			public int compare(DictionaryPair o1, DictionaryPair o2) {
-				if (o1 == null && o2 == null) { return 0; }
-				if (o1 == null) { return 1; }
-				if (o2 == null) { return -1; }
+				if (o1 == null && o2 == null) {
+					return 0;
+				}
+				if (o1 == null) {
+					return 1;
+				}
+				if (o2 == null) {
+					return -1;
+				}
 				return o1.compareTo(o2);
 			}
 		});
@@ -266,7 +295,8 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * the childPointers after the specified split. The method returns the removed
 	 * pointers in a list of their own to be used when constructing a new
 	 * InternalNode sibling.
-	 * @param in: an InternalNode whose childPointers will be split
+	 * 
+	 * @param in:    an InternalNode whose childPointers will be split
 	 * @param split: the index at which the split in the childPointers begins
 	 * @return a Node[] of the removed pointers
 	 */
@@ -291,7 +321,8 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * primarily used when splitting a node within the B+ tree. The dictionary of
 	 * the specified LeafNode is modified in place. The method returns the
 	 * remainder of the DictionaryPairs that are no longer within ln's dictionary.
-	 * @param ln: list of DictionaryPairs to be split
+	 * 
+	 * @param ln:    list of DictionaryPairs to be split
 	 * @param split: the index at which the split occurs
 	 * @return DictionaryPair[] of the two split dictionaries
 	 */
@@ -299,8 +330,10 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		DictionaryPair[] dictionary = ln.dictionary;
 
-		/* Initialize two dictionaries that each hold half of the original
-		   dictionary values */
+		/*
+		 * Initialize two dictionaries that each hold half of the original
+		 * dictionary values
+		 */
 		DictionaryPair[] halfDict = new bplustree.DictionaryPair[this.m];
 
 		// Copy half of the values into halfDict
@@ -317,6 +350,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * is called to remedy the issue, i.e. to split the overfull node. This method
 	 * calls the sub-methods of splitKeys() and splitChildPointers() in order to
 	 * split the overfull node.
+	 * 
 	 * @param in: an overfull InternalNode that is to be split
 	 */
 	private void splitInternalNode(InternalNode in) {
@@ -336,7 +370,9 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		// Create new sibling internal node and add half of keys and pointers
 		InternalNode sibling = new InternalNode(this.m, halfKeys, halfPointers);
 		for (Node pointer : halfPointers) {
-			if (pointer != null) { pointer.parent = sibling; }
+			if (pointer != null) {
+				pointer.parent = sibling;
+			}
 		}
 
 		// Make internal nodes siblings of one another
@@ -378,7 +414,8 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * This method modifies a list of Integer-typed objects that represent keys
 	 * by removing half of the keys and returning them in a separate Integer[].
 	 * This method is used when splitting an InternalNode object.
-	 * @param keys: a list of Integer objects
+	 * 
+	 * @param keys:  a list of Integer objects
 	 * @param split: the index where the split is to occur
 	 * @return Integer[] of removed keys
 	 */
@@ -403,11 +440,12 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		return (K[]) Array.newInstance(clazz, this.m);
 	}
 
-	/*~~~~~~~~~~~~~~~~ API: DELETE, INSERT, SEARCH, UPDATE ~~~~~~~~~~~~~~~~*/
+	/* ~~~~~~~~~~~~~~~~ API: DELETE, INSERT, SEARCH, UPDATE ~~~~~~~~~~~~~~~~ */
 
 	/**
 	 * Given a dictionaryPair that contains a subset of values of search method.
-	 * It deletes the values within the dictionaryPair's value array 
+	 * It deletes the values within the dictionaryPair's value array
+	 * 
 	 * @param dp: dictionaryPair to delete with.
 	 */
 	public ArrayList<String> delete(K key, ArrayList<String> pageNames) {
@@ -424,33 +462,32 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		LeafNode ln = (this.root == null) ? this.firstLeaf : findLeafNode(dp.key);
 		int dpIndex = binarySearch(ln.dictionary, ln.numPairs, key);
 
-
 		if (dpIndex < 0) {
 
 			/* Flow of execution goes here when key is absent in B+ tree */
 			System.err.println("Invalid Delete: Key unable to be found.");
 
-		} 
-
+		}
 
 		DictionaryPair targetDP = ln.dictionary[dpIndex];
 
-		//delete specific values for given key if dp.value is null
-		if(dp.value != null)  {
-		//PageNames to be returned by method
-		ArrayList<String> pagesHadKey = new ArrayList<>();
-		//delete relevant pages from dictionaryPair
-		for (String o : dp.value) {
-			int filterValue = targetDP.value.indexOf(o);
-			if(filterValue > -1) {
-				targetDP.value.remove(filterValue);
-				pagesHadKey.add(o);
-			} else {
-				System.out.println("Key: " + key + " does not contain " + o);
-		}
-		}
+		// delete specific values for given key if dp.value is null
+		if (dp.value != null) {
+			// PageNames to be returned by method
+			ArrayList<String> pagesHadKey = new ArrayList<>();
+			// delete relevant pages from dictionaryPair
+			for (String o : dp.value) {
+				int filterValue = targetDP.value.indexOf(o);
+				if (filterValue > -1) {
+					targetDP.value.remove(filterValue);
+					pagesHadKey.add(o);
+				} else {
+					System.out.println("Key: " + key + " does not contain " + o);
+				}
+			}
 
-		if (!targetDP.value.isEmpty()) return pagesHadKey;
+			if (!targetDP.value.isEmpty())
+				return pagesHadKey;
 
 		}
 
@@ -465,14 +502,16 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 			// Borrow: First, check the left sibling, then the right sibling
 			if (ln.leftSibling != null &&
-				ln.leftSibling.parent == ln.parent &&
-				ln.leftSibling.isLendable()) {
+					ln.leftSibling.parent == ln.parent &&
+					ln.leftSibling.isLendable()) {
 
 				sibling = ln.leftSibling;
 				DictionaryPair borrowedDP = sibling.dictionary[sibling.numPairs - 1];
 
-				/* Insert borrowed dictionary pair, sort dictionary,
-					and delete dictionary pair from sibling */
+				/*
+				 * Insert borrowed dictionary pair, sort dictionary,
+				 * and delete dictionary pair from sibling
+				 */
 				ln.insert(borrowedDP);
 				sortDictionary(ln.dictionary);
 				sibling.delete(sibling.numPairs - 1);
@@ -484,14 +523,16 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 				}
 
 			} else if (ln.rightSibling != null &&
-						ln.rightSibling.parent == ln.parent &&
-						ln.rightSibling.isLendable()) {
+					ln.rightSibling.parent == ln.parent &&
+					ln.rightSibling.isLendable()) {
 
 				sibling = ln.rightSibling;
 				DictionaryPair borrowedDP = sibling.dictionary[0];
 
-				/* Insert borrowed dictionary pair, sort dictionary,
-					and delete dictionary pair from sibling */
+				/*
+				 * Insert borrowed dictionary pair, sort dictionary,
+				 * and delete dictionary pair from sibling
+				 */
 				ln.insert(borrowedDP);
 				sibling.delete(0);
 				sortDictionary(sibling.dictionary);
@@ -506,8 +547,8 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 			// Merge: First, check the left sibling, then the right sibling
 			else if (ln.leftSibling != null &&
-						ln.leftSibling.parent == ln.parent &&
-						ln.leftSibling.isMergeable()) {
+					ln.leftSibling.parent == ln.parent &&
+					ln.leftSibling.isMergeable()) {
 
 				sibling = ln.leftSibling;
 				int pointerIndex = findIndexOfPointer(parent.childPointers, ln);
@@ -525,8 +566,8 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 				}
 
 			} else if (ln.rightSibling != null &&
-						ln.rightSibling.parent == ln.parent &&
-						ln.rightSibling.isMergeable()) {
+					ln.rightSibling.parent == ln.parent &&
+					ln.rightSibling.isMergeable()) {
 
 				sibling = ln.rightSibling;
 				int pointerIndex = findIndexOfPointer(parent.childPointers, ln);
@@ -548,16 +589,20 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		} else if (this.root == null && this.firstLeaf.numPairs == 0) {
 
-			/* Flow of execution goes here when the deleted dictionary
-				pair was the only pair within the tree */
+			/*
+			 * Flow of execution goes here when the deleted dictionary
+			 * pair was the only pair within the tree
+			 */
 
 			// Set first leaf as null to indicate B+ tree is empty
 			this.firstLeaf = null;
 
 		} else {
 
-			/* The dictionary of the LeafNode object may need to be
-				sorted after a successful delete */
+			/*
+			 * The dictionary of the LeafNode object may need to be
+			 * sorted after a successful delete
+			 */
 			sortDictionary(ln.dictionary);
 
 		}
@@ -568,10 +613,11 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	/**
 	 * Given an integer key and floating point value, this method inserts a
 	 * dictionary pair accordingly into the B+ tree.
-	 * @param key: an integer key to be used in the dictionary pair
+	 * 
+	 * @param key:   an integer key to be used in the dictionary pair
 	 * @param value: a floating point number to be used in the dictionary pair
 	 */
-	public void insert(K key, ArrayList<String> pageNames){
+	public void insert(K key, ArrayList<String> pageNames) {
 
 		DictionaryPair dp = new DictionaryPair(key, pageNames);
 
@@ -588,11 +634,10 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		} else {
 
 			// Find leaf node to insert into
-			LeafNode ln = (this.root == null) ? this.firstLeaf :
-												findLeafNode(dp.key);
+			LeafNode ln = (this.root == null) ? this.firstLeaf : findLeafNode(dp.key);
 
 			int indexOfEqualKey = binarySearch(ln.dictionary, ln.numPairs, key);
-			if(indexOfEqualKey >= 0) {
+			if (indexOfEqualKey >= 0) {
 
 				ln.dictionary[indexOfEqualKey].value.addAll(dp.value);
 			}
@@ -651,8 +696,10 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 				} else {
 
-					/* If parent is overfull, repeat the process up the tree,
-			   		   until no deficiencies are found */
+					/*
+					 * If parent is overfull, repeat the process up the tree,
+					 * until no deficiencies are found
+					 */
 					InternalNode in = ln.parent;
 					while (in != null) {
 						if (in.isOverfull()) {
@@ -670,17 +717,18 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	/**
 	 * Given a key, this method returns the value associated with the key
 	 * within a dictionary pair that exists inside the B+ tree.
+	 * 
 	 * @param key: the key to be searched within the B+ tree
 	 * @return the floating point value associated with the key within the B+ tree
 	 */
 	public ArrayList<String> search(K key) {
 
-		//Empty ArrayList if search doesn't find anything
+		// Empty ArrayList if search doesn't find anything
 		ArrayList<String> returnEmpty = new ArrayList<>();
 		// If B+ tree is completely empty, simply return null
-		if (isEmpty()) { 
+		if (isEmpty()) {
 			System.err.println("This key doesn't exist");
-			return returnEmpty; 
+			return returnEmpty;
 		}
 
 		// Find leaf node that holds the dictionary key
@@ -693,7 +741,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		// If index negative, the key doesn't exist in B+ tree
 		if (index < 0) {
 			System.err.println("This key doesn't exist");
-			return returnEmpty; 
+			return returnEmpty;
 		} else {
 			return dps[index].value;
 		}
@@ -703,10 +751,11 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * This method traverses the doubly linked list of the B+ tree and records
 	 * all values whose associated keys are within the range specified by
 	 * lowerBound and upperBound.
+	 * 
 	 * @param lowerBound: (int) the lower bound of the range
 	 * @param upperBound: (int) the upper bound of the range
 	 * @return an ArrayList<Double> that holds all values of dictionary pairs
-	 * whose keys are within the specified range
+	 *         whose keys are within the specified range
 	 */
 	public ArrayList<String> search(K lowerBound, K upperBound) {
 
@@ -721,29 +770,37 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 			DictionaryPair dps[] = currNode.dictionary;
 			for (DictionaryPair dp : dps) {
 
-				/* Stop searching the dictionary once a null value is encountered
-				   as this the indicates the end of non-null values */
-				if (dp == null) { break; }
+				/*
+				 * Stop searching the dictionary once a null value is encountered
+				 * as this the indicates the end of non-null values
+				 */
+				if (dp == null) {
+					break;
+				}
 
 				// Include value if its key fits within the provided range
 				if ((dp.key.compareTo(lowerBound) >= 0) && (dp.key.compareTo(upperBound) <= 0)) {
 					values.addAll(dp.value);
 				}
 			}
-			/* Update the current node to be the right sibling,
-				leaf traversal is from left to right */
+			/*
+			 * Update the current node to be the right sibling,
+			 * leaf traversal is from left to right
+			 */
 			currNode = currNode.rightSibling;
-			}	
+		}
 
 		return values;
 	}
 
 	/**
 	 * This method takes a DictionaryPair and map the values to another key
-	 * @param oldDP: The dictionaryPair of key and specific pages that are to be changed
+	 * 
+	 * @param oldDP: The dictionaryPair of key and specific pages that are to be
+	 *               changed
 	 */
 	public void update(K oldKey, ArrayList<String> pageNamesToMove, K newKey) {
-				
+
 		ArrayList<String> values = this.delete(oldKey, pageNamesToMove);
 
 		this.insert(newKey, values);
@@ -751,6 +808,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 	/**
 	 * Constructor
+	 * 
 	 * @param m: the order (fanout) of the B+ tree
 	 */
 	public bplustree(Class<K> clazz, int m) {
@@ -772,7 +830,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * all search/insert/delete operations. An internal node only holds keys; it
 	 * does not hold dictionary pairs.
 	 */
-	private class InternalNode extends Node  implements Serializable{
+	private class InternalNode extends Node implements Serializable {
 		int maxDegree;
 		int minDegree;
 		int degree;
@@ -781,22 +839,23 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		K[] keys;
 		Node[] childPointers;
 
-		
 		public String toString() {
 			String res = "";
-			for(int i =0;i<this.keys.length;i++) {
-				res  = res + this.keys[i] + "      ";
+			for (int i = 0; i < this.keys.length; i++) {
+				res = res + this.keys[i] + "      ";
 			}
-				 
+
 			return res;
 		}
+
 		/**
 		 * This method appends 'pointer' to the end of the childPointers
 		 * instance variable of the InternalNode object. The pointer can point to
 		 * an InternalNode object or a LeafNode object since the formal
 		 * parameter specifies a Node object.
+		 * 
 		 * @param pointer: Node pointer that is to be appended to the
-		 *                    childPointers list
+		 *                 childPointers list
 		 */
 		private void appendChildPointer(Node pointer) {
 			this.childPointers[degree] = pointer;
@@ -807,14 +866,17 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		 * Given a Node pointer, this method will return the index of where the
 		 * pointer lies within the childPointers instance variable. If the pointer
 		 * can't be found, the method returns -1.
+		 * 
 		 * @param pointer: a Node pointer that may lie within the childPointers
-		 *                     instance variable
+		 *                 instance variable
 		 * @return the index of 'pointer' within childPointers, or -1 if
-		 * 'pointer' can't be found
+		 *         'pointer' can't be found
 		 */
 		private int findIndexOfPointer(Node pointer) {
 			for (int i = 0; i < childPointers.length; i++) {
-				if (childPointers[i] == pointer) { return i; }
+				if (childPointers[i] == pointer) {
+					return i;
+				}
 			}
 			return -1;
 		}
@@ -824,11 +886,12 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		 * inserts the pointer at the specified index within the childPointers
 		 * instance variable. As a result of the insert, some pointers may be
 		 * shifted to the right of the index.
+		 * 
 		 * @param pointer: the Node pointer to be inserted
-		 * @param index: the index at which the insert is to take place
+		 * @param index:   the index at which the insert is to take place
 		 */
 		private void insertChildPointer(Node pointer, int index) {
-			for (int i = degree - 1; i >= index ;i--) {
+			for (int i = degree - 1; i >= index; i--) {
 				childPointers[i + 1] = childPointers[i];
 			}
 			this.childPointers[index] = pointer;
@@ -839,8 +902,9 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		 * This simple method determines if the InternalNode is deficient or not.
 		 * An InternalNode is deficient when its current degree of children falls
 		 * below the allowed minimum.
+		 * 
 		 * @return a boolean indicating whether the InternalNode is deficient
-		 * or not
+		 *         or not
 		 */
 		private boolean isDeficient() {
 			return this.degree < this.minDegree;
@@ -851,24 +915,31 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		 * lending one of its dictionary pairs to a deficient node. An InternalNode
 		 * can give away a dictionary pair if its current degree is above the
 		 * specified minimum.
+		 * 
 		 * @return a boolean indicating whether or not the InternalNode has
-		 * enough dictionary pairs in order to give one away.
+		 *         enough dictionary pairs in order to give one away.
 		 */
-		private boolean isLendable() { return this.degree > this.minDegree; }
+		private boolean isLendable() {
+			return this.degree > this.minDegree;
+		}
 
 		/**
 		 * This simple method determines if the InternalNode is capable of being
 		 * merged with. An InternalNode can be merged with if it has the minimum
 		 * degree of children.
+		 * 
 		 * @return a boolean indicating whether or not the InternalNode can be
-		 * merged with
+		 *         merged with
 		 */
-		private boolean isMergeable() { return this.degree == this.minDegree; }
+		private boolean isMergeable() {
+			return this.degree == this.minDegree;
+		}
 
 		/**
 		 * This simple method determines if the InternalNode is considered overfull,
 		 * i.e. the InternalNode object's current degree is one more than the
 		 * specified maximum.
+		 * 
 		 * @return a boolean indicating if the InternalNode is overfull
 		 */
 		private boolean isOverfull() {
@@ -878,10 +949,11 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		/**
 		 * Given a pointer to a Node object, this method inserts the pointer to
 		 * the beginning of the childPointers instance variable.
+		 * 
 		 * @param pointer: the Node object to be prepended within childPointers
 		 */
 		private void prependChildPointer(Node pointer) {
-			for (int i = degree - 1; i >= 0 ;i--) {
+			for (int i = degree - 1; i >= 0; i--) {
 				childPointers[i + 1] = childPointers[i];
 			}
 			this.childPointers[0] = pointer;
@@ -891,13 +963,17 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		/**
 		 * This method sets keys[index] to null. This method is used within the
 		 * parent of a merging, deficient LeafNode.
+		 * 
 		 * @param index: the location within keys to be set to null
 		 */
-		private void removeKey(int index) { this.keys[index] = null; }
+		private void removeKey(int index) {
+			this.keys[index] = null;
+		}
 
 		/**
 		 * This method sets childPointers[index] to null and additionally
 		 * decrements the current degree of the InternalNode.
+		 * 
 		 * @param index: the location within childPointers to be set to null
 		 */
 		private void removePointer(int index) {
@@ -909,37 +985,42 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		 * This method removes 'pointer' from the childPointers instance
 		 * variable and decrements the current degree of the InternalNode. The
 		 * index where the pointer node was assigned is set to null.
+		 * 
 		 * @param pointer: the Node pointer to be removed from childPointers
 		 */
 		private void removePointer(Node pointer) {
 			for (int i = 0; i < childPointers.length; i++) {
-				if (childPointers[i] == pointer) { this.childPointers[i] = null; }
+				if (childPointers[i] == pointer) {
+					this.childPointers[i] = null;
+				}
 			}
 			this.degree--;
 		}
 
 		/**
 		 * Constructor
-		 * @param m: the max degree of the InternalNode
+		 * 
+		 * @param m:    the max degree of the InternalNode
 		 * @param keys: the list of keys that InternalNode is initialized with
 		 */
-		private InternalNode(int m, K[] keys)  {
+		private InternalNode(int m, K[] keys) {
 			this.maxDegree = m;
-			this.minDegree = (int)Math.ceil(m/2.0);
+			this.minDegree = (int) Math.ceil(m / 2.0);
 			this.degree = 0;
 			this.keys = keys;
-			this.childPointers = new bplustree.Node[this.maxDegree+1];
+			this.childPointers = new bplustree.Node[this.maxDegree + 1];
 		}
 
 		/**
 		 * Constructor
-		 * @param m: the max degree of the InternalNode
-		 * @param keys: the list of keys that InternalNode is initialized with
+		 * 
+		 * @param m:        the max degree of the InternalNode
+		 * @param keys:     the list of keys that InternalNode is initialized with
 		 * @param pointers: the list of pointers that InternalNode is initialized with
 		 */
 		private InternalNode(int m, K[] keys, Node[] pointers) {
 			this.maxDegree = m;
-			this.minDegree = (int)Math.ceil(m/2.0);
+			this.minDegree = (int) Math.ceil(m / 2.0);
 			this.degree = linearNullSearch(pointers);
 			this.keys = keys;
 			this.childPointers = pointers;
@@ -951,8 +1032,9 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * dictionary pairs. The leaf node has no children. The leaf node has a
 	 * minimum and maximum number of dictionary pairs it can hold, as specified
 	 * by m, the max degree of the B+ tree. The leaf nodes form a doubly linked
-	 * list that, i.e. each leaf node has a left and right sibling*/
-	public class LeafNode extends Node  implements Serializable{
+	 * list that, i.e. each leaf node has a left and right sibling
+	 */
+	public class LeafNode extends Node implements Serializable {
 		int maxNumPairs;
 		int minNumPairs;
 		int numPairs;
@@ -962,27 +1044,26 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		public String toString() {
 			String res = "";
-			LeafNode n = this;LeafNode x = n.leftSibling;LeafNode y = n.rightSibling;
-			
-					for(int i =0;i<n.dictionary.length;i++) 
-						res  = res + n.dictionary[i] + "      ";
-					
-					
-					
-				
-			
-				 
+			LeafNode n = this;
+			LeafNode x = n.leftSibling;
+			LeafNode y = n.rightSibling;
+
+			for (int i = 0; i < n.dictionary.length; i++)
+				res = res + n.dictionary[i] + "      ";
+
 			return res;
 		}
+
 		/**
 		 * Given an index, this method sets the dictionary pair at that index
 		 * within the dictionary to null.
+		 * 
 		 * @param index: the location within the dictionary to be set to null
 		 * @return DictionaryPair just deleted
 		 */
 		public DictionaryPair delete(int index) {
 
-			//get DictionaryPair
+			// get DictionaryPair
 			DictionaryPair dp = this.dictionary[index];
 
 			// Delete dictionary pair from leaf
@@ -999,6 +1080,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		 * of the LeafNode object. If it succeeds, numPairs increments, the
 		 * dictionary is sorted, and the boolean true is returned. If the method
 		 * fails, the boolean false is returned.
+		 * 
 		 * @param dp: the dictionary pair to be inserted
 		 * @return a boolean indicating whether or not the insert was successful
 		 */
@@ -1022,33 +1104,43 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		/**
 		 * This simple method determines if the LeafNode is deficient, i.e.
 		 * the numPairs within the LeafNode object is below minNumPairs.
+		 * 
 		 * @return a boolean indicating whether or not the LeafNode is deficient
 		 */
-		public boolean isDeficient() { return numPairs < minNumPairs; }
+		public boolean isDeficient() {
+			return numPairs < minNumPairs;
+		}
 
 		/**
 		 * This simple method determines if the LeafNode is full, i.e. the
 		 * numPairs within the LeafNode is equal to the maximum number of pairs.
+		 * 
 		 * @return a boolean indicating whether or not the LeafNode is full
 		 */
-		public boolean isFull() { return numPairs == maxNumPairs; }
+		public boolean isFull() {
+			return numPairs == maxNumPairs;
+		}
 
 		/**
 		 * This simple method determines if the LeafNode object is capable of
 		 * lending a dictionary pair to a deficient leaf node. The LeafNode
 		 * object can lend a dictionary pair if its numPairs is greater than
 		 * the minimum number of pairs it can hold.
+		 * 
 		 * @return a boolean indicating whether or not the LeafNode object can
-		 * give a dictionary pair to a deficient leaf node
+		 *         give a dictionary pair to a deficient leaf node
 		 */
-		public boolean isLendable() { return numPairs > minNumPairs; }
+		public boolean isLendable() {
+			return numPairs > minNumPairs;
+		}
 
 		/**
 		 * This simple method determines if the LeafNode object is capable of
 		 * being merged with, which occurs when the number of pairs within the
 		 * LeafNode object is equal to the minimum number of pairs it can hold.
+		 * 
 		 * @return a boolean indicating whether or not the LeafNode object can
-		 * be merged with
+		 *         be merged with
 		 */
 		public boolean isMergeable() {
 			return numPairs == minNumPairs;
@@ -1056,13 +1148,14 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		/**
 		 * Constructor
-		 * @param m: order of B+ tree that is used to calculate maxNumPairs and
-		 *           minNumPairs
+		 * 
+		 * @param m:  order of B+ tree that is used to calculate maxNumPairs and
+		 *            minNumPairs
 		 * @param dp: first dictionary pair insert into new node
 		 */
 		public LeafNode(int m, DictionaryPair dp) {
 			this.maxNumPairs = m - 1;
-			this.minNumPairs = (int)(Math.ceil(m/2) - 1);
+			this.minNumPairs = (int) (Math.ceil(m / 2) - 1);
 			this.dictionary = new bplustree.DictionaryPair[m];
 			this.numPairs = 0;
 			this.insert(dp);
@@ -1070,15 +1163,16 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		/**
 		 * Constructor
-		 * @param dps: list of DictionaryPair objects to be immediately inserted
-		 *             into new LeafNode object
-		 * @param m: order of B+ tree that is used to calculate maxNumPairs and
-		 * 		     minNumPairs
+		 * 
+		 * @param dps:    list of DictionaryPair objects to be immediately inserted
+		 *                into new LeafNode object
+		 * @param m:      order of B+ tree that is used to calculate maxNumPairs and
+		 *                minNumPairs
 		 * @param parent: parent of newly created child LeafNode
 		 */
 		public LeafNode(int m, DictionaryPair[] dps, InternalNode parent) {
 			this.maxNumPairs = m - 1;
-			this.minNumPairs = (int)(Math.ceil(m/2) - 1);
+			this.minNumPairs = (int) (Math.ceil(m / 2) - 1);
 			this.dictionary = dps;
 			this.numPairs = linearNullSearch(dps);
 			this.parent = parent;
@@ -1090,17 +1184,18 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * leaf nodes of the B+ tree. The class implements the Comparable interface
 	 * so that the DictionaryPair objects can be sorted later on.
 	 */
-	public class DictionaryPair implements Comparable<DictionaryPair>,Serializable {
+	public class DictionaryPair implements Comparable<DictionaryPair>, Serializable {
 		private K key;
 		ArrayList<String> value;
-	    
-		
-     public String toString() {
-    	 return "KEY : " + key + "  VALUE :" + value;
-     }
+
+		public String toString() {
+			return "KEY : " + key + "  VALUE :" + value;
+		}
+
 		/**
 		 * Constructor
-		 * @param key: the key of the key-value pair
+		 * 
+		 * @param key:   the key of the key-value pair
 		 * @param value: the value of the key-value pair
 		 */
 		public DictionaryPair(K key, ArrayList<String> value) {
@@ -1111,10 +1206,11 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		public K getKey() {
 			return key;
 		}
-	
+
 		/**
 		 * This is a method that allows comparisons to take place between
 		 * DictionaryPair objects in order to sort them later on
+		 * 
 		 * @param o
 		 * @return
 		 */
@@ -1123,6 +1219,5 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 			return this.key.compareTo(o.getKey());
 		}
 
-	
 	}
 }
