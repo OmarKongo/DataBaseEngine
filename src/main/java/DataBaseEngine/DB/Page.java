@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -141,6 +142,126 @@ public class Page implements Serializable, Comparable<Object> {
 	public boolean overFlowed() throws IOException {
 		return this.getTuplesInPage().size() > this.getMaxCount();
 
+	}
+	public ArrayList<Object> selectDistinctNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>();
+
+		int tupleIndex = this.getTupleIndexUsingBS(arrSQLTerms);
+		if (tupleIndex != -1)
+			res.add(this.getTuplesInPage().elementAt(tupleIndex));
+
+		return res;
+	}
+
+	public int getTupleIndexUsingBS(SQLTerm[] arrSQLTerms) {
+		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
+		attributesInTuple.put(arrSQLTerms[0]._strColumnName, arrSQLTerms[0]._objValue);
+		int tupleIndex = Collections.binarySearch(this.getTuplesInPage(),
+				new Tuple(arrSQLTerms[0]._strColumnName, attributesInTuple.keys(),
+						attributesInTuple.elements()));
+		return tupleIndex;
+	}
+
+	public ArrayList<Object> selectNoIndexNoPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<Object>();
+		String searchedColumn = arrSQLTerms[0]._strColumnName;
+		Object searchedValue = arrSQLTerms[0]._objValue;
+		for (Tuple t : this.getTuplesInPage()) {
+			Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+			int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+			switch (arrSQLTerms[0]._strOperator) {
+				case ">":
+					if (comparison > 0) {
+						res.add(t);
+					}
+					break;
+				case ">=":
+					if (comparison >= 0) {
+						res.add(t);
+					}
+					break;
+				case "<":
+					if (comparison < 0) {
+						res.add(t);
+					}
+					break;
+				case "<=":
+					if (comparison <= 0) {
+						res.add(t);
+					}
+					break;
+				case "!=":
+					if (comparison != 0) {
+						res.add(t);
+					}
+					break;
+				case "=":
+					if (comparison == 0) {
+						res.add(t);
+					}
+					break;
+
+			}
+		}
+		return res;
+	}
+
+	public ArrayList<Object> selectRangeNoIndexPK(SQLTerm[] arrSQLTerms, String[] strarrOperators,
+			int firstLoopMarker) {
+		ArrayList<Object> res = new ArrayList<Object>();
+		String searchedColumn = arrSQLTerms[0]._strColumnName;
+		Object searchedValue = arrSQLTerms[0]._objValue;
+		int testCount = 0;
+		switch (arrSQLTerms[0]._strOperator) {
+			case ">":
+			case ">=": {
+				int j = 0;
+				if (firstLoopMarker == 0) {
+					j = this.getTupleIndexUsingBS(arrSQLTerms);
+				}
+				for (int i = j; i < this.getTuplesInPage().size(); i++) {
+					testCount++;
+					Tuple t = this.getTuplesInPage().elementAt(i);
+					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+
+					if (comparison != 0) {
+						res.add(t);
+					} else {
+						if (arrSQLTerms[0]._strOperator.equals(">="))
+							res.add(t);
+					}
+				}
+			}
+			case "<":
+			case "<=":
+			case "!=": {
+
+				for (Tuple t : this.getTuplesInPage()) {
+					testCount++;
+					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
+					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
+					if (comparison != 0) {
+						res.add(t);
+					} else {
+						if (arrSQLTerms[0]._strOperator.equals("<=")) {
+							res.add(t);
+							break;
+						} else {
+							if (arrSQLTerms[0]._strOperator.equals("<")) {
+								break;
+							}
+						}
+
+					}
+				}
+
+			}
+
+		}
+
+		System.out.println("test count is: " + testCount + " tuples in page is: " + this.getTuplesInPage().size());
+		return res;
 	}
 
 	public static void main(String[] args) {
