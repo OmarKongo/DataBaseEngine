@@ -212,6 +212,7 @@ public class DBApp {
 			if (indicies.isEmpty()) {
 				resList.addAll(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 			} else {
+				System.err.println("yesssssss1");
 				resList.addAll(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators,indicies));
 			}
 		} catch (Exception e) {

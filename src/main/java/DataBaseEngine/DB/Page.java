@@ -126,11 +126,11 @@ public class Page implements Serializable, Comparable<Object> {
 
 	public ArrayList<Object> selectDistinctPK(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<Object>();
-
+		System.out.println("yesssssss3");
 		int tupleIndex = this.getTupleIndexUsingBS(arrSQLTerms);
+		System.out.println(tupleIndex+" tupleIndex");
 		if (tupleIndex != -1)
 			res.add(this.getTuplesInPage().elementAt(tupleIndex));
-
 		return res;
 	}
 
@@ -219,7 +219,7 @@ public class Page implements Serializable, Comparable<Object> {
 			case "<":
 			case "<=":
 			case "!=": {
-
+				System.out.println(" in 2nd switch case");
 				for (Tuple t : this.getTuplesInPage()) {
 					testCount++;
 					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);

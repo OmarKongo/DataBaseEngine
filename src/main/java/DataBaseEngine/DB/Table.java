@@ -414,8 +414,7 @@ public class Table implements Serializable {
 				Serialize.Page(p, pageName);
 
 				// OVERFLOW ON THE LAST PAGE
-				if (index == table.getPages().size() - 1) { // if the overflow in the last page, I will create a new
-					System.out.println("I enter here");								// page without going through any loops
+				if (index == table.getPages().size() - 1) { // if the overflow in the last page, I will create a new							// page without going through any loops
 					table = Deserialize.Table(tableName);
 					p = new Page(table.setNameForpage());
 					p.getPageProp().put(p.getName(), new Pair(baseType(T)));
@@ -875,9 +874,10 @@ public class Table implements Serializable {
 				// within the pages (through the tuples)
 
 				if (arrSQLTerms[0]._strColumnName.equals(this.getStrClusteringKeyColumn())) {
+					System.out.println("yesssssss2");
 					int pageIndex = this.binarySearch(arrSQLTerms[0]._objValue, false);
 					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
-
+					System.out.println(pageIndex+ " pageIndex");
 					switch (arrSQLTerms[0]._strOperator) {
 						// O(log(n)*log(n))
 						case "=":
@@ -905,8 +905,9 @@ public class Table implements Serializable {
 						case "<":
 						case "!=": {
 							int firstLoopMarker = 0;
-							for (Page page : this.getPages()) {
-								Page p2 = Deserialize.Page(page.getName());
+							System.out.println("in switchcase");
+							for (int i = 0; i<pageIndex+1; i++) {
+								Page p2 = Deserialize.Page(this.getPages().elementAt(i).getName());
 								res.addAll(p2.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p2, p2.getName());
 								firstLoopMarker++;
@@ -930,7 +931,6 @@ public class Table implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return res;
 	}
 
@@ -992,7 +992,7 @@ public class Table implements Serializable {
 					Serialize.Index(btree, indexName);
 				}
 				else{
-					selectFromTableNoIndex(arrSQLTerms, strarrOperators);
+					res.addAll(selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 				}
 			}
 		} catch (Exception e) {

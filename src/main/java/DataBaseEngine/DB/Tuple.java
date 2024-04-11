@@ -51,10 +51,10 @@ public class Tuple extends Page implements Comparable<Object>, Serializable {
 
 	@Override
 	public int compareTo(Object o) {
-		// Tuple T = (Tuple) o;
+		Tuple T = (Tuple) o;
 		Object x = this.getAttributesInTuple().get(this.getStrPrimaryKey());
-		// Object y = (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
-		return DBApp.compareValue(x,o);
+		Object y = (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
+		return DBApp.compareValue(x, y);
 	}
 
 	public Object getPK() {
