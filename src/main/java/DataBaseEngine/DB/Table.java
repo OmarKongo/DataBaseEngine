@@ -369,7 +369,7 @@ public class Table implements Serializable {
 			// table.getProps().put(p.getName(),new Pair(baseType(T.getPK())));
 
 			T.addTuple(p);
-			System.out.print("KEY : " + T.getPK() + " added to " + p.getName());
+			System.out.println("KEY : " + T.getPK() + " added to " + p.getName());
 			p = p.updateMax();
 			table.getPages().add(p);
 			table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
@@ -402,6 +402,7 @@ public class Table implements Serializable {
 				// ADDED SUCCESSFULLY
 			} else {
 				// OVERFLOW ON PAGE BUT STILL ADDED
+				System.out.println("Hi, from solution: "+p.getName());
 				addInBtree(T, p, indexes, true);
 				T = p.getTuplesInPage().remove(p.getMaxCount());
 				deleteFromIndex(T, p, indexes, true);
@@ -414,7 +415,7 @@ public class Table implements Serializable {
 
 				// OVERFLOW ON THE LAST PAGE
 				if (index == table.getPages().size() - 1) { // if the overflow in the last page, I will create a new
-															// page without going through any loops
+					System.out.println("I enter here");								// page without going through any loops
 					table = Deserialize.Table(tableName);
 					p = new Page(table.setNameForpage());
 					p.getPageProp().put(p.getName(), new Pair(baseType(T)));
@@ -882,7 +883,7 @@ public class Table implements Serializable {
 						case "=":
 							String pageName = this.getPages().elementAt(pageIndex).getName();
 							Page p = Deserialize.Page(pageName);
-							res.add(p.selectDistinctPK(arrSQLTerms, strarrOperators));
+							res.addAll(p.selectDistinctPK(arrSQLTerms, strarrOperators));
 							Serialize.Page(p, p.getName());
 							break;
 
@@ -893,7 +894,7 @@ public class Table implements Serializable {
 							for (int i = pageIndex; i < this.getPages().size(); i++) {
 								// I want to start printing from the tuple index (or not, if >) to the end
 								Page p1 = Deserialize.Page(this.getPages().elementAt(i).getName());
-								res.add(p1.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
+								res.addAll(p1.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p1, p1.getName());
 								firstLoopMarker++;
 							}
@@ -906,7 +907,7 @@ public class Table implements Serializable {
 							int firstLoopMarker = 0;
 							for (Page page : this.getPages()) {
 								Page p2 = Deserialize.Page(page.getName());
-								res.add(p2.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
+								res.addAll(p2.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p2, p2.getName());
 								firstLoopMarker++;
 							}
@@ -920,7 +921,7 @@ public class Table implements Serializable {
 					// (non-sorted column)
 					for (Page p : this.getPages()) {
 						Page p1 = Deserialize.Page(p.getName());
-						res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
+						res.addAll(p1.selectNoPK(arrSQLTerms, strarrOperators));
 						Serialize.Page(p1, p1.getName());
 					}
 
@@ -939,7 +940,6 @@ public class Table implements Serializable {
 		ArrayList<Object> res = new ArrayList<Object>();
 		// indexes contains {gpa:gpaIndex} which is inside tableName inside SQLTerm (it
 		// is always going to be the same table);
-		System.out.println("Hello from With Index!!");
 		try {
 			// instead of this if should be a for loop iterating through the sql terms
 			if (strarrOperators.length == 0 && arrSQLTerms.length == 1) {
@@ -969,9 +969,7 @@ public class Table implements Serializable {
 						case "<=":
 						case "<":{
 							arr = btree.rangeSearch((Comparable) value,arrSQLTerms[0]._strOperator);
-							System.out.println("Hona men Kalb el 7adas "+arr.size());
 							for (String pageName : arr) {
-								System.out.println(pageName+" first element of arr");
 								Page p1 = Deserialize.Page(pageName);
 								res.addAll(p1.selectNoPK(arrSQLTerms, strarrOperators));
 								Serialize.Page(p1, p1.getName());
@@ -992,6 +990,9 @@ public class Table implements Serializable {
 					}
 
 					Serialize.Index(btree, indexName);
+				}
+				else{
+					selectFromTableNoIndex(arrSQLTerms, strarrOperators);
 				}
 			}
 		} catch (Exception e) {

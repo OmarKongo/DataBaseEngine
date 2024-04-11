@@ -167,6 +167,8 @@ public class Page implements Serializable, Comparable<Object> {
 		ArrayList<Object> res = new ArrayList<Object>();
 		String searchedColumn = arrSQLTerms[0]._strColumnName;
 		Object searchedValue = arrSQLTerms[0]._objValue;
+		// System.out.println(this.getTuplesInPage().size() + ": number of tuples");
+		// System.out.println("name: " + this.getName());
 		for (Tuple t : this.getTuplesInPage()) {
 			Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
 			int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);

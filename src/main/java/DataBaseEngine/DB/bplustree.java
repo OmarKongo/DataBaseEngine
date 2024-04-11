@@ -618,7 +618,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 	 * @param value: a floating point number to be used in the dictionary pair
 	 */
 	public void insert(K key, ArrayList<String> pageNames) {
-
+		System.out.println("--------Page Names-------- " + pageNames.toString());
 		DictionaryPair dp = new DictionaryPair(key, pageNames);
 
 		if (isEmpty()) {
@@ -752,6 +752,9 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		// Instantiate array to hold values
 		ArrayList<String> values = new ArrayList<String>();
 		LeafNode currNode = (this.root == null) ? this.firstLeaf : findLeafNode(key);
+		// Create a new LinkedHashSet
+		Set<String> set = new LinkedHashSet<>();
+
 		// Iterate through the doubly linked list of leaves
 		switch (strarrOperator) {
 			case ">":
@@ -761,7 +764,9 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 					// Iterate through the dictionary of each node
 					DictionaryPair dps[] = currNode.dictionary;
-					System.out.println(dps.length+" length of dict");
+					System.out.println(dps.length + " length of dict");
+					System.out.println(dps[0] + " Brolosy?");
+					System.out.println(dps[1] + " Brolosy 1 ?");
 					for (DictionaryPair dp : dps) {
 
 						/*
@@ -779,8 +784,11 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 						}
 						// value is the array containing the pages (where dups may occur)
 						// values now contains all pages which include tuples > | >= the key
-						if (!(values.containsAll(dp.value)))
+						System.out.println("values before: " + values);
+						if (!(values.containsAll(dp.value))) {
 							values.addAll(dp.value);
+						}
+						System.out.println("values after: " + values);
 						countIter++;
 
 					}
@@ -832,7 +840,15 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 			}
 				break;
 		}
+		// Add the elements to set
+		set.addAll(values);
 
+		// Clear the list
+		values.clear();
+
+		// add the elements of set
+		// with no duplicates to the list
+		values.addAll(set);
 		return values;
 
 	}
@@ -1130,6 +1146,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 		int numPairs;
 		LeafNode leftSibling;
 		LeafNode rightSibling;
+		// why an array list because a node may hold multiple keys
 		DictionaryPair[] dictionary;
 
 		public String toString() {
