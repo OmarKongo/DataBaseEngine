@@ -725,6 +725,8 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		// Empty ArrayList if search doesn't find anything
 		ArrayList<String> returnEmpty = new ArrayList<>();
+		Set<String> set = new LinkedHashSet<>();
+
 		// If B+ tree is completely empty, simply return null
 		if (isEmpty()) {
 			System.err.println("This key doesn't exist");
@@ -743,6 +745,15 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 			System.err.println("This key doesn't exist");
 			return returnEmpty;
 		} else {
+			// Add the elements to set
+			set.addAll(dps[index].value);
+
+			// Clear the list
+			dps[index].value.clear();
+
+			// add the elements of set
+			// with no duplicates to the list
+			dps[index].value.addAll(set);
 			return dps[index].value;
 		}
 	}
