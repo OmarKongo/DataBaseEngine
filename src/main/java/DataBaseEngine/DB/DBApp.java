@@ -210,9 +210,9 @@ public class DBApp {
 		try {
 			Hashtable<String, String> indicies = Table.outputIndicies(tableName, csvPath).get(0);
 			if (indicies.isEmpty()) {
-				resList.add(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
+				resList.addAll(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 			} else {
-				resList.add(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators,indicies));
+				resList.addAll(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators,indicies));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -959,7 +959,7 @@ public class Table implements Serializable {
 
 							for (String pageName : arr) {
 								Page p1 = Deserialize.Page(pageName);
-								res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
+								res.addAll(p1.selectNoPK(arrSQLTerms, strarrOperators));
 								Serialize.Page(p1, p1.getName());
 							}
 							break;
@@ -973,7 +973,7 @@ public class Table implements Serializable {
 							for (String pageName : arr) {
 								System.out.println(pageName+" first element of arr");
 								Page p1 = Deserialize.Page(pageName);
-								res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
+								res.addAll(p1.selectNoPK(arrSQLTerms, strarrOperators));
 								Serialize.Page(p1, p1.getName());
 							}
 
@@ -983,7 +983,7 @@ public class Table implements Serializable {
 						case "!=": {
 							for (Page p : this.getPages()) {
 								Page p1 = Deserialize.Page(p.getName());
-								res.add(p1.selectNoPK(arrSQLTerms, strarrOperators));
+								res.addAll(p1.selectNoPK(arrSQLTerms, strarrOperators));
 								Serialize.Page(p1, p1.getName());
 							}
 							break;

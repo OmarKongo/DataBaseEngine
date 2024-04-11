@@ -122,38 +122,36 @@ public class Test {
 	}
 
 	@SuppressWarnings("removal")
-	public static void select(DBApp d) throws DBAppException,IOException {
+	public static void select(DBApp d) throws DBAppException, IOException {
 
 		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
-		/*
+
 		String strTableName = "TestingTable";
 		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 		htblColNameType.put("id", "java.lang.Integer");
 		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("gpa", "java.lang.Double");
 		d.createTable(strTableName, "id", htblColNameType);
-		 */
-
 
 		// INSERTIONSSSSS
-		/* 
-		attributesInTuple.put("id", new Integer(3));
-		attributesInTuple.put("name", new String("John Noor"));
-		attributesInTuple.put("gpa", new Double(1.5));
-		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
-		// attributesInTuple.values());
-		d.insertIntoTable("TestingTable", attributesInTuple);
-		attributesInTuple.clear();
+
 		attributesInTuple.put("id", new Integer(1));
-		attributesInTuple.put("name", new String("Brolos"));
+		attributesInTuple.put("name", new String("John Noor"));
 		attributesInTuple.put("gpa", new Double(1.2));
 		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 		// attributesInTuple.values());
 		d.insertIntoTable("TestingTable", attributesInTuple);
-
 		attributesInTuple.clear();
 		attributesInTuple.put("id", new Integer(2));
 		attributesInTuple.put("name", new String("Brolos"));
+		attributesInTuple.put("gpa", new Double(1.5));
+		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
+		// attributesInTuple.values());
+		d.insertIntoTable("TestingTable", attributesInTuple);
+
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer(3));
+		attributesInTuple.put("name", new String("Shaarawy"));
 		attributesInTuple.put("gpa", new Double(1.7));
 		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 		// attributesInTuple.values());
@@ -161,12 +159,41 @@ public class Test {
 
 		attributesInTuple.clear();
 		attributesInTuple.put("id", new Integer(4));
+		attributesInTuple.put("name", new String("Andalusy"));
+		attributesInTuple.put("gpa", new Double(1.9));
+		d.insertIntoTable("TestingTable", attributesInTuple);
+
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer(5));
+		attributesInTuple.put("name", new String("John Noor"));
+		attributesInTuple.put("gpa", new Double(1.2));
+		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
+		// attributesInTuple.values());
+		d.insertIntoTable("TestingTable", attributesInTuple);
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer(6));
 		attributesInTuple.put("name", new String("Brolos"));
+		attributesInTuple.put("gpa", new Double(1.5));
+		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
+		// attributesInTuple.values());
+		d.insertIntoTable("TestingTable", attributesInTuple);
+
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer(7));
+		attributesInTuple.put("name", new String("Shaarawy"));
+		attributesInTuple.put("gpa", new Double(1.7));
+		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
+		// attributesInTuple.values());
+		d.insertIntoTable("TestingTable", attributesInTuple);
+
+		attributesInTuple.clear();
+		attributesInTuple.put("id", new Integer(8));
+		attributesInTuple.put("name", new String("Andalusy"));
 		attributesInTuple.put("gpa", new Double(1.9));
 		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 		// attributesInTuple.values());
 		d.insertIntoTable("TestingTable", attributesInTuple);
-		*/
+
 		SQLTerm[] arrSQLTerms;
 		arrSQLTerms = new SQLTerm[1];
 		arrSQLTerms[0] = new SQLTerm();
@@ -177,16 +204,13 @@ public class Test {
 
 		String[] strarrOperators = new String[0];
 
-		
-		// d.createIndex("TestingTable", "gpa", "gpaIndex");
-		// d.createIndex("TestingTable", "name", "nameIndex");
-		
+		d.createIndex("TestingTable", "gpa", "gpaIndex");
+		d.createIndex("TestingTable", "name", "nameIndex");
+
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
 		// table]
 		// I think yes because no joins
-
-		
 
 		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
 
@@ -201,10 +225,10 @@ public class Test {
 	@SuppressWarnings({})
 	public static void main(String[] args) throws Exception {
 		/*
-		Test T = new Test();
-		int max = T.getMaxCount();
-		System.out.println(max); // 200
-		*/
+		 * Test T = new Test();
+		 * int max = T.getMaxCount();
+		 * System.out.println(max); // 200
+		 */
 		DBApp d = new DBApp();
 		select(d);
 		// test();
