@@ -214,7 +214,9 @@ public class Page implements Serializable, Comparable<Object> {
 						if (arrSQLTerms[0]._strOperator.equals(">="))
 							res.add(t);
 					}
+					// System.out.println("Printing tuple: "+t.toString());
 				}
+				break;
 			}
 			case "<":
 			case "<=":

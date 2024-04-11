@@ -175,9 +175,9 @@ public class Test {
 		arrSQLTerms = new SQLTerm[1];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
-		arrSQLTerms[0]._strColumnName = "id";
-		arrSQLTerms[0]._strOperator = ">=";
-		arrSQLTerms[0]._objValue = new Integer(6);
+		arrSQLTerms[0]._strColumnName = "gpa";
+		arrSQLTerms[0]._strOperator = "<";
+		arrSQLTerms[0]._objValue = new Double(1.8);
 
 		String[] strarrOperators = new String[0];
 

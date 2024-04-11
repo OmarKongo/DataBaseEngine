@@ -220,8 +220,9 @@ public class Table implements Serializable {
 				if (!(values.nextElement().getClass().equals(Class.forName(collector.get(key)))))
 					throw new DBAppException("Mismatch type");
 
-			} else{
-				throw new Exception("mismatch key  " + key);}
+			} else {
+				throw new Exception("mismatch key  " + key);
+			}
 
 		}
 		return indexes;
@@ -402,7 +403,7 @@ public class Table implements Serializable {
 				// ADDED SUCCESSFULLY
 			} else {
 				// OVERFLOW ON PAGE BUT STILL ADDED
-				System.out.println("Hi, from solution: "+p.getName());
+				System.out.println("Hi, from solution: " + p.getName());
 				addInBtree(T, p, indexes, true);
 				T = p.getTuplesInPage().remove(p.getMaxCount());
 				deleteFromIndex(T, p, indexes, true);
@@ -414,7 +415,8 @@ public class Table implements Serializable {
 				Serialize.Page(p, pageName);
 
 				// OVERFLOW ON THE LAST PAGE
-				if (index == table.getPages().size() - 1) { // if the overflow in the last page, I will create a new							// page without going through any loops
+				if (index == table.getPages().size() - 1) { // if the overflow in the last page, I will create a new //
+															// page without going through any loops
 					table = Deserialize.Table(tableName);
 					p = new Page(table.setNameForpage());
 					p.getPageProp().put(p.getName(), new Pair(baseType(T)));
@@ -877,7 +879,7 @@ public class Table implements Serializable {
 					System.out.println("yesssssss2");
 					int pageIndex = this.binarySearch(arrSQLTerms[0]._objValue, false);
 					// ListIterator<Page> listIterator = this.getPages().listIterator(pageIndex);
-					System.out.println(pageIndex+ " pageIndex");
+					System.out.println(pageIndex + " pageIndex");
 					switch (arrSQLTerms[0]._strOperator) {
 						// O(log(n)*log(n))
 						case "=":
@@ -892,11 +894,13 @@ public class Table implements Serializable {
 						case ">": {
 							int firstLoopMarker = 0;
 							for (int i = pageIndex; i < this.getPages().size(); i++) {
+
 								// I want to start printing from the tuple index (or not, if >) to the end
 								Page p1 = Deserialize.Page(this.getPages().elementAt(i).getName());
+								System.out.println("In page: " + p1.getName());
 								res.addAll(p1.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p1, p1.getName());
-								firstLoopMarker++;
+								firstLoopMarker += 1;
 							}
 							break;
 						}
@@ -906,7 +910,9 @@ public class Table implements Serializable {
 						case "!=": {
 							int firstLoopMarker = 0;
 							System.out.println("in switchcase");
-							for (int i = 0; i<pageIndex+1; i++) {
+							int bound = (arrSQLTerms[0]._strOperator.equals("!=")) ? this.getPages().size()
+									: pageIndex + 1;
+							for (int i = 0; i < bound; i++) {
 								Page p2 = Deserialize.Page(this.getPages().elementAt(i).getName());
 								res.addAll(p2.selectRangePK(arrSQLTerms, strarrOperators, firstLoopMarker));
 								Serialize.Page(p2, p2.getName());
@@ -953,9 +959,8 @@ public class Table implements Serializable {
 					switch (arrSQLTerms[0]._strOperator) {
 
 						case "=":
-							//must make sure of all pages output in arrayList
+							// must make sure of all pages output in arrayList
 							arr = btree.search((Comparable) value);
-							
 
 							for (String pageName : arr) {
 								Page p1 = Deserialize.Page(pageName);
@@ -967,8 +972,8 @@ public class Table implements Serializable {
 						case ">=":
 						case ">":
 						case "<=":
-						case "<":{
-							arr = btree.rangeSearch((Comparable) value,arrSQLTerms[0]._strOperator);
+						case "<": {
+							arr = btree.rangeSearch((Comparable) value, arrSQLTerms[0]._strOperator);
 							for (String pageName : arr) {
 								Page p1 = Deserialize.Page(pageName);
 								res.addAll(p1.selectNoPK(arrSQLTerms, strarrOperators));
@@ -977,7 +982,7 @@ public class Table implements Serializable {
 
 							break;
 						}
-						//!= Does not benefift from B+tree so will iterate through everything
+						// != Does not benefift from B+tree so will iterate through everything
 						case "!=": {
 							for (Page p : this.getPages()) {
 								Page p1 = Deserialize.Page(p.getName());
@@ -990,8 +995,7 @@ public class Table implements Serializable {
 					}
 
 					Serialize.Index(btree, indexName);
-				}
-				else{
+				} else {
 					res.addAll(selectFromTableNoIndex(arrSQLTerms, strarrOperators));
 				}
 			}

@@ -831,7 +831,7 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 						}
 
 						// Include value if its key fits within the provided range
-						if (strarrOperator.equals("<") && countIter == 0) {
+						if (strarrOperator.equals("<") && countIter == 0 && currNode.leftSibling != null) {
 							countIter++;
 							continue;
 						}
