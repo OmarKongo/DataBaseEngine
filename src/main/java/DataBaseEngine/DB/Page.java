@@ -76,27 +76,7 @@ public class Page implements Serializable, Comparable<Object> {
 		Object fMin = this.getPageProp().get(this.getName()).getMin();
 		Object sMin = P.getPageProp().get(P.getName()).getMin();
 
-		if (fMin instanceof Integer) {
-			int first = (int) fMin;
-			int second = (int) sMin;
-			return first - second;
-		} else {
-			if (fMin instanceof Double) {
-				Double first = (Double) fMin;
-				Double second = (Double) sMin;
-				Double res = first - second;
-				if (res > 0)
-					return (int) Math.ceil(res);
-				else
-					return (int) Math.floor(res);
-
-			} else {
-				String first = (String) fMin;
-				String second = (String) sMin;
-				return first.compareToIgnoreCase(second);
-			}
-
-		}
+		return DBApp.compareValue(fMin, sMin);
 	}
 
 	public boolean tupleFounded(Object key) {
