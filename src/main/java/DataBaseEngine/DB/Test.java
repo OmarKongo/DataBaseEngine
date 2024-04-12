@@ -161,7 +161,7 @@ public class Test {
 
 
 		d.createIndex(tableName, "gpa", "gpaIndex");
-		d.createIndex(tableName, "name", "nameIndex");
+		//d.createIndex(tableName, "name", "nameIndex");
 	}
 
 	@SuppressWarnings("removal")
@@ -175,9 +175,9 @@ public class Test {
 		arrSQLTerms = new SQLTerm[1];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
-		arrSQLTerms[0]._strColumnName = "gpa";
-		arrSQLTerms[0]._strOperator = "<";
-		arrSQLTerms[0]._objValue = new Double(1.8);
+		arrSQLTerms[0]._strColumnName = "name";
+		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._objValue = new String("Andalusy");
 
 		String[] strarrOperators = new String[0];
 
@@ -206,7 +206,7 @@ public class Test {
 		 * System.out.println(max); // 200
 		 */
 
-		String strTableName = "Mama4";
+		String strTableName = "Joe6";
 
 		DBApp d = new DBApp();
 		// createTable(d, strTableName);
