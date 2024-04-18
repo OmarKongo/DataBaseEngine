@@ -1,3 +1,6 @@
 "Joe6","gpa","java.lang.Double","False","gpaIndex","B+ tree"
 "Joe6","name","java.lang.String","False","",""
 "Joe6","id","java.lang.Integer","True","",""
+"FinishLineClose","gpa","java.lang.Double","False","gpaIndex","B+ tree"
+"FinishLineClose","name","java.lang.String","False","",""
+"FinishLineClose","id","java.lang.Integer","True","",""

@@ -187,7 +187,6 @@ public class DBApp {
 		try {
 			T.deleteFromTable(htblColNameValue, indexes);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -205,18 +204,20 @@ public class DBApp {
 
 		String tableName = arrSQLTerms[0]._strTableName;
 		Table t = Deserialize.Table(tableName);
+		ArrayList<ArrayList> resultSetList = new ArrayList<>();
 		ArrayList<Object> resList = new ArrayList<>();
-
-		try {
-			Hashtable<String, String> indicies = Table.outputIndicies(tableName, csvPath).get(0);
-			if (indicies.isEmpty()) {
-				resList.addAll(t.selectFromTableNoIndex(arrSQLTerms, strarrOperators));
-			} else {
-				System.err.println("yesssssss1");
-				resList.addAll(t.selectFromTableWithIndex(arrSQLTerms, strarrOperators,indicies));
+		for (SQLTerm sqlTerm : arrSQLTerms){
+			try {
+				Hashtable<String, String> indicies = Table.outputIndicies(tableName, csvPath).get(0);
+				if (indicies.isEmpty()) {
+					resList.addAll(t.selectFromTableNoIndex(sqlTerm));
+				} else {
+					resList.addAll(t.selectFromTableWithIndex(sqlTerm,indicies));
+				}
+				resultSetList.add(resList);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		Iterator<Object> result = resList.iterator();
 		Serialize.Table(t, t.getStrTableName());

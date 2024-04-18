@@ -206,7 +206,7 @@ public class Test {
 		 * System.out.println(max); // 200
 		 */
 
-		String strTableName = "Joe6";
+		String strTableName = "FinishLineClose";
 
 		DBApp d = new DBApp();
 		// createTable(d, strTableName);
