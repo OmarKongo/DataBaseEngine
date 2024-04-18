@@ -206,19 +206,20 @@ public class DBApp {
 		Table t = Deserialize.Table(tableName);
 		ArrayList<ArrayList> resultSetList = new ArrayList<>();
 		ArrayList<Object> resList = new ArrayList<>();
-		for (SQLTerm sqlTerm : arrSQLTerms){
+		for (SQLTerm sqlTerm : arrSQLTerms) {
 			try {
 				Hashtable<String, String> indicies = Table.outputIndicies(tableName, csvPath).get(0);
 				if (indicies.isEmpty()) {
 					resList.addAll(t.selectFromTableNoIndex(sqlTerm));
 				} else {
-					resList.addAll(t.selectFromTableWithIndex(sqlTerm,indicies));
+					resList.addAll(t.selectFromTableWithIndex(sqlTerm, indicies));
 				}
 				resultSetList.add(resList);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+
 		Iterator<Object> result = resList.iterator();
 		Serialize.Table(t, t.getStrTableName());
 		return result;
@@ -269,6 +270,38 @@ public class DBApp {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static ArrayList<Object> and(ArrayList<Object> a, ArrayList<Object> b) {
+		ArrayList<Object> res = new ArrayList<>();
+		res.addAll(a);
+		res.retainAll(b);
+		return res;
+	}
+
+	// No dups
+	public static ArrayList<Object> or(ArrayList<Object> a, ArrayList<Object> b) {
+		ArrayList<Object> res = new ArrayList<>();
+		res.addAll(a);
+		if (!(res.containsAll(b))) {
+			res.removeAll(b);
+			res.addAll(b);
+		}
+		return res;
+	}
+
+	public static ArrayList<Object> xor(ArrayList<Object> a, ArrayList<Object> b) {
+		// XORING b and d
+		ArrayList<Object> res = new ArrayList<>();
+		res.addAll(or(a, b));
+
+		ArrayList<Object> res2 = new ArrayList<>();
+		res2.addAll(and(a, b));
+
+		res.removeAll(res2);
+
+		return res;
+
 	}
 
 	@SuppressWarnings({ "removal" })

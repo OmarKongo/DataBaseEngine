@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -115,32 +116,32 @@ public class Test {
 	public static void insert(DBApp d, String strTableName) throws DBAppException {
 		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
 		// INSERTIONSSSSS
-		for (int i = 0; i<5; i++){
+		for (int i = 0; i < 5; i++) {
 			attributesInTuple.clear();
-			attributesInTuple.put("id", new Integer(1+i*4));
+			attributesInTuple.put("id", new Integer(1 + i * 4));
 			attributesInTuple.put("name", new String("John Noor"));
 			attributesInTuple.put("gpa", new Double(1.2));
 			// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 			// attributesInTuple.values());
 			d.insertIntoTable(strTableName, attributesInTuple);
 			attributesInTuple.clear();
-			attributesInTuple.put("id", new Integer(2+i*4));
+			attributesInTuple.put("id", new Integer(2 + i * 4));
 			attributesInTuple.put("name", new String("Brolos"));
 			attributesInTuple.put("gpa", new Double(1.5));
 			// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 			// attributesInTuple.values());
 			d.insertIntoTable(strTableName, attributesInTuple);
-	
+
 			attributesInTuple.clear();
-			attributesInTuple.put("id", new Integer(3+i*4));
+			attributesInTuple.put("id", new Integer(3 + i * 4));
 			attributesInTuple.put("name", new String("Shaarawy"));
 			attributesInTuple.put("gpa", new Double(1.7));
 			// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 			// attributesInTuple.values());
 			d.insertIntoTable(strTableName, attributesInTuple);
-	
+
 			attributesInTuple.clear();
-			attributesInTuple.put("id", new Integer(4+i*4));
+			attributesInTuple.put("id", new Integer(4 + i * 4));
 			attributesInTuple.put("name", new String("Andalusy"));
 			attributesInTuple.put("gpa", new Double(1.9));
 			d.insertIntoTable(strTableName, attributesInTuple);
@@ -148,7 +149,7 @@ public class Test {
 		// D.deleteFromTable( "Student", htblColNameValue );
 	}
 
-	public static void createTable(DBApp d, String tableName) throws Exception{
+	public static void createTable(DBApp d, String tableName) throws Exception {
 		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 		htblColNameType.put("id", "java.lang.Integer");
 		htblColNameType.put("name", "java.lang.String");
@@ -157,16 +158,14 @@ public class Test {
 
 	}
 
-	public static void createIndex(DBApp d, String tableName) throws Exception{
-
+	public static void createIndex(DBApp d, String tableName) throws Exception {
 
 		d.createIndex(tableName, "gpa", "gpaIndex");
-		//d.createIndex(tableName, "name", "nameIndex");
+		// d.createIndex(tableName, "name", "nameIndex");
 	}
 
 	@SuppressWarnings("removal")
 	public static void select(DBApp d, String strTableName) throws DBAppException, IOException {
-
 
 		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 		// attributesInTuple.values());
@@ -181,8 +180,6 @@ public class Test {
 
 		String[] strarrOperators = new String[0];
 
-
-
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
 		// table]
@@ -195,6 +192,68 @@ public class Test {
 		while (resultSet.hasNext()) {
 			System.out.println(resultSet.next().toString());
 		}
+
+	}
+
+	public static void arrayListOperations() throws DBAppException, IOException {
+
+		ArrayList<Object> a = new ArrayList<>();
+		ArrayList<Object> b = new ArrayList<>();
+		ArrayList<Object> c = new ArrayList<>();
+		ArrayList<Object> d = new ArrayList<>();
+		a.add("Yousef");
+		a.add("Ahmed");
+		a.add("Elbrolosy");
+		b.add("Omar");
+		b.add("Magdy");
+		b.add("Kongo");
+		c.add("Julian");
+		c.add("Casablancas");
+		d.add("Fabrizio");
+		d.add("Elbrolosy");
+		d.add("Magdy");
+
+		// a --> {Yousef, Ahmed, Elbrolosy}
+		// b --> {Omar, Magdy, Kongo}
+		// c --> {Julian, Casablancas}
+		// d --> {Fabrizio, Elbrolosy, Magdy}
+		// ArrayList<String> addAll = new ArrayList<>();
+		// ArrayList<String> retainAll = new ArrayList<>();
+		// ArrayList<String> xorAll = new ArrayList<>();
+		// addAll.addAll(b);
+		// retainAll.addAll(b);
+		// xorAll.addAll(b);
+		// // ORING b and d
+		// if (!(addAll.containsAll(d))) {
+		// 	addAll.removeAll(d);
+		// 	addAll.addAll(d);
+		// }
+		// //ANDING b and d
+		// retainAll.retainAll(d);
+
+
+		// //XORING b and d
+		// if (!(xorAll.containsAll(d))) {
+		// 	xorAll.removeAll(d);
+		// 	System.out.println("1: "+ xorAll);
+		// 	xorAll.addAll(d);
+		// 	System.out.println("2: "+ xorAll);
+		// }
+		// xorAll.removeAll(retainAll);
+
+		// (B and NOT D) OR (NOT B and D)
+
+
+
+
+
+		// System.out.println(addAll);
+		// System.out.println(retainAll);
+		// System.out.println("3: "+xorAll);
+
+		System.out.println("hi: "+DBApp.or(b,d));
+
+
 
 	}
 
@@ -212,15 +271,14 @@ public class Test {
 		// createTable(d, strTableName);
 		// createIndex(d, strTableName);
 		// insert(d,strTableName);
-		select(d,strTableName);
+		// select(d,strTableName);
 		// test();
 		// delete();
 		// update();
 		// insert();
 		// printAllPages();
 
+		arrayListOperations();
+
 	}
 }
-
-
-
