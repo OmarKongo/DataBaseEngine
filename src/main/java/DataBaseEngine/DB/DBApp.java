@@ -292,13 +292,11 @@ public class DBApp {
 
 	public static ArrayList<Object> xor(ArrayList<Object> a, ArrayList<Object> b) {
 		// XORING b and d
-		ArrayList<Object> res = new ArrayList<>();
-		res.addAll(or(a, b));
 
-		ArrayList<Object> res2 = new ArrayList<>();
-		res2.addAll(and(a, b));
-
-		res.removeAll(res2);
+		ArrayList<Object> temp1 = a;
+		ArrayList<Object> temp2 = b;
+		ArrayList<Object> res = or(a,b);
+		res.removeAll(and(temp1, temp2));
 
 		return res;
 

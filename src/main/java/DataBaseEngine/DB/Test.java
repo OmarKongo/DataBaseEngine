@@ -251,7 +251,7 @@ public class Test {
 		// System.out.println(retainAll);
 		// System.out.println("3: "+xorAll);
 
-		System.out.println("hi: "+DBApp.or(b,d));
+		System.out.println("hi: "+DBApp.xor(b,d));
 
 
 
