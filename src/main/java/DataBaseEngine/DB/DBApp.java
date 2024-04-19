@@ -204,7 +204,7 @@ public class DBApp {
 
 		String tableName = arrSQLTerms[0]._strTableName;
 		Table t = Deserialize.Table(tableName);
-		ArrayList<ArrayList> resultSetList = new ArrayList<>();
+		ArrayList<ArrayList<Object>> resultSetList = new ArrayList<>();
 		ArrayList<Object> resList = new ArrayList<>();
 		for (SQLTerm sqlTerm : arrSQLTerms) {
 			try {
@@ -295,11 +295,42 @@ public class DBApp {
 
 		ArrayList<Object> temp1 = a;
 		ArrayList<Object> temp2 = b;
-		ArrayList<Object> res = or(a,b);
+		ArrayList<Object> res = or(a, b);
 		res.removeAll(and(temp1, temp2));
 
 		return res;
 
+	}
+
+	public static ArrayList<Object> convertToInfix(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+		ArrayList<Object> res = new ArrayList<>();
+
+		for (int i = 0; i < arrSQLTerms.length; i++) {
+			res.add(arrSQLTerms[i]);
+			if (i != strarrOperators.length) {
+				res.add(strarrOperators[i]);
+			}
+		}
+
+
+
+		return res;
+	}
+
+	public static int priority(String operator){
+		switch(operator){
+			case "AND":
+				return 2;
+			case "OR":
+				return 1;
+			default:
+				return 0;
+		}
+	}
+
+	private static ArrayList<Object> addPriorityBrackets(ArrayList<Object> infix) {
+
+		return null;
 	}
 
 	@SuppressWarnings({ "removal" })

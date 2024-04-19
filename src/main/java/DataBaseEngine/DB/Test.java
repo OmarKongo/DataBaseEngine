@@ -251,7 +251,38 @@ public class Test {
 		// System.out.println(retainAll);
 		// System.out.println("3: "+xorAll);
 
-		System.out.println("hi: "+DBApp.xor(b,d));
+		//System.out.println("hi: "+DBApp.or(b,d));
+		SQLTerm[] arrSQLTerms;
+		arrSQLTerms = new SQLTerm[4];
+		arrSQLTerms[0] = new SQLTerm();
+		arrSQLTerms[0]._strTableName = "Student";
+		arrSQLTerms[0]._strColumnName = "name";
+		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._objValue = new String("Andalusy");
+		arrSQLTerms[1] = new SQLTerm();
+		arrSQLTerms[1]._strTableName = "Student";
+		arrSQLTerms[1]._strColumnName = "name";
+		arrSQLTerms[1]._strOperator = ">";
+		arrSQLTerms[1]._objValue = new String("Brolosy");
+		arrSQLTerms[2] = new SQLTerm();
+		arrSQLTerms[2]._strTableName = "Student";
+		arrSQLTerms[2]._strColumnName = "name";
+		arrSQLTerms[2]._strOperator = ">";
+		arrSQLTerms[2]._objValue = new String("Chadi");
+		arrSQLTerms[3] = new SQLTerm();
+		arrSQLTerms[3]._strTableName = "Student";
+		arrSQLTerms[3]._strColumnName = "name";
+		arrSQLTerms[3]._strOperator = ">";
+		arrSQLTerms[3]._objValue = new String("David");
+
+		String[] strarrOperators = new String[3];
+		strarrOperators[0] = "XOR";
+		strarrOperators[1] = "AND";
+		strarrOperators[2] = "OR";
+
+
+
+		System.out.println(DBApp.convertToInfix(arrSQLTerms, strarrOperators));
 
 
 
