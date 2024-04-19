@@ -305,20 +305,40 @@ public class DBApp {
 	public static ArrayList<Object> convertToInfix(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<>();
 
+		Hashtable<String, ArrayList<Integer>> indiciesOfOperators = new Hashtable<>();
+		ArrayList<Integer> and = new ArrayList<>();
+		ArrayList<Integer> or = new ArrayList<>();
+		ArrayList<Integer> xor = new ArrayList<>();
 		for (int i = 0; i < arrSQLTerms.length; i++) {
 			res.add(arrSQLTerms[i]);
 			if (i != strarrOperators.length) {
 				res.add(strarrOperators[i]);
+				switch (strarrOperators[i]) {
+					case "AND":
+						and.add((2 * i) + 1);
+						indiciesOfOperators.put(strarrOperators[i], and);
+						break;
+					case "OR":
+						or.add((2 * i) + 1);
+						indiciesOfOperators.put(strarrOperators[i], or);
+						break;
+					default:
+						xor.add((2 * i) + 1);
+						indiciesOfOperators.put(strarrOperators[i], xor);
+						break;
+				}
 			}
 		}
 
+		for (int i = 0; i < res.size(); i++) {
 
+		}
 
 		return res;
 	}
 
-	public static int priority(String operator){
-		switch(operator){
+	public static int priority(String operator) {
+		switch (operator) {
 			case "AND":
 				return 2;
 			case "OR":

@@ -4,3 +4,6 @@
 "FinishLineClose","gpa","java.lang.Double","False","gpaIndex","B+ tree"
 "FinishLineClose","name","java.lang.String","False","",""
 "FinishLineClose","id","java.lang.Integer","True","",""
+"Student","gpa","java.lang.Double","False","gpaIndex","B+ tree"
+"Student","name","java.lang.String","False","",""
+"Student","id","java.lang.Integer","True","",""
