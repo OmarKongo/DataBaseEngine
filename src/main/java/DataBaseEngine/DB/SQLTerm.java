@@ -13,9 +13,15 @@ public class SQLTerm {
 		x = instanceCount;
 	}
 
+	// @Override
+	// public String toString(){
+	// 	return "SQLTerm "+x ;
+	// }
+
 	@Override
-	public String toString(){
-		return "SQLTerm "+x ;
+	public String toString() {
+		return "SQLTerm [_strColumnName=" + _strColumnName + ", _strOperator=" + _strOperator + ", _objValue="
+				+ _objValue + "]";
 	}
 
 }

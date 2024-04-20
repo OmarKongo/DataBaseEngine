@@ -12,6 +12,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -610,6 +612,20 @@ public class Table implements Serializable {
 
 	}
 
+ 	public void deleteAllPages() {
+ 		String pageName = null;
+ 		Enumeration <String> pageNames = this.getProps().keys();
+ 		while(!this.getPages().isEmpty()) {
+ 			pageName = this.getPages().elementAt(0).getName();
+ 			this.getPages().remove(0);
+ 	 		this.getProps().remove(pageName);
+ 	 		this.deleteFile(pageName);
+ 		}
+ 		Serialize.Table(this, this.getStrTableName());
+ 	}
+
+
+
 	public static boolean tupleMatched(Tuple t, Hashtable<String, Object> htblColNameValue) {
 		Enumeration<String> attributes = htblColNameValue.keys();
 		while (attributes.hasMoreElements()) {
@@ -633,6 +649,7 @@ public class Table implements Serializable {
 				// t = iter.next();
 				if (tupleMatched(t, htblColNameValue)) {
 					try {
+
 						this.deleteTupleUsingKey(p, t);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block

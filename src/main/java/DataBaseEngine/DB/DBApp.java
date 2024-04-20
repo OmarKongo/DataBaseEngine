@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 import com.opencsv.CSVReader;
@@ -27,7 +28,11 @@ public class DBApp {
 	final static String csvPath = "metadata.csv";
 
 	public DBApp() {
+
+		
+
 		// this.init();
+
 	}
 
 	// this does whatever initialization you would like
@@ -98,6 +103,9 @@ public class DBApp {
 	// htblColNameValue will have the column name as key and the data
 	// type as value
 
+
+
+
 	/**
 	 * creates a table
 	 * @param strTableName
@@ -108,6 +116,7 @@ public class DBApp {
 	 */
 	public void createTable(String strTableName,
 			String strClusteringKeyColumn,
+
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
 
 		Table.addTable(strTableName, strClusteringKeyColumn, htblColNameType, csvPath);
@@ -127,9 +136,13 @@ public class DBApp {
 	 */
 	// following method creates a B+tree index
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+
+
+
 	public void createIndex(String strTableName,
 			String strColName,
 			String strIndexName) throws DBAppException, IOException {
+
 		Table t = Deserialize.Table(strTableName);
 		String type = t.addIndex(strTableName, strColName, strIndexName, csvPath);
 		bplustree btree = Table.btreeType(type);
@@ -153,8 +166,12 @@ public class DBApp {
 
 	// following method inserts one row only.
 	// htblColNameValue must include a value for the primary key
+
+
+
 	public void insertIntoTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 
 		Hashtable<String, String> indexes = null;
 		try {
@@ -179,8 +196,10 @@ public class DBApp {
 	// htblColNameValue holds the key and new value
 	// htblColNameValue will not include clustering key as column name
 	// strClusteringKeyValue is the value to look for to find the row to update.
+
 	public void updateTable(String strTableName,
 			String strClusteringKeyValue,
+
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		Hashtable<String, String> indexes = null;
 
@@ -203,8 +222,10 @@ public class DBApp {
 	// htblColNameValue holds the key and value. This will be used in search
 	// to identify which rows/tuples to delete.
 	// htblColNameValue enteries are ANDED together
+
 	public void deleteFromTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 
 		Hashtable<String, String> indexes = null;
 		try {
@@ -214,13 +235,19 @@ public class DBApp {
 			e.printStackTrace();
 		}
 		Table T = Deserialize.Table(strTableName);
+		if(htblColNameValue.size()==0)
+			T.deleteAllPages();
+		else {
 		try {
 			T.deleteFromTable(htblColNameValue, indexes);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+		}
 	}
+
+	
 
 
 	/**
@@ -572,6 +599,10 @@ public class DBApp {
 
 			SQLTerm[] arrSQLTerms;
 			arrSQLTerms = new SQLTerm[2];
+
+			arrSQLTerms[0] = new SQLTerm();
+			arrSQLTerms[1] = new SQLTerm();
+
 			arrSQLTerms[0]._strTableName = "Student";
 			arrSQLTerms[0]._strColumnName = "name";
 			arrSQLTerms[0]._strOperator = "=";

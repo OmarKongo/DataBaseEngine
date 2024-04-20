@@ -10,9 +10,11 @@ import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Stack;
 import java.util.Vector;
 
 public class Test {
@@ -243,7 +245,7 @@ public class Test {
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
 		arrSQLTerms[0]._strColumnName = "name";
-		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._strOperator = "=";
 		arrSQLTerms[0]._objValue = new String("Omar1");
 		arrSQLTerms[1] = new SQLTerm();
 		arrSQLTerms[1]._strTableName = strTableName;
