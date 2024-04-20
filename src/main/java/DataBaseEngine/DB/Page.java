@@ -122,7 +122,11 @@ public class Page implements Serializable, Comparable<Object> {
 		return this.getTuplesInPage().size() > this.getMaxCount();
 
 	}
-
+	/**
+	 * This method selects a distinct tple when selecting a coulmn that is a pk
+	 * @param sqlTerm
+	 * @return arraylist containing record
+	 */
 	public ArrayList<Object> selectDistinctPK(SQLTerm sqlTerm) {
 		ArrayList<Object> res = new ArrayList<Object>();
 		int tupleIndex = this.getTupleIndexUsingBS(sqlTerm);
@@ -132,6 +136,11 @@ public class Page implements Serializable, Comparable<Object> {
 		return res;
 	}
 
+	/**
+	 * this method gets the a tuple index
+	 * @param sqlTerm
+	 * @return
+	 */
 	public int getTupleIndexUsingBS(SQLTerm sqlTerm) {
 		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
 		attributesInTuple.put(sqlTerm._strColumnName, sqlTerm._objValue);
@@ -139,6 +148,12 @@ public class Page implements Serializable, Comparable<Object> {
 				sqlTerm._objValue);
 		return tupleIndex;
 	}
+
+	/**
+	 * selects tuples which are not a PK
+	 * @param sqlTerm
+	 * @return
+	 */
 
 	public ArrayList<Object> selectNoPK(SQLTerm sqlTerm) {
 		ArrayList<Object> res = new ArrayList<Object>();
@@ -186,6 +201,13 @@ public class Page implements Serializable, Comparable<Object> {
 		return res;
 	}
 
+
+	/**
+	 * This method outputs the tuples output by a range query on a pk
+	 * @param sqlTerm
+	 * @param firstLoopMarker
+	 * @return
+	 */
 	public ArrayList<Object> selectRangePK(SQLTerm sqlTerm,
 			int firstLoopMarker) {
 		ArrayList<Object> res = new ArrayList<Object>();

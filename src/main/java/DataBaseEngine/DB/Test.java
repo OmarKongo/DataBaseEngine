@@ -194,7 +194,7 @@ public class Test {
 		// attributesInTuple.values());
 
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[4];
+		arrSQLTerms = new SQLTerm[1];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
 		arrSQLTerms[0]._strColumnName = "name";
