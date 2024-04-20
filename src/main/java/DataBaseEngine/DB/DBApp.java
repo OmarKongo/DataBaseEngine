@@ -309,6 +309,7 @@ public class DBApp {
 		ArrayList<Integer> and = new ArrayList<>();
 		ArrayList<Integer> or = new ArrayList<>();
 		ArrayList<Integer> xor = new ArrayList<>();
+		ArrayList<Integer> all = new ArrayList<>();
 		for (int i = 0; i < arrSQLTerms.length; i++) {
 			res.add(arrSQLTerms[i]);
 			if (i != strarrOperators.length) {
@@ -316,25 +317,62 @@ public class DBApp {
 				switch (strarrOperators[i]) {
 					case "AND":
 						and.add((2 * i) + 1);
+						all.add((2 * i) + 1);
 						indiciesOfOperators.put(strarrOperators[i], and);
 						break;
 					case "OR":
 						or.add((2 * i) + 1);
+						all.add((2 * i) + 1);
 						indiciesOfOperators.put(strarrOperators[i], or);
 						break;
 					default:
 						xor.add((2 * i) + 1);
+						all.add((2 * i) + 1);
 						indiciesOfOperators.put(strarrOperators[i], xor);
 						break;
 				}
 			}
 		}
 
-		for (int i = 0; i < res.size(); i++) {
-
-		}
+		ArrayList<Object> output = addBrackets(res, all);
 
 		return res;
+	}
+
+	public static ArrayList<Object> addBrackets(ArrayList<Object> infixNoBrackets,
+			ArrayList<Integer> indiciesOfOperators) {
+		// this for loop is to add brackets around AND
+		int index;
+
+
+			for (int i = 0; i < indiciesOfOperators.size(); i++) {
+				if(i!=0){
+					indiciesOfOperators.set(i, indiciesOfOperators.get(i) + 2*i);
+				}
+
+				index = indiciesOfOperators.get(i);
+
+				// adding left bracket
+				if (infixNoBrackets.get(index - 1) != ")") {
+					infixNoBrackets.add(index - 1, "(");
+					System.out.println(infixNoBrackets);
+					infixNoBrackets.add(index + 3, ")");
+					System.out.println(infixNoBrackets);
+				}
+
+				else {
+					infixNoBrackets.add(index - 1 - (3*i), "(");
+					System.out.println(infixNoBrackets);
+					infixNoBrackets.add(index + 3, ")");
+					System.out.println(infixNoBrackets);
+				}
+
+				System.out.println("---------");
+			}
+
+		
+
+		return infixNoBrackets;
 	}
 
 	public static int priority(String operator) {

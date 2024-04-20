@@ -225,35 +225,30 @@ public class Test {
 		// xorAll.addAll(b);
 		// // ORING b and d
 		// if (!(addAll.containsAll(d))) {
-		// 	addAll.removeAll(d);
-		// 	addAll.addAll(d);
+		// addAll.removeAll(d);
+		// addAll.addAll(d);
 		// }
 		// //ANDING b and d
 		// retainAll.retainAll(d);
 
-
 		// //XORING b and d
 		// if (!(xorAll.containsAll(d))) {
-		// 	xorAll.removeAll(d);
-		// 	System.out.println("1: "+ xorAll);
-		// 	xorAll.addAll(d);
-		// 	System.out.println("2: "+ xorAll);
+		// xorAll.removeAll(d);
+		// System.out.println("1: "+ xorAll);
+		// xorAll.addAll(d);
+		// System.out.println("2: "+ xorAll);
 		// }
 		// xorAll.removeAll(retainAll);
 
 		// (B and NOT D) OR (NOT B and D)
 
-
-
-
-
 		// System.out.println(addAll);
 		// System.out.println(retainAll);
 		// System.out.println("3: "+xorAll);
 
-		//System.out.println("hi: "+DBApp.or(b,d));
+		// System.out.println("hi: "+DBApp.or(b,d));
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[4];
+		arrSQLTerms = new SQLTerm[5];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = "Student";
 		arrSQLTerms[0]._strColumnName = "name";
@@ -274,18 +269,37 @@ public class Test {
 		arrSQLTerms[3]._strColumnName = "name";
 		arrSQLTerms[3]._strOperator = ">";
 		arrSQLTerms[3]._objValue = new String("David");
+		arrSQLTerms[4] = new SQLTerm();
+		arrSQLTerms[4]._strTableName = "Student";
+		arrSQLTerms[4]._strColumnName = "name";
+		arrSQLTerms[4]._strOperator = ">";
+		arrSQLTerms[4]._objValue = new String("Emanuel");
 
-		String[] strarrOperators = new String[3];
-		strarrOperators[0] = "XOR";
-		strarrOperators[1] = "AND";
-		strarrOperators[2] = "OR";
+
+		String[] strarrOperators = new String[4];
+		strarrOperators[0] = "AND";
+		strarrOperators[1] = "OR";
+		strarrOperators[2] = "XOR";
+		strarrOperators[3] = "AND";
 
 
 
 		System.out.println(DBApp.convertToInfix(arrSQLTerms, strarrOperators));
 
+	}
 
-
+	public static void arrayListTest() throws DBAppException, IOException {
+		ArrayList<Object> test = new ArrayList<>();
+		test.add("A");
+		test.add(" XOR ");
+		test.add("B");
+		test.add(" AND ");
+		test.add(" C ");
+		test.add(" OR ");
+		test.add(" D ");
+		System.out.println(test);
+		test.add(2,"(");
+		System.out.println(test);
 	}
 
 	@SuppressWarnings({})
@@ -310,6 +324,7 @@ public class Test {
 		// printAllPages();
 
 		arrayListOperations();
+		//arrayListTest();
 
 	}
 }
