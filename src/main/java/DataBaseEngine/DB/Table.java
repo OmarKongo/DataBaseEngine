@@ -28,570 +28,574 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
+public class Table implements Serializable {
+	// Is it correct that only the pageFileName are persistent?
 
-
-public class Table implements Serializable{
-    //Is it correct that only the pageFileName are persistent?
-
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 9059644501928761439L;
 	/**
 	 * 
 	 */
-	//private static final long serialVersionUID = 1L;
-	private Hashtable<String,Pair> props;
+	// private static final long serialVersionUID = 1L;
+	private Hashtable<String, Pair> props;
 	private Vector<Page> pages;
-    private String strTableName;
-    private String strClusteringKeyColumn;
-    //tranisent since already in metadata?
-    private transient Hashtable<String,String> htblColNameType;
-    private int pagesCounter;
+	private String strTableName;
+	private String strClusteringKeyColumn;
+	// tranisent since already in metadata?
+	private transient Hashtable<String, String> htblColNameType;
+	private int pagesCounter;
 
+	public Table() {
 
+	}
 
+	public Table(String strTableName, String strClusteringKeyColumn,
+			Hashtable<String, String> htblColNameType) {
+		pagesCounter = 1;
+		pages = new Vector<Page>();
+		props = new Hashtable<String, Pair>();
+		this.strTableName = strTableName;
+		this.strClusteringKeyColumn = strClusteringKeyColumn;
+		this.htblColNameType = htblColNameType;
 
+	}
 
-
-
-
-
-
-
-    public Table() {
-    	
-    }
-    public Table(String strTableName, String strClusteringKeyColumn,
-            Hashtable<String, String> htblColNameType) {
-        pagesCounter = 1;
-        pages = new Vector<Page>();
-        props = new Hashtable<String,Pair>();
-        this.strTableName = strTableName;
-        this.strClusteringKeyColumn = strClusteringKeyColumn;
-        this.htblColNameType = htblColNameType;
-
-    }
-    public Hashtable<String, Pair> getProps() {
+	public Hashtable<String, Pair> getProps() {
 		return props;
 	}
+
 	public Vector<Page> getPages() {
 		return pages;
 	}
 
-    public int getPagesCounter() {
-        return pagesCounter;
-    }
+	public int getPagesCounter() {
+		return pagesCounter;
+	}
 
-    public void setPagesCounter(int pagesCounter) {
-        this.pagesCounter = pagesCounter;
-    }
+	public void setPagesCounter(int pagesCounter) {
+		this.pagesCounter = pagesCounter;
+	}
 
-    
+	public String getStrTableName() {
+		return strTableName;
+	}
 
-    public String getStrTableName() {
-        return strTableName;
-    }
+	public void setStrTableName(String strTableName) {
+		this.strTableName = strTableName;
+	}
 
-    public void setStrTableName(String strTableName) {
-        this.strTableName = strTableName;
-    }
+	public String getStrClusteringKeyColumn() {
+		return strClusteringKeyColumn;
+	}
 
-    public String getStrClusteringKeyColumn() {
-        return strClusteringKeyColumn;
-    }
+	public void setStrClusteringKeyColumn(String strClusteringKeyColumn) {
+		this.strClusteringKeyColumn = strClusteringKeyColumn;
+	}
 
-    public void setStrClusteringKeyColumn(String strClusteringKeyColumn) {
-        this.strClusteringKeyColumn = strClusteringKeyColumn;
-    }
+	public Hashtable<String, String> getHtblColNameType() {
+		return htblColNameType;
+	}
 
-    public Hashtable<String, String> getHtblColNameType() {
-        return htblColNameType;
-    }
+	public static void addTable(String tableName, String pK, Hashtable<String, String> htblColNameType,
+			String filePath) {
+		try {
+			checkDataType(htblColNameType, filePath, tableName);
+			CSVWriter writer = new CSVWriter(new FileWriter(filePath, true));
+			Enumeration<String> types = htblColNameType.elements();
+			Enumeration<String> keys = htblColNameType.keys();
+			String[] line = new String[6];
 
-    public static void addTable(String tableName,String pK,Hashtable<String,String>htblColNameType,String filePath) {
-        try {
-            checkDataType(htblColNameType,filePath,tableName);
-            CSVWriter writer = new CSVWriter(new FileWriter(filePath,true));
-            Enumeration<String> types = htblColNameType.elements();
-            Enumeration<String> keys = htblColNameType.keys();
-            String []line =  new String[6];
-            
-            while(types.hasMoreElements()) {
-                line = insertLine(line,tableName,keys.nextElement(),types.nextElement(),pK);
-                writer.writeNext(line);
-            }
-            writer.flush();
-            writer.close();
-        }
-        catch(Exception ex) {
-            ex.printStackTrace();
-        }
-    
-    }
-    public String addIndex(String tableName,String column, String indexName,String filePath) {
-                String type= "";
-    	try {
-    		
-            
-    		CSVReader reader2 = new CSVReaderBuilder(new FileReader(filePath))
-    				.withSkipLines(0) 
-                    .build();
-    	    List<String[]> allElements = reader2.readAll();
-    	    CSVWriter writer = new CSVWriter(new FileWriter(filePath));
-    	    
-            boolean flag = false;
-    		for(String[] nextRecord : allElements) {
-    			if(nextRecord[0].equals(tableName) & nextRecord[1].equals(column) ) {
-    				if(nextRecord[4].equals("") & nextRecord[5].equals("")) {
-                	nextRecord[4] = indexName;nextRecord[5] = "B+ tree"; type = nextRecord[2];
-                	writer.writeAll(allElements);
-            	    writer.flush();
-                     flag = true;
-                	break;
-    				}
-    				else
-    					throw new DBAppException("Index already created ");
-    					
-                	
-                }
-                
-    		}
-            
-    		if(!flag)
-    			throw new DBAppException("Invalid Table or Column");
-           
-        }
-        catch(Exception ex) {
-            ex.printStackTrace();
-        }
-    	return type;
-    
-    }	
-    	
-    
+			while (types.hasMoreElements()) {
+				line = insertLine(line, tableName, keys.nextElement(), types.nextElement(), pK);
+				writer.writeNext(line);
+			}
+			writer.flush();
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 
-    public static void checkDataType(Hashtable<String,String> htblColNameType,String filePath,String tableName) throws DBAppException, IOException{
-		for(String s : htblColNameType.values()){
-			if(!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.Double"))){
+	}
+
+	public String addIndex(String tableName, String column, String indexName, String filePath) {
+		String type = "";
+		try {
+
+			CSVReader reader2 = new CSVReaderBuilder(new FileReader(filePath))
+					.withSkipLines(0)
+					.build();
+			List<String[]> allElements = reader2.readAll();
+			CSVWriter writer = new CSVWriter(new FileWriter(filePath));
+
+			boolean flag = false;
+			for (String[] nextRecord : allElements) {
+				if (nextRecord[0].equals(tableName) & nextRecord[1].equals(column)) {
+					if (nextRecord[4].equals("") & nextRecord[5].equals("")) {
+						nextRecord[4] = indexName;
+						nextRecord[5] = "B+ tree";
+						type = nextRecord[2];
+						writer.writeAll(allElements);
+						writer.flush();
+						flag = true;
+						break;
+					} else
+						throw new DBAppException("Index already created ");
+
+				}
+
+			}
+
+			if (!flag)
+				throw new DBAppException("Invalid Table or Column");
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return type;
+
+	}
+
+	public static void checkDataType(Hashtable<String, String> htblColNameType, String filePath, String tableName)
+			throws DBAppException, IOException {
+		for (String s : htblColNameType.values()) {
+			if (!(s.equals("java.lang.Integer") || s.equals("java.lang.String") || s.equals("java.lang.Double"))) {
 				throw new DBAppException("Column DataType invalid");
 			}
 		}
 		CSVReader csvReader = null;
 		try {
-			csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-			        .withSkipLines(1) 
-			        .build();
+			csvReader = new CSVReaderBuilder(new FileReader(filePath))
+					.withSkipLines(1)
+					.build();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String[] nextRecord;boolean flag = false;
-		
-        // this loop iterate over the csv file untill the table is founded
-        // if it's  founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) { 
-            
-            if(nextRecord[0].equals(tableName))
-            	throw new DBAppException("Duplicate Table");
-            	
-            else
-            	continue;
-        
+		String[] nextRecord;
+		boolean flag = false;
 
+		// this loop iterate over the csv file untill the table is founded
+		// if it's founded then an exception will be thrown
+		while ((nextRecord = csvReader.readNext()) != null) {
+
+			if (nextRecord[0].equals(tableName))
+				throw new DBAppException("Duplicate Table");
+
+			else
+				continue;
+
+		}
 	}
-    }
-    public static String[] insertLine(String []line,String tableName,String name, String type,String primaryKey) {
-		
-		line[0] = tableName;line[1] = name; line[2] = type;
-		if(primaryKey.equals(name))
+
+	public static String[] insertLine(String[] line, String tableName, String name, String type, String primaryKey) {
+
+		line[0] = tableName;
+		line[1] = name;
+		line[2] = type;
+		if (primaryKey.equals(name))
 			line[3] = "True";
 		else
 			line[3] = "False";
-		line[4] = null;line[5] = null;
-	
-        return line;
-    }
-    
-    public static Hashtable<String,String> checkData(String tableName,Hashtable<String,Object> data,String filePath) throws Exception {
-		
-    	CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-                .withSkipLines(1) 
-                .build();
-		String[] nextRecord;boolean flag = false;
-		Hashtable<String,String> indexes = new Hashtable<String,String>();
+		line[4] = null;
+		line[5] = null;
+
+		return line;
+	}
+
+	public static Hashtable<String, String> checkData(String tableName, Hashtable<String, Object> data, String filePath)
+			throws Exception {
+
+		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
+				.withSkipLines(1)
+				.build();
+		String[] nextRecord;
+		boolean flag = false;
+		Hashtable<String, String> indexes = new Hashtable<String, String>();
 		Enumeration<Object> values = data.elements();
-        Enumeration<String> keys = data.keys();
-        Hashtable<String,String> collector = new Hashtable<String,String>();
-        // this loop iterate over the csv file untill the table is founded
-        // if it's not founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) { 
-            
-            if(nextRecord[0].equals(tableName)) {
-            	flag = true;
-            	break;
-            }
-            else
-            	continue;
-        }
-		if(!flag)
-			throw new Exception("Invalid Table");
-		// this loop insert all the original attributes of the table inside collector hashtable
-		while(nextRecord!=null && nextRecord[0].equals(tableName)) {
-			collector.put(nextRecord[1],nextRecord[2]);
-			
-			if(nextRecord[4]!="")
-				indexes.put(nextRecord[1],nextRecord[4]);
-			nextRecord = csvReader.readNext();
-			
+		Enumeration<String> keys = data.keys();
+		Hashtable<String, String> collector = new Hashtable<String, String>();
+		// this loop iterate over the csv file untill the table is founded
+		// if it's not founded then an exception will be thrown
+		while ((nextRecord = csvReader.readNext()) != null) {
+
+			if (nextRecord[0].equals(tableName)) {
+				flag = true;
+				break;
+			} else
+				continue;
 		}
-		// this loop checks the entered data and throws exception if anything mismatches the original attributes 
-		while(keys.hasMoreElements()) {
+		if (!flag)
+			throw new Exception("Invalid Table");
+		// this loop insert all the original attributes of the table inside collector
+		// hashtable
+		while (nextRecord != null && nextRecord[0].equals(tableName)) {
+			collector.put(nextRecord[1], nextRecord[2]);
+
+			if (nextRecord[4] != "")
+				indexes.put(nextRecord[1], nextRecord[4]);
+			nextRecord = csvReader.readNext();
+
+		}
+		// this loop checks the entered data and throws exception if anything mismatches
+		// the original attributes
+		while (keys.hasMoreElements()) {
 			String key = keys.nextElement();
-			if(collector.containsKey(key)){
-				if(!(values.nextElement().getClass().equals(Class.forName(collector.get(key)))))
+			if (collector.containsKey(key)) {
+				if (!(values.nextElement().getClass().equals(Class.forName(collector.get(key)))))
 					throw new DBAppException("Mismatch type");
-				
-			}
-			else
-				throw new Exception("mismatch key  "+key);
-			
-    	}
+
+			} else
+				throw new Exception("mismatch key  " + key);
+
+		}
 		return indexes;
 	}
-    public  String getPkType(String filePath) throws Exception {
+
+	public String getPkType(String filePath) throws Exception {
 		String tableName = this.getStrTableName();
 		String pk = this.getStrClusteringKeyColumn();
-    	String type = null;
-    	CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)) 
-                .withSkipLines(1) 
-                .build();
-		String[] nextRecord;boolean flag = false;
-		
-        
-        // this loop iterate over the csv file untill the table is founded
-        // if it's not founded then an exception will be thrown
-		while ((nextRecord = csvReader.readNext()) != null) { 
-            
-            if(nextRecord[0].equals(tableName) & nextRecord[1].equals(pk)) {
-            	pk = nextRecord[2];
-            	break;
-            }
-            else
-            	continue;
-        }
+		String type = null;
+		CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
+				.withSkipLines(1)
+				.build();
+		String[] nextRecord;
+		boolean flag = false;
+
+		// this loop iterate over the csv file untill the table is founded
+		// if it's not founded then an exception will be thrown
+		while ((nextRecord = csvReader.readNext()) != null) {
+
+			if (nextRecord[0].equals(tableName) & nextRecord[1].equals(pk)) {
+				pk = nextRecord[2];
+				break;
+			} else
+				continue;
+		}
 		return pk;
-		
+
 	}
-    public String setNameForpage() {
-    	int counter = this.getPagesCounter();
-		String pageName = this.getStrTableName()+counter;
+
+	public String setNameForpage() {
+		int counter = this.getPagesCounter();
+		String pageName = this.getStrTableName() + counter;
 		this.setPagesCounter(++counter);
 		return pageName;
-    }
-     public static Object baseType(Object key) {
-    	 
-    	 if((key instanceof String)) {
-    		 return "";
-    	 }
-    	 else
-    		 if(key instanceof Double)
-    			 return 0.0;
-    		 else
-    			 return 0;
-    	 
-     }
-     public static bplustree btreeType(String type){
-    	 bplustree btree = null;
- 		
-         if(type.equals("java.lang.Integer")) 
-      	  btree = new bplustree<Integer>(Integer.class,3);    
-         
-         else
-      	   if(type.equals("java.lang.String")) 
-      	   btree = new bplustree<String>(String.class,3);
-      	   
-      	   else 
-      	      btree = new bplustree<Double>(Double.class,3);
-         return btree;
-     }
-     @SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void addInBtree(Tuple T,Page p,Hashtable<String,String> indexes,boolean firstInsert) {
-    	 ArrayList<String> pages = new ArrayList<String>();                                        
-    	 for(String key : indexes.keySet()) {
-    		 bplustree btree = Deserialize.Index(indexes.get(key));
-    		// System.out.println(indexes.get(key));
-    		 pages.add(p.getName());
-    		 Object attr =  T.getAttributesInTuple().get(key);
-    		 btree.insert((Comparable)attr,pages);
-    		 if(firstInsert)
-    		  System.out.println(attr +" added to " +key + " index");
-    		 Serialize.Index(btree,indexes.get(key));
-    		 pages.clear();
-    	 }
-     }
-     @SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void deleteFromIndex(Tuple T,Page p,Hashtable<String,String> indexes,boolean insert) {
-    	 String pageName = null;
-    	 ArrayList<String> pages = new ArrayList<String>();                                        
-    	 for(String key : indexes.keySet()) {
-    		 bplustree btree = Deserialize.Index(indexes.get(key));
-    		 pageName = p.getName();
-    		 pages.add(pageName);
-    		 Object attr = T.getAttributesInTuple().get(key);
-    		 btree.delete((Comparable)attr, pages);
-    		 if(!insert)
-    			 System.err.println( attr+" deleted from "  +key +" index"   );
-    		 Serialize.Index(btree,indexes.get(key));
-    		 pages.clear();
-    	 }
-     }
-     
-    public Table insertIntoTable(Tuple T,Hashtable<String,String> indexes) throws Exception {
-        String tableName = this.getStrTableName();
-    	Table table = Deserialize.Table(tableName);
-        //System.out.println(table.getProps());
-    	Page p = null;String pageName;boolean flag = false;
-           Object maxKeyInPreviousPage;// this attribute connect the pages with each other maxLastpage = minNextPage
-    	//Base Case
-    
-    	if(table.getPages().size()==0) {
-    		 p = new Page(table.setNameForpage());
-    		 p.getPageProp().put(p.getName(),new Pair(baseType(T.getPK())));
-    		// table.getProps().put(p.getName(),new Pair(baseType(T.getPK())));
-    		
-    		 T.addTuple(p);
-    		 System.out.print("KEY : "+ T.getPK()+" added to "+ p.getName());
-    		 p = p.updateMax();
-    		 table.getPages().add(p);
-     		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-     		Serialize.Table(table, tableName);
-    		 addInBtree(T,p,indexes,true);
-    		
-    		 pageName = p.getName();
-    		 Serialize.Page(p,pageName);
-    		 
-    	}
-    	
-    	else {  // Search for the right page to insert in
-    		//table = Deserialize.Table(tableName);
-    		int index = table.binarySearch(T.getPK(),true);
-    		 pageName = table.getPages().elementAt(index).getName();
-    		 p = Deserialize.Page(pageName);
-    		 //p = table.getPages().elementAt(index);
-    		if(p.tupleFounded(T.getPK()))
-    	        	throw new DBAppException("Duplicate Tuple");
-    		p = T.addTuple(p);
-    		System.out.println("KEY : "+ T.getPK()+" added to "+ p.getName());
-    		if(!p.overFlowed()) {
-    			p = p.updateMax();
-    			
-    			table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-         		Serialize.Table(table, tableName);
-    			addInBtree(T,p,indexes,true);
-    			Serialize.Page(p,pageName);
-    			
-    	    	//ADDED SUCCESSFULLY
-    	    }
-    	    else {
-    	    	//OVERFLOW ON PAGE BUT STILL ADDED
-    	    	addInBtree(T,p,indexes,true);
-    	    	T = p.getTuplesInPage().remove(p.getMaxCount());
-    	    	deleteFromIndex(T,p,indexes,true);
-    	    	p = p.updateMax();
-    	    	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-         		Serialize.Table(table, tableName);
-    	    	pageName = p.getName();
-          maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
-                   Serialize.Page(p,pageName);
-                 
-                 //OVERFLOW ON THE LAST PAGE
-                if(index == table.getPages().size()-1) { // if the overflow in the last page, I will create a new page without going through any loops
-                	 table = Deserialize.Table(tableName);
-                	p = new Page(table.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T))); 
-                	
-            		
-            		
-                	p = p.updateMin(maxKeyInPreviousPage);	
-                	T.addTuple(p);addInBtree(T,p,indexes,false);p = p.updateMax();
-                	table.getPages().add(p);
-                	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-             		Serialize.Table(table, tableName);
-                	pageName = p.getName();Serialize.Page(p,pageName);
-                }
-                
-                else { // handle the overflow of pages by setting flag = true 
-                	 /// if flag is still false this means that the last page has an overflow 
-                	while(index!=table.getPages().size()-1) {
-                		  table = Deserialize.Table(tableName);
-                	pageName = table.getPages().elementAt(index+1).getName();
-                	//System.out.println(pageName);
-                	p = Deserialize.Page(pageName);
-                	T.addTuple(p);
-                	if(!p.overFlowed()) {
-                		addInBtree(T,p,indexes,false);
-                		
-                		p = p.updateMin(maxKeyInPreviousPage);p = p.updateMax();
-                		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-                 		Serialize.Table(table, tableName);
-                		pageName = p.getName();
-                		Serialize.Page(p,pageName);
-                		
-                		flag = true;
-                		break;
-                	}
-                	else {
-                		addInBtree(T,p,indexes,false);
-                		T = p.getTuplesInPage().remove(p.getMaxCount());
-                		deleteFromIndex(T,p,indexes,true);
-                		p = p.updateMax();p = p.updateMin(maxKeyInPreviousPage);
-                		table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-                 		Serialize.Table(table, tableName);
-                        maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
-                        pageName = p.getName();
-                        Serialize.Page(p,pageName);
-                     
-                	}
-                	index++;
-                }
-                	if(!flag) { // this if handles the last overflow can happen
-                		  table = Deserialize.Table(tableName);
-                		p = new Page(table.setNameForpage());p.getPageProp().put(p.getName(),new Pair(baseType(T)));
-                		p = p.updateMin(maxKeyInPreviousPage);	
-                    	T.addTuple(p); addInBtree(T,p,indexes,false);p = p.updateMax();
-                    	table.getPages().add(p);
-                    	table.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-                 		Serialize.Table(table, tableName);
-                    	
-                	
-                    	pageName = p.getName();
-                    	Serialize.Page(p,pageName);
-                	}
-                }
-    	    	
-    	    }
-    	}
-    	return table;
-    	
-    }
-    
-    public  boolean hasPK( Hashtable<String,Object> h ) {
- 		if(h.containsKey(this.getStrClusteringKeyColumn()))
- 			return true;
- 		return false;
- 	}
- 
- 	public static boolean hasIndex(Hashtable<String,String> indexes,String strFromHshTblCol ) {
- 		
- 		if (indexes.containsKey(strFromHshTblCol))
- 			return true;
- 		return false ;
- 	}
- 	@SuppressWarnings({ "unchecked", "rawtypes" })
- 	public Page searchPK(Object key, boolean hasIndex,String indexName) throws DBAppException {
- 		Page p = null;
- 		if (hasIndex) {
- 			bplustree bTree= Deserialize.Index(indexName);
- 			ArrayList<String> page = bTree.search((Comparable)key);
- 			bTree.delete((Comparable)key, page);
- 			p = Deserialize.Page(page.get(0));
- 		}
- 		else {
- 			
- 			int index = 0;
- 			try {
- 				//index = t.binarySearch(key);
- 			} catch (Exception e) {
- 				// TODO Auto-generated catch block
- 				e.printStackTrace();
- 			}
- 			// p = Deserialize.Page(t.getPages().get(index).getName());
- 		}
- 		return p ;
- 	}
- 	
- 	public  void deleteTupleUsingKey(Page p,Tuple t) throws Exception {
-	     String pageName = null;Page prevPage = null;Page nextPage = null;int pageIndex = this.binarySearch(t.getPK(),false);
-	  String tableName = this.getStrTableName();
-	   //  int index = Collections.binarySearch(p.getTuplesInPage(),key);
-	    //if(index<0)
-	  Object key = t.getPK();
-	    //	throw new DBAppException("Key not Found");
-	     p.getTuplesInPage().remove(t);
-	     System.err.println("Primary Key : " + key +" deleted form "+ p.getName());
-	    if(p.getTuplesInPage().size()>0) {
-	    	p.updateMax();
-	    	this.getProps().put(p.getName(),p.getPageProp().get(p.getName()));
-    		Serialize.Table(this, tableName);
-    		Serialize.Page(p,p.getName());
-	    	if(!(pageIndex==this.getPages().size()-1)) {
-	    	    nextPage = this.getPages().get(pageIndex+1);
-	    	    pageName = nextPage.getName();
-	    	    nextPage = Deserialize.Page(pageName);
-	    	    nextPage.updateMin(p.getPageProp().get(p.getName()).getMax());
-	    	    this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
-	     		Serialize.Table(this, tableName);
-	    	    Serialize.Page(nextPage,pageName);
-	    	}
-	    	
-	    }
-	    else {
-	    	if(pageIndex==0 & !(pageIndex==this.getPages().size()-1)) {
-	    		nextPage = this.getPages().get(pageIndex+1);
-	    		pageName = nextPage.getName();
-	    	    nextPage = Deserialize.Page(pageName);
-	    	    nextPage.updateMin(baseType(t.getPK()));
-	    	    this.getProps().put(pageName,nextPage.getPageProp().get(pageName));
-	     		Serialize.Table(this, tableName);
-	    	    Serialize.Page(nextPage,pageName);
-	    	}
-	    	else {
-	    		if(!(pageIndex==this.getPages().size()-1)) {
-	    			
-	    			
-       prevPage = this.getPages().get(pageIndex-1);pageName = prevPage.getName();
-                          prevPage = Deserialize.Page(pageName);
-              
-                          
-       nextPage = this.getPages().get(pageIndex+1);pageName = nextPage.getName();
-                          nextPage = Deserialize.Page(pageName);
-                          
-                          
-               nextPage.updateMin(prevPage.getPageProp().get(prevPage.getName()).getMax());
-               this.getProps().put(nextPage.getName(),nextPage.getPageProp().get(nextPage.getName()));
-	     		Serialize.Table(this, tableName);            
-               Serialize.Page(nextPage,pageName);
-	    			
-	    		}
-	    		
-	    	}
-	    	this.updatepages(p,pageIndex);
-	    
-	    }
-	    System.out.println(key + "  deleted");	
-	
-}
- 	 public void updatepages(Page p,int pageIndex) {
- 
-     	String pageName = p.getName();
- 		this.getPages().remove(pageIndex);
- 		this.getProps().remove(pageName);
- 		
- 		this.deleteFile(pageName);
- 		String tableName = this.getStrTableName();
-     	Serialize.Table(this,tableName);
-     	//return this;
-     }
- 	public  void deleteFile(String pageName) {
-		String path = "Pages/"+pageName+".ser";
+	}
+
+	public static Object baseType(Object key) {
+
+		if ((key instanceof String)) {
+			return "";
+		} else if (key instanceof Double)
+			return 0.0;
+		else
+			return 0;
+
+	}
+
+	public static bplustree btreeType(String type) {
+		bplustree btree = null;
+
+		if (type.equals("java.lang.Integer"))
+			btree = new bplustree<Integer>(Integer.class, 3);
+
+		else if (type.equals("java.lang.String"))
+			btree = new bplustree<String>(String.class, 3);
+
+		else
+			btree = new bplustree<Double>(Double.class, 3);
+		return btree;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void addInBtree(Tuple T, Page p, Hashtable<String, String> indexes, boolean firstInsert) {
+		ArrayList<String> pages = new ArrayList<String>();
+		for (String key : indexes.keySet()) {
+			bplustree btree = Deserialize.Index(indexes.get(key));
+			// System.out.println(indexes.get(key));
+			pages.add(p.getName());
+			Object attr = T.getAttributesInTuple().get(key);
+			btree.insert((Comparable) attr, pages);
+			if (firstInsert)
+				System.out.println(attr + " added to " + key + " index");
+			Serialize.Index(btree, indexes.get(key));
+			pages.clear();
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void deleteFromIndex(Tuple T, Page p, Hashtable<String, String> indexes, boolean insert) {
+		String pageName = null;
+		ArrayList<String> pages = new ArrayList<String>();
+		for (String key : indexes.keySet()) {
+			bplustree btree = Deserialize.Index(indexes.get(key));
+			pageName = p.getName();
+			pages.add(pageName);
+			Object attr = T.getAttributesInTuple().get(key);
+			btree.delete((Comparable) attr, pages);
+			if (!insert)
+				System.err.println(attr + " deleted from " + key + " index");
+			Serialize.Index(btree, indexes.get(key));
+			pages.clear();
+		}
+	}
+
+	public Table insertIntoTable(Tuple T, Hashtable<String, String> indexes) throws Exception {
+		String tableName = this.getStrTableName();
+		Table table = Deserialize.Table(tableName);
+		// System.out.println(table.getProps());
+		Page p = null;
+		String pageName;
+		boolean flag = false;
+		Object maxKeyInPreviousPage;// this attribute connect the pages with each other maxLastpage = minNextPage
+		// Base Case
+
+		if (table.getPages().size() == 0) {
+			p = new Page(table.setNameForpage());
+			p.getPageProp().put(p.getName(), new Pair(baseType(T.getPK())));
+			// table.getProps().put(p.getName(),new Pair(baseType(T.getPK())));
+
+			T.addTuple(p);
+			System.out.print("KEY : " + T.getPK() + " added to " + p.getName());
+			p = p.updateMax();
+			table.getPages().add(p);
+			table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+			Serialize.Table(table, tableName);
+			addInBtree(T, p, indexes, true);
+
+			pageName = p.getName();
+			Serialize.Page(p, pageName);
+
+		}
+
+		else { // Search for the right page to insert in
+			// table = Deserialize.Table(tableName);
+			int index = table.binarySearch(T.getPK(), true);
+			pageName = table.getPages().elementAt(index).getName();
+			p = Deserialize.Page(pageName);
+			// p = table.getPages().elementAt(index);
+			if (p.tupleFounded(T.getPK()))
+				throw new DBAppException("Duplicate Tuple");
+			p = T.addTuple(p);
+			System.out.println("KEY : " + T.getPK() + " added to " + p.getName());
+			if (!p.overFlowed()) {
+				p = p.updateMax();
+
+				table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+				Serialize.Table(table, tableName);
+				addInBtree(T, p, indexes, true);
+				Serialize.Page(p, pageName);
+
+				// ADDED SUCCESSFULLY
+			} else {
+				// OVERFLOW ON PAGE BUT STILL ADDED
+				addInBtree(T, p, indexes, true);
+				T = p.getTuplesInPage().remove(p.getMaxCount());
+				deleteFromIndex(T, p, indexes, true);
+				p = p.updateMax();
+				table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+				Serialize.Table(table, tableName);
+				pageName = p.getName();
+				maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
+				Serialize.Page(p, pageName);
+
+				// OVERFLOW ON THE LAST PAGE
+				if (index == table.getPages().size() - 1) { // if the overflow in the last page, I will create a new
+															// page without going through any loops
+					table = Deserialize.Table(tableName);
+					p = new Page(table.setNameForpage());
+					p.getPageProp().put(p.getName(), new Pair(baseType(T)));
+
+					p = p.updateMin(maxKeyInPreviousPage);
+					T.addTuple(p);
+					addInBtree(T, p, indexes, false);
+					p = p.updateMax();
+					table.getPages().add(p);
+					table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+					Serialize.Table(table, tableName);
+					pageName = p.getName();
+					Serialize.Page(p, pageName);
+				}
+
+				else { // handle the overflow of pages by setting flag = true
+						/// if flag is still false this means that the last page has an overflow
+					while (index != table.getPages().size() - 1) {
+						table = Deserialize.Table(tableName);
+						pageName = table.getPages().elementAt(index + 1).getName();
+						// System.out.println(pageName);
+						p = Deserialize.Page(pageName);
+						T.addTuple(p);
+						if (!p.overFlowed()) {
+							addInBtree(T, p, indexes, false);
+
+							p = p.updateMin(maxKeyInPreviousPage);
+							p = p.updateMax();
+							table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+							Serialize.Table(table, tableName);
+							pageName = p.getName();
+							Serialize.Page(p, pageName);
+
+							flag = true;
+							break;
+						} else {
+							addInBtree(T, p, indexes, false);
+							T = p.getTuplesInPage().remove(p.getMaxCount());
+							deleteFromIndex(T, p, indexes, true);
+							p = p.updateMax();
+							p = p.updateMin(maxKeyInPreviousPage);
+							table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+							Serialize.Table(table, tableName);
+							maxKeyInPreviousPage = p.getTuplesInPage().lastElement().getPK();
+							pageName = p.getName();
+							Serialize.Page(p, pageName);
+
+						}
+						index++;
+					}
+					if (!flag) { // this if handles the last overflow can happen
+						table = Deserialize.Table(tableName);
+						p = new Page(table.setNameForpage());
+						p.getPageProp().put(p.getName(), new Pair(baseType(T)));
+						p = p.updateMin(maxKeyInPreviousPage);
+						T.addTuple(p);
+						addInBtree(T, p, indexes, false);
+						p = p.updateMax();
+						table.getPages().add(p);
+						table.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+						Serialize.Table(table, tableName);
+
+						pageName = p.getName();
+						Serialize.Page(p, pageName);
+					}
+				}
+
+			}
+		}
+		return table;
+
+	}
+
+	public boolean hasPK(Hashtable<String, Object> h) {
+		if (h.containsKey(this.getStrClusteringKeyColumn()))
+			return true;
+		return false;
+	}
+
+	public static boolean hasIndex(Hashtable<String, String> indexes, String strFromHshTblCol) {
+
+		if (indexes.containsKey(strFromHshTblCol))
+			return true;
+		return false;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Page searchPK(Object key, boolean hasIndex, String indexName) throws DBAppException {
+		Page p = null;
+		if (hasIndex) {
+			bplustree bTree = Deserialize.Index(indexName);
+			ArrayList<String> page = bTree.search((Comparable) key);
+			bTree.delete((Comparable) key, page);
+			p = Deserialize.Page(page.get(0));
+		} else {
+
+			int index = 0;
+			try {
+				// index = t.binarySearch(key);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// p = Deserialize.Page(t.getPages().get(index).getName());
+		}
+		return p;
+	}
+
+	public void deleteTupleUsingKey(Page p, Tuple t) throws Exception {
+		String pageName = null;
+		Page prevPage = null;
+		Page nextPage = null;
+		int pageIndex = this.binarySearch(t.getPK(), false);
+		String tableName = this.getStrTableName();
+		// int index = Collections.binarySearch(p.getTuplesInPage(),key);
+		// if(index<0)
+		Object key = t.getPK();
+		// throw new DBAppException("Key not Found");
+		p.getTuplesInPage().remove(t);
+		System.err.println("Primary Key : " + key + " deleted form " + p.getName());
+		if (p.getTuplesInPage().size() > 0) {
+			p.updateMax();
+			this.getProps().put(p.getName(), p.getPageProp().get(p.getName()));
+			Serialize.Table(this, tableName);
+			Serialize.Page(p, p.getName());
+			if (!(pageIndex == this.getPages().size() - 1)) {
+				nextPage = this.getPages().get(pageIndex + 1);
+				pageName = nextPage.getName();
+				nextPage = Deserialize.Page(pageName);
+				nextPage.updateMin(p.getPageProp().get(p.getName()).getMax());
+				this.getProps().put(nextPage.getName(), nextPage.getPageProp().get(nextPage.getName()));
+				Serialize.Table(this, tableName);
+				Serialize.Page(nextPage, pageName);
+			}
+
+		} else {
+			if (pageIndex == 0 & !(pageIndex == this.getPages().size() - 1)) {
+				nextPage = this.getPages().get(pageIndex + 1);
+				pageName = nextPage.getName();
+				nextPage = Deserialize.Page(pageName);
+				nextPage.updateMin(baseType(t.getPK()));
+				this.getProps().put(pageName, nextPage.getPageProp().get(pageName));
+				Serialize.Table(this, tableName);
+				Serialize.Page(nextPage, pageName);
+			} else {
+				if (!(pageIndex == this.getPages().size() - 1)) {
+
+					prevPage = this.getPages().get(pageIndex - 1);
+					pageName = prevPage.getName();
+					prevPage = Deserialize.Page(pageName);
+
+					nextPage = this.getPages().get(pageIndex + 1);
+					pageName = nextPage.getName();
+					nextPage = Deserialize.Page(pageName);
+
+					nextPage.updateMin(prevPage.getPageProp().get(prevPage.getName()).getMax());
+					this.getProps().put(nextPage.getName(), nextPage.getPageProp().get(nextPage.getName()));
+					Serialize.Table(this, tableName);
+					Serialize.Page(nextPage, pageName);
+
+				}
+
+			}
+			this.updatepages(p, pageIndex);
+
+		}
+		System.out.println(key + "  deleted");
+
+	}
+
+	public void updatepages(Page p, int pageIndex) {
+
+		String pageName = p.getName();
+		this.getPages().remove(pageIndex);
+		this.getProps().remove(pageName);
+
+		this.deleteFile(pageName);
+		String tableName = this.getStrTableName();
+		Serialize.Table(this, tableName);
+		// return this;
+	}
+
+	public void deleteFile(String pageName) {
+		String path = "Pages/" + pageName + ".ser";
 		File file = new File(path);
-		if(file.delete())
-			System.err.println(pageName+" deleted");
+		if (file.delete())
+			System.err.println(pageName + " deleted");
 		else
 			System.err.println("file cannot be deleted");
-		
-		
+
 	}
+
  	public void deleteAllPages() {
  		String pageName = null;
  		Enumeration <String> pageNames = this.getProps().keys();
@@ -603,157 +607,173 @@ public class Table implements Serializable{
  		}
  		Serialize.Table(this, this.getStrTableName());
  	}
- 	public static boolean tupleMatched(Tuple t,Hashtable<String,Object> htblColNameValue) {
- 		Enumeration<String> attributes = htblColNameValue.keys();
-  	  while(attributes.hasMoreElements()) {
-  		  
-  		  if(!(t.getAttributesInTuple().contains(htblColNameValue.get(attributes.nextElement()))))
-  		 	  return false;
-  		 
-  	  }
-  	  return true;
- 	}
- 	public  void iterateOverChosenPages(Set<String> pageNames,Hashtable<String,Object> htblColNameValue,Hashtable<String,String> indexes) throws DBAppException {
- 		  Page p = null;//Tuple t = null;//Vector<Tuple> v = new Vector<Tuple>();
- 		  
- 		  for(String name : pageNames) {
- 			  p = Deserialize.Page(name);
- 			  List<Tuple> tuples = new ArrayList<Tuple>(p.getTuplesInPage());
- 			  //Iterator<Tuple> iter = v.iterator();
- 			  for(Tuple t : tuples) {
- 				  //t = iter.next();
- 				  if(tupleMatched(t,htblColNameValue)) {
- 					  try {
+
+
+
+	public static boolean tupleMatched(Tuple t, Hashtable<String, Object> htblColNameValue) {
+		Enumeration<String> attributes = htblColNameValue.keys();
+		while (attributes.hasMoreElements()) {
+
+			if (!(t.getAttributesInTuple().contains(htblColNameValue.get(attributes.nextElement()))))
+				return false;
+
+		}
+		return true;
+	}
+
+	public void iterateOverChosenPages(Set<String> pageNames, Hashtable<String, Object> htblColNameValue,
+			Hashtable<String, String> indexes) throws DBAppException {
+		Page p = null;// Tuple t = null;//Vector<Tuple> v = new Vector<Tuple>();
+
+		for (String name : pageNames) {
+			p = Deserialize.Page(name);
+			List<Tuple> tuples = new ArrayList<Tuple>(p.getTuplesInPage());
+			// Iterator<Tuple> iter = v.iterator();
+			for (Tuple t : tuples) {
+				// t = iter.next();
+				if (tupleMatched(t, htblColNameValue)) {
+					try {
+
 						this.deleteTupleUsingKey(p, t);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
- 					if(indexes.size()!=0)
- 			      deleteFromIndex(t,p, indexes,false);
- 			  }}
- 			  
- 		  }
- 		
- 	}
- 	public static boolean hasAnyIndex(Hashtable <String,Object> htblColNameValue,Hashtable<String,String> indexes ) {
- 		
- 		for(String key : htblColNameValue.keySet()) {
- 			if(indexes.containsKey(key))
- 				return true;
- 		}
- 		return false;
- 	}
- 	
-    @SuppressWarnings({  "rawtypes", "unchecked" })
-	public void deleteFromTable(Hashtable<String,Object> htblColNameValue,Hashtable<String,String>indexes) throws Exception {
-    	Page p =null;String pageName = null;int index;Tuple t = null;boolean flag =false;
-    	bplustree btree = null;String indexName = null;
-    	 ArrayList<String> tuples = new ArrayList<String>();Object key = null;String indx = null;
-    	 ArrayList<String> currIndex = null;Set<String> finalTuples = null;
-    	//First Case
-    	if(this.hasPK(htblColNameValue)) {
-    		 key = htblColNameValue.get(this.getStrClusteringKeyColumn());
-    	    if(!hasIndex(indexes,this.getStrClusteringKeyColumn())) {
-    		index = this.binarySearch(htblColNameValue.get(this.getStrClusteringKeyColumn()),false);
-    	  pageName = this.getPages().elementAt(index).getName();
-    	    }
-    	 else {
-    		 flag = true;
-    		 indexName = indexes.get(this.getStrClusteringKeyColumn());
-    		 btree = Deserialize.Index(indexName);
-    		 pageName = (String) btree.search((Comparable)key).get(0); 
-    	 }
-    	  p = Deserialize.Page(pageName);
-    	  index = Collections.binarySearch(p.getTuplesInPage(),key);
-    	  if(index<0)
-    		  throw new DBAppException("key not found");
-    	  t = p.getTuplesInPage().elementAt(index);
-    	   
-    	  
-    	  if(tupleMatched(t,htblColNameValue)) {
-    		  deleteFromIndex(t,p,indexes,false);
-    		  this.deleteTupleUsingKey(p, t);  
-    	  
-    	  }
-    	  else
-    		  throw new DBAppException("Record not found");
-    	}
-    	//second case
-    	else
-    		if(indexes.size()!=0 & hasAnyIndex(htblColNameValue,indexes)) {
-    			Enumeration<String> keys = htblColNameValue.keys();
-    			while(keys.hasMoreElements()) {
-    				  indx = keys.nextElement();
-    				  indexName = indexes.get(indx);
-    				  if(indexName!=null) {
-    				  btree = Deserialize.Index(indexName);
-    		          key = htblColNameValue.get(indx);
-    		          if(tuples.isEmpty())
-    		        	  tuples = btree.search((Comparable)key);
-    		          else {
-    		        	  currIndex = btree.search((Comparable)key);
-    		        	  tuples.retainAll(currIndex);
-    		          }
-    				  }
-    			}
-    			
-    			if(tuples.size()==0)
-    				throw new DBAppException("Invalid Enteries");
-    			 finalTuples = new HashSet<String>(tuples);
-    			 this.iterateOverChosenPages(finalTuples, htblColNameValue,indexes);
-    		}
-    	 // Third case
-    		else {
-    			finalTuples = new HashSet<String>(this.getProps().keySet());
-    			this.iterateOverChosenPages(finalTuples, htblColNameValue,indexes);
-    		}
-    }
-    public static Object getOriginalKey(String strClusteringKeyValue,String type){
-      	 Object key = null;
-   		
-           if(type.equals("java.lang.Integer")) 
-        	  key = Integer.parseInt(strClusteringKeyValue);    
-           
-           else
-        	   if(type.equals("java.lang.String")) 
-        	   key = Double.parseDouble(strClusteringKeyValue);
-        	   
-        	   else 
-        	      key = strClusteringKeyValue;
-           return key;
-       }
-    
-    @SuppressWarnings("rawtypes")
-	public void updateTable(Object key,Hashtable<String,String> indexes,Hashtable<String,Object> htblColNameValue) throws Exception {
-    	Page p = null;String pageName = null;String tableName = this.getStrTableName();
-    	int index = this.binarySearch(key,false); ArrayList<String> updateTree = new ArrayList<String>();
-    	pageName = this.getPages().elementAt(index).getName();String indexName = null;
-    	bplustree btree = null;
-    	p = Deserialize.Page(pageName);
-    	if(!p.tupleFounded(key))
-    		throw new DBAppException("Record not found");
-    	
-    	 int tupleIndex;
-    	 List<Tuple> tuples = new ArrayList<Tuple>(p.getTuplesInPage());
-		  //Iterator<Tuple> iter = v.iterator();
-		  for(Tuple t : tuples) {
-			  //t = iter.next();
-			  if(t.getPK().equals(key)) {
-				  try {
-					  tupleIndex = t.getActualIndex(p.getTuplesInPage());
-	        p.getTuplesInPage().set(tupleIndex,t.updateTuple(p.getName(),indexes, htblColNameValue));
-	        System.out.println("KEY : " +key +" Updated Correctly");
-	        Serialize.Page(p, pageName);
-	        Serialize.Table(this, tableName);
-				  
-						   
-					   
-					       
+					if (indexes.size() != 0)
+						deleteFromIndex(t, p, indexes, false);
+				}
+			}
+
+		}
+
+	}
+
+	public static boolean hasAnyIndex(Hashtable<String, Object> htblColNameValue, Hashtable<String, String> indexes) {
+
+		for (String key : htblColNameValue.keySet()) {
+			if (indexes.containsKey(key))
+				return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void deleteFromTable(Hashtable<String, Object> htblColNameValue, Hashtable<String, String> indexes)
+			throws Exception {
+		Page p = null;
+		String pageName = null;
+		int index;
+		Tuple t = null;
+		boolean flag = false;
+		bplustree btree = null;
+		String indexName = null;
+		ArrayList<String> tuples = new ArrayList<String>();
+		Object key = null;
+		String indx = null;
+		ArrayList<String> currIndex = null;
+		Set<String> finalTuples = null;
+		// First Case
+		if (this.hasPK(htblColNameValue)) {
+			key = htblColNameValue.get(this.getStrClusteringKeyColumn());
+			if (!hasIndex(indexes, this.getStrClusteringKeyColumn())) {
+				index = this.binarySearch(htblColNameValue.get(this.getStrClusteringKeyColumn()), false);
+				pageName = this.getPages().elementAt(index).getName();
+			} else {
+				flag = true;
+				indexName = indexes.get(this.getStrClusteringKeyColumn());
+				btree = Deserialize.Index(indexName);
+				pageName = (String) btree.search((Comparable) key).get(0);
+			}
+			p = Deserialize.Page(pageName);
+			index = Collections.binarySearch(p.getTuplesInPage(), key);
+			if (index < 0)
+				throw new DBAppException("key not found");
+			t = p.getTuplesInPage().elementAt(index);
+
+			if (tupleMatched(t, htblColNameValue)) {
+				deleteFromIndex(t, p, indexes, false);
+				this.deleteTupleUsingKey(p, t);
+
+			} else
+				throw new DBAppException("Record not found");
+		}
+		// second case
+		else if (indexes.size() != 0 & hasAnyIndex(htblColNameValue, indexes)) {
+			Enumeration<String> keys = htblColNameValue.keys();
+			while (keys.hasMoreElements()) {
+				indx = keys.nextElement();
+				indexName = indexes.get(indx);
+				if (indexName != null) {
+					btree = Deserialize.Index(indexName);
+					key = htblColNameValue.get(indx);
+					if (tuples.isEmpty())
+						tuples = btree.search((Comparable) key);
+					else {
+						currIndex = btree.search((Comparable) key);
+						tuples.retainAll(currIndex);
+					}
+				}
+			}
+
+			if (tuples.size() == 0)
+				throw new DBAppException("Invalid Enteries");
+			finalTuples = new HashSet<String>(tuples);
+			this.iterateOverChosenPages(finalTuples, htblColNameValue, indexes);
+		}
+		// Third case
+		else {
+			finalTuples = new HashSet<String>(this.getProps().keySet());
+			this.iterateOverChosenPages(finalTuples, htblColNameValue, indexes);
+		}
+	}
+
+	public static Object getOriginalKey(String strClusteringKeyValue, String type) {
+		Object key = null;
+
+		if (type.equals("java.lang.Integer"))
+			key = Integer.parseInt(strClusteringKeyValue);
+
+		else if (type.equals("java.lang.String"))
+			key = Double.parseDouble(strClusteringKeyValue);
+
+		else
+			key = strClusteringKeyValue;
+		return key;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void updateTable(Object key, Hashtable<String, String> indexes, Hashtable<String, Object> htblColNameValue)
+			throws Exception {
+		Page p = null;
+		String pageName = null;
+		String tableName = this.getStrTableName();
+		int index = this.binarySearch(key, false);
+		ArrayList<String> updateTree = new ArrayList<String>();
+		pageName = this.getPages().elementAt(index).getName();
+		String indexName = null;
+		bplustree btree = null;
+		p = Deserialize.Page(pageName);
+		if (!p.tupleFounded(key))
+			throw new DBAppException("Record not found");
+
+		int tupleIndex;
+		List<Tuple> tuples = new ArrayList<Tuple>(p.getTuplesInPage());
+		// Iterator<Tuple> iter = v.iterator();
+		for (Tuple t : tuples) {
+			// t = iter.next();
+			if (t.getPK().equals(key)) {
+				try {
+					tupleIndex = t.getActualIndex(p.getTuplesInPage());
+					p.getTuplesInPage().set(tupleIndex, t.updateTuple(p.getName(), indexes, htblColNameValue));
+					System.out.println("KEY : " + key + " Updated Correctly");
+					Serialize.Page(p, pageName);
+					Serialize.Table(this, tableName);
+
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+
 				
 		  }}
     	
@@ -857,6 +877,15 @@ public class Table implements Serializable{
 		
 		
 		
-	}
 
-}
+
+			}
+		}
+
+	
+
+	
+
+	
+
+

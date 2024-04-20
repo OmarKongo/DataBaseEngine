@@ -23,7 +23,11 @@ public class DBApp {
 	final static String csvPath = "metadata.csv";
 
 	public DBApp() {
-		//this.init();
+
+		
+
+		// this.init();
+
 	}
 
 	// this does whatever initialization you would like
@@ -53,7 +57,12 @@ public class DBApp {
 	// htblColNameValue will have the column name as key and the data
 	// type as value
 
-	public void createTable(String strTableName, String strClusteringKeyColumn,
+
+
+
+	public void createTable(String strTableName,
+			String strClusteringKeyColumn,
+
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
 
 		Table.addTable(strTableName, strClusteringKeyColumn, htblColNameType, csvPath);
@@ -64,8 +73,13 @@ public class DBApp {
 
 	// following method creates a B+tree index
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void createIndex(String strTableName, String strColName, String strIndexName)
-			throws DBAppException, IOException {
+
+
+
+	public void createIndex(String strTableName,
+			String strColName,
+			String strIndexName) throws DBAppException, IOException {
+
 		Table t = Deserialize.Table(strTableName);
 		String type = t.addIndex(strTableName, strColName, strIndexName, csvPath);
 		bplustree btree = Table.btreeType(type);
@@ -89,7 +103,12 @@ public class DBApp {
 
 	// following method inserts one row only.
 	// htblColNameValue must include a value for the primary key
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
+
+
+	public void insertIntoTable(String strTableName,
+			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 
 		Hashtable<String, String> indexes = null;
 		try {
@@ -114,7 +133,10 @@ public class DBApp {
 	// htblColNameValue holds the key and new value
 	// htblColNameValue will not include clustering key as column name
 	// strClusteringKeyValue is the value to look for to find the row to update.
-	public void updateTable(String strTableName, String strClusteringKeyValue,
+
+	public void updateTable(String strTableName,
+			String strClusteringKeyValue,
+
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		Hashtable<String, String> indexes = null;
 
@@ -137,10 +159,11 @@ public class DBApp {
 	// htblColNameValue holds the key and value. This will be used in search
 	// to identify which rows/tuples to delete.
 	// htblColNameValue enteries are ANDED together
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
-		
-			
+	public void deleteFromTable(String strTableName,
+			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
+
 		Hashtable<String, String> indexes = null;
 		try {
 			indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
@@ -158,11 +181,68 @@ public class DBApp {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 		}
 	}
 
-	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
-		 throw new DBAppException("");
+	
+
+	public Hashtable<String, String> checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators)
+			throws DBAppException {
+		// need to check if SQLTerm tables are in MetaData File with correct data types
+		// Do I make this Hashtable global so as to decrease spatial complexity by not
+		// creating a hashtable everytime we select?
+		Hashtable<String, String> indexes = null;
+		String tableName = "";
+		try {
+			/*
+			 * Checking if valid table and valid columns
+			 * Making sure that no joins are allowed
+			 * Making sure the operators inside the SQLTerm are supported
+			 * By this order
+			 */
+			Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+			ArrayList<String> checkForStrOperators = new ArrayList<>(Arrays.asList(">", ">=", "<", "<=", "!=", "="));
+			for (SQLTerm sqlTerm : arrSQLTerms) {
+				// should I say that if table names differ throw exception "joins not
+				// supported?"
+
+				if (tableName.equals(""))
+					tableName = sqlTerm._strColumnName;
+				else {
+					if (!tableName.equals(sqlTerm._strColumnName))
+						throw new DBAppException("Multiple table queries are not supported on this engine.");
+				}
+
+				htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
+
+				if (!(checkForStrOperators.contains(sqlTerm._strOperator))) {
+					throw new DBAppException(
+							"Please enter a valid string operator.\nSupported operators are >, >=, <, <=, != or =");
+				}
+			}
+
+			indexes = Table.checkData(tableName, htblColNameValue, csvPath);
+			/*
+			 * Checking if valid operators
+			 */
+			for (String operator : strarrOperators) {
+				if (operator != "AND" && operator != "OR" && operator != "XOR") {
+					throw new DBAppException("Please enter a valid operator.\nOperators supported are AND, OR or XOR");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return indexes;
+		// ex: "gpa","gpaIndex"
+	} // "name","nameIndex"
+
+	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms,
+			String[] strarrOperators) throws DBAppException {
+
+		return null;
+
 	}
 
 	@SuppressWarnings({ "removal" })
@@ -211,8 +291,10 @@ public class DBApp {
 
 			SQLTerm[] arrSQLTerms;
 			arrSQLTerms = new SQLTerm[2];
+
 			arrSQLTerms[0] = new SQLTerm();
 			arrSQLTerms[1] = new SQLTerm();
+
 			arrSQLTerms[0]._strTableName = "Student";
 			arrSQLTerms[0]._strColumnName = "name";
 			arrSQLTerms[0]._strOperator = "=";
