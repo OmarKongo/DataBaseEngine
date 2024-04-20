@@ -130,8 +130,8 @@ public class Page implements Serializable, Comparable<Object> {
 	public ArrayList<Object> selectDistinctPK(SQLTerm sqlTerm) {
 		ArrayList<Object> res = new ArrayList<Object>();
 		int tupleIndex = this.getTupleIndexUsingBS(sqlTerm);
-		System.out.println(tupleIndex+" tupleIndex");
-		if (tupleIndex != -1)
+		//System.out.println(tupleIndex+" tupleIndex");
+		if (tupleIndex>=0)
 			res.add(this.getTuplesInPage().elementAt(tupleIndex));
 		return res;
 	}

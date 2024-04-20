@@ -31,7 +31,7 @@ public class DBApp {
 
 		
 
-		 //this.init();
+		 this.init();
 
 	}
 

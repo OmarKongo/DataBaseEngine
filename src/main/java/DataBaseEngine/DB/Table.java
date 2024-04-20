@@ -223,7 +223,7 @@ public class Table implements Serializable {
 					throw new DBAppException("Mismatch type");
 
 			} else {
-				throw new Exception("mismatch key  " + key);
+				throw new DBAppException("mismatch key  " + key);
 			}
 
 		}
@@ -231,7 +231,7 @@ public class Table implements Serializable {
 	}
 
 	public static ArrayList<Hashtable<String, String>> outputIndicies(String tableName, String filePath)
-			throws Exception {
+			throws DBAppException, IOException {
 		ArrayList<Hashtable<String, String>> res = new ArrayList<Hashtable<String, String>>();
 		String[] nextRecord;
 		boolean flag = false;
@@ -251,7 +251,7 @@ public class Table implements Serializable {
 				continue;
 		}
 		if (!flag)
-			throw new Exception("Invalid Table");
+			throw new DBAppException("Invalid Table");
 
 		// this loop insert all the original attributes of the table inside collector
 		// hashtable
@@ -845,7 +845,7 @@ public class Table implements Serializable {
 				Double min = (Double) p.getMin();
 				Double max = (Double) p.getMax();
 				if (min == (Double) key || max == (Double) key)
-					throw new Exception("Duplicate Key");
+					throw new DBAppException("Duplicate Key");
 
 				if ((Double) key > min & (Double) key < max)
 					return mid;
@@ -860,7 +860,7 @@ public class Table implements Serializable {
 				String min = (String) p.getMin();
 				String max = (String) p.getMax();
 				if (min.equals(key) || max.equals(key))
-					throw new Exception("Duplicate Key");
+					throw new DBAppException("Duplicate Key");
 
 				if (((String) key).compareTo(min) > 0 & ((String) key).compareTo(max) < 0)
 					return mid;
