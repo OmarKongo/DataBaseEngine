@@ -4,6 +4,10 @@ package DataBaseEngine.DB;
 
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Stack;
+
+import javax.print.DocFlavor.STRING;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -206,6 +210,26 @@ public class DBApp {
 		Table t = Deserialize.Table(tableName);
 		ArrayList<ArrayList<Object>> resultSetList = new ArrayList<>();
 		ArrayList<Object> resList = new ArrayList<>();
+		ArrayList<Object> infix = convertToInfix(arrSQLTerms, strarrOperators);
+		ArrayList<Object> postfix = infixToPostfix(infix);
+		Stack<Object> stck = new Stack<>();
+
+		for(int i = 0; i<postfix.size();i++){
+			if(!(postfix.get(i).equals("OR") || postfix.get(i).equals("AND") || postfix.get(i).equals("XOR"))){
+				stck.push(postfix.get(i));
+			}
+			else{
+				switch((String) postfix.get(i)){
+					case "AND":
+
+				}
+			}
+		}
+
+
+
+
+
 		for (SQLTerm sqlTerm : arrSQLTerms) {
 			try {
 				Hashtable<String, String> indicies = Table.outputIndicies(tableName, csvPath).get(0);
@@ -224,6 +248,7 @@ public class DBApp {
 		Serialize.Table(t, t.getStrTableName());
 		return result;
 	}
+	
 
 	public void checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		// need to check if SQLTerm tables are in MetaData File with correct data types
@@ -334,45 +359,64 @@ public class DBApp {
 			}
 		}
 
-		ArrayList<Object> output = addBrackets(res, all);
+		addBracketsNoPriority(res, all);
+
 
 		return res;
 	}
 
-	public static ArrayList<Object> addBrackets(ArrayList<Object> infixNoBrackets,
+	public static void addBracketsNoPriority(ArrayList<Object> infixNoBrackets,
 			ArrayList<Integer> indiciesOfOperators) {
 		// this for loop is to add brackets around AND
 		int index;
 
-
-			for (int i = 0; i < indiciesOfOperators.size(); i++) {
-				if(i!=0){
-					indiciesOfOperators.set(i, indiciesOfOperators.get(i) + 2*i);
-				}
-
-				index = indiciesOfOperators.get(i);
-
-				// adding left bracket
-				if (infixNoBrackets.get(index - 1) != ")") {
-					infixNoBrackets.add(index - 1, "(");
-					System.out.println(infixNoBrackets);
-					infixNoBrackets.add(index + 3, ")");
-					System.out.println(infixNoBrackets);
-				}
-
-				else {
-					infixNoBrackets.add(index - 1 - (3*i), "(");
-					System.out.println(infixNoBrackets);
-					infixNoBrackets.add(index + 3, ")");
-					System.out.println(infixNoBrackets);
-				}
-
-				System.out.println("---------");
+		for (int i = 0; i < indiciesOfOperators.size(); i++) {
+			if (i != 0) {
+				indiciesOfOperators.set(i, indiciesOfOperators.get(i) + 2 * i);
 			}
 
-		
+			index = indiciesOfOperators.get(i);
 
-		return infixNoBrackets;
+			// adding left bracket
+			if (infixNoBrackets.get(index - 1) != ")") {
+				infixNoBrackets.add(index - 1, "(");
+
+				infixNoBrackets.add(index + 3, ")");
+
+			}
+
+			else {
+				infixNoBrackets.add(index - 1 - (3 * i), "(");
+
+				infixNoBrackets.add(index + 3, ")");
+
+			}
+
+		}
+
+	}
+
+	public static ArrayList<Object> infixToPostfix(ArrayList<Object> infix) {
+		Stack<Object> stck = new Stack<>();
+		ArrayList<Object> postfix = new ArrayList<>();
+		for (int i = 0; i < infix.size(); i++) {
+			if (infix.get(i) != "AND" && infix.get(i) != "OR" && infix.get(i) != "XOR" && infix.get(i) != "("
+					&& infix.get(i) != ")") {
+				postfix.add(infix.get(i));
+			} else {
+				if (infix.get(i).equals(")")) {
+					while (stck.peek() != "(")
+						postfix.add(stck.pop());
+					stck.pop();
+				} else {
+					stck.push(infix.get(i));
+				}
+
+			}
+
+		}
+		return postfix;
+
 	}
 
 	public static int priority(String operator) {
@@ -386,10 +430,7 @@ public class DBApp {
 		}
 	}
 
-	private static ArrayList<Object> addPriorityBrackets(ArrayList<Object> infix) {
 
-		return null;
-	}
 
 	@SuppressWarnings({ "removal" })
 	public static void main(String[] args) {

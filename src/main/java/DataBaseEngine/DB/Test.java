@@ -248,7 +248,7 @@ public class Test {
 
 		// System.out.println("hi: "+DBApp.or(b,d));
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[5];
+		arrSQLTerms = new SQLTerm[6];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = "Student";
 		arrSQLTerms[0]._strColumnName = "name";
@@ -274,14 +274,19 @@ public class Test {
 		arrSQLTerms[4]._strColumnName = "name";
 		arrSQLTerms[4]._strOperator = ">";
 		arrSQLTerms[4]._objValue = new String("Emanuel");
+		arrSQLTerms[5] = new SQLTerm();
+		arrSQLTerms[5]._strTableName = "Student";
+		arrSQLTerms[5]._strColumnName = "name";
+		arrSQLTerms[5]._strOperator = ">";
+		arrSQLTerms[5]._objValue = new String("Fmanuel");
 
 
-		String[] strarrOperators = new String[4];
+		String[] strarrOperators = new String[5];
 		strarrOperators[0] = "AND";
 		strarrOperators[1] = "OR";
 		strarrOperators[2] = "XOR";
 		strarrOperators[3] = "AND";
-
+		strarrOperators[4] = "OR";
 
 
 		System.out.println(DBApp.convertToInfix(arrSQLTerms, strarrOperators));
