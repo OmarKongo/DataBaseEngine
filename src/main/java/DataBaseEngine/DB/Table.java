@@ -895,7 +895,7 @@ public class Table implements Serializable {
 
 							// I want to start printing from the tuple index (or not, if >) to the end
 							Page p1 = Deserialize.Page(this.getPages().elementAt(i).getName());
-							System.out.println("In page: " + p1.getName());
+
 							res.addAll(p1.selectRangePK(sqlTerm, firstLoopMarker));
 							Serialize.Page(p1, p1.getName());
 							firstLoopMarker += 1;
@@ -907,7 +907,7 @@ public class Table implements Serializable {
 					case "<":
 					case "!=": {
 						int firstLoopMarker = 0;
-						System.out.println("in switchcase");
+						// System.out.println("in switchcase");
 						int bound = (sqlTerm._strOperator.equals("!=")) ? this.getPages().size()
 								: pageIndex + 1;
 						for (int i = 0; i < bound; i++) {

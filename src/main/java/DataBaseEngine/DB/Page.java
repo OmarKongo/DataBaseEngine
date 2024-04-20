@@ -243,7 +243,7 @@ public class Page implements Serializable, Comparable<Object> {
 
 		}
 
-		System.out.println("test count is: " + testCount + " tuples in page is: " + this.getTuplesInPage().size());
+		// System.out.println("test count is: " + testCount + " tuples in page is: " + this.getTuplesInPage().size());
 		return res;
 	}
 

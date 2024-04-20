@@ -213,16 +213,13 @@ public class DBApp {
 		ArrayList<ArrayList<Object>> resultSetList = new ArrayList<>();
 
 		for (SQLTerm sqlTerm : arrSQLTerms) {
-			resultSetList.add(selectSQLTerm(sqlTerm,t));
+			resultSetList.add(selectSQLTerm(sqlTerm, t));
 		}
 
-		System.out.println((resultSetList.size())+ "size");
+		ArrayList<Object> infix = convertToInfix(resultSetList, strarrOperators, arrSQLTerms);
 
-		ArrayList<Object> infix = convertToInfix(resultSetList, strarrOperators);
-		System.out.println(infix+" infix ");
 		ArrayList<Object> postfix = infixToPostfix(infix);
 
-		System.out.println(postfix+" postfix ");
 		Stack<Object> stck = new Stack<>();
 
 		for (int i = 0; i < postfix.size(); i++) {
@@ -234,9 +231,9 @@ public class DBApp {
 				ArrayList<Object> intermediary = new ArrayList<>();
 				switch ((String) postfix.get(i)) {
 					case "AND":
-						System.out.println(	"in and case");
+
 						intermediary = and(sqlTerm2, sqlTerm1);
-						System.out.println(intermediary+" intermediary");
+
 						stck.push(intermediary);
 						break;
 					case "OR":
@@ -259,7 +256,6 @@ public class DBApp {
 	}
 
 	public static ArrayList<Object> selectSQLTerm(SQLTerm sqlTerm, Table t) {
-
 
 		ArrayList<Object> resList = new ArrayList<>();
 		try {
@@ -327,10 +323,9 @@ public class DBApp {
 	public static ArrayList<Object> and(ArrayList<Object> a, ArrayList<Object> b) {
 		ArrayList<Object> res = new ArrayList<>();
 		res.addAll(a);
-		System.out.println(res +"res 1");
+
 		res.retainAll(b);
-		System.out.println(b+" this is b");
-		System.out.println(res +"res 2");
+
 		return res;
 	}
 
@@ -357,9 +352,10 @@ public class DBApp {
 
 	}
 
-	public static ArrayList<Object> convertToInfix(ArrayList<ArrayList<Object>> arrSQLTerms, String[] strarrOperators) {
+	public static ArrayList<Object> convertToInfix(ArrayList<ArrayList<Object>> arrSQLTerms, String[] strarrOperators,
+			SQLTerm[] arrSQLTerms2) {
 		ArrayList<Object> res = new ArrayList<>();
-
+		ArrayList<Object> vis = new ArrayList<>();
 		Hashtable<String, ArrayList<Integer>> indiciesOfOperators = new Hashtable<>();
 		ArrayList<Integer> and = new ArrayList<>();
 		ArrayList<Integer> or = new ArrayList<>();
@@ -367,8 +363,10 @@ public class DBApp {
 		ArrayList<Integer> all = new ArrayList<>();
 		for (int i = 0; i < arrSQLTerms.size(); i++) {
 			res.add(arrSQLTerms.get(i));
+			vis.add(arrSQLTerms2[i]);
 			if (i != strarrOperators.length) {
 				res.add(strarrOperators[i]);
+				vis.add(strarrOperators[i]);
 				switch (strarrOperators[i]) {
 					case "AND":
 						and.add((2 * i) + 1);
@@ -390,6 +388,7 @@ public class DBApp {
 		}
 
 		addBracketsNoPriority(res, all);
+
 
 		return res;
 	}
@@ -424,6 +423,190 @@ public class DBApp {
 		}
 
 	}
+/* 
+	public static ArrayList<Object> addBracketsPriority(ArrayList<Object> infixNoBrackets,
+			Hashtable<String, ArrayList<Integer>> indiciesOfOperators,String[] strarrOperators) {
+
+		int index;
+		Enumeration<String> e = indiciesOfOperators.keys();
+		Stack<Object> stck = new Stack<>();
+
+
+
+		for(int i = 0; i<infixNoBrackets.size();i++){
+			if(!infixNoBrackets.get(i).equals("AND")){
+				continue;
+			}
+			else{
+				if (infixNoBrackets.get(i - 1) != ")") {
+
+					infixNoBrackets.add(index - 1, "(");
+					System.out.println(infixNoBrackets);
+					infixNoBrackets.add(index + 3, ")");
+					System.out.println(infixNoBrackets);
+				}
+
+				else {
+					stck.push(infixNoBrackets.get(index - 1));
+					for (int j = index - 1; j > 0; j--) {
+						if (infixNoBrackets.get(j).equals(")")) {
+							stck.push(infixNoBrackets.get(j));
+						}
+						if (infixNoBrackets.get(j).equals("(")) {
+							stck.pop();
+						}
+						if (stck.isEmpty()) {
+							System.out.println(infixNoBrackets);
+							infixNoBrackets.add(j, "(");
+							System.out.println(infixNoBrackets);
+						}
+					}
+
+					infixNoBrackets.add(index + 3, ")");
+					System.out.println(infixNoBrackets);
+				}
+				strarrOperators.remove()
+			}
+		}
+
+			if (indiciesOfOperators.containsKey("AND")) {
+				System.out.println(infixNoBrackets);
+				System.out.println("---------------");
+				ArrayList<Integer> indexOfAnd = indiciesOfOperators.get("AND");
+				Stack<Object> stck = new Stack<>();
+				for (int m = 0; i < indexOfAnd.size(); i++) {
+					if (i != 0) {
+						indexOfAnd.set(i, indexOfAnd.get(i) + 2 * i);
+
+					}
+
+					index = indexOfAnd.get(i);
+
+					// adding left bracket
+					if (infixNoBrackets.get(index - 1) != ")") {
+
+						infixNoBrackets.add(index - 1, "(");
+						System.out.println(infixNoBrackets);
+						infixNoBrackets.add(index + 3, ")");
+						System.out.println(infixNoBrackets);
+					}
+
+					else {
+						stck.push(infixNoBrackets.get(index - 1));
+						for (int j = index - 1; j > 0; j--) {
+							if (infixNoBrackets.get(j).equals(")")) {
+								stck.push(infixNoBrackets.get(j));
+							}
+							if (infixNoBrackets.get(j).equals("(")) {
+								stck.pop();
+							}
+							if (stck.isEmpty()) {
+								System.out.println(infixNoBrackets);
+								infixNoBrackets.add(j, "(");
+								System.out.println(infixNoBrackets);
+							}
+						}
+
+						infixNoBrackets.add(index + 3, ")");
+						System.out.println(infixNoBrackets);
+					}
+
+				}
+
+			}
+			if (indiciesOfOperators.containsKey("OR")) {
+				System.out.println(infixNoBrackets);
+				System.out.println("---------------");
+				ArrayList<Integer> indexOfOR = indiciesOfOperators.get("OR");
+				Stack<Object> stck1 = new Stack<>();
+				for (int i = 0; i < indexOfOR.size(); i++) {
+					if (i != 0) {
+						indexOfOR.set(i, indexOfOR.get(i) + 2 * i);
+					}
+
+					index = indexOfOR.get(i);
+
+					// adding left bracket
+					if (infixNoBrackets.get(index - 1) != ")") {
+						System.out.println("BrolosyyyyyyyyNOOO");
+						infixNoBrackets.add(index - 1, "(");
+						System.out.println(infixNoBrackets);
+						infixNoBrackets.add(index + 3, ")");
+						System.out.println(infixNoBrackets);
+					}
+
+					else {
+						System.out.println("Brolosyyyyyyyy");
+						stck1.push(infixNoBrackets.get(index - 1));
+						for (int j = index - 1; j > 0; j--) {
+							if (infixNoBrackets.get(j).equals(")")) {
+								stck1.push(infixNoBrackets.get(j));
+							}
+							if (infixNoBrackets.get(j).equals("(")) {
+								stck1.pop();
+							}
+							if (stck1.isEmpty()) {
+								System.out.println(infixNoBrackets);
+								infixNoBrackets.add(j, "(");
+								System.out.println(infixNoBrackets);
+							}
+						}
+
+						infixNoBrackets.add(index + 3, ")");
+						System.out.println(infixNoBrackets);
+					}
+				}
+
+			}
+			if (indiciesOfOperators.containsKey("XOR")) {
+				System.out.println(infixNoBrackets);
+				System.out.println("---------------");
+				ArrayList<Integer> indexOfXOR = indiciesOfOperators.get("XOR");
+
+				Stack<Object> stck2 = new Stack<>();
+				for (int i = 0; i < indexOfXOR.size(); i++) {
+					if (i != 0) {
+						indexOfXOR.set(i, indexOfXOR.get(i) + 2 * i);
+					}
+
+					index = indexOfXOR.get(i);
+
+					// adding left bracket
+					if (infixNoBrackets.get(index - 1) != ")") {
+						infixNoBrackets.add(index - 1, "(");
+						System.out.println(infixNoBrackets);
+						infixNoBrackets.add(index + 3, ")");
+						System.out.println(infixNoBrackets);
+					}
+
+					else {
+						stck2.push(infixNoBrackets.get(index - 1));
+						for (int j = index - 1; j > 0; j--) {
+							if (infixNoBrackets.get(j).equals(")")) {
+								stck2.push(infixNoBrackets.get(j));
+							}
+							if (infixNoBrackets.get(j).equals("(")) {
+								stck2.pop();
+							}
+							if (stck2.isEmpty()) {
+								System.out.println(infixNoBrackets);
+								infixNoBrackets.add(j, "(");
+								System.out.println(infixNoBrackets);
+							}
+						}
+
+						infixNoBrackets.add(index + 3, ")");
+						System.out.println(infixNoBrackets);
+
+					}
+
+				}
+			}
+		}
+
+		return infixNoBrackets;
+	}
+	*/
 
 	public static ArrayList<Object> infixToPostfix(ArrayList<Object> infix) {
 		Stack<Object> stck = new Stack<>();
@@ -458,7 +641,6 @@ public class DBApp {
 				return 0;
 		}
 	}
-
 
 	@SuppressWarnings({ "removal" })
 	public static void main(String[] args) {

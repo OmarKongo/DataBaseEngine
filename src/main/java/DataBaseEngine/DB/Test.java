@@ -166,12 +166,12 @@ public class Test {
 
 	@SuppressWarnings("removal")
 	public static void select(DBApp d, String strTableName) throws DBAppException, IOException {
-		System.out.println("3AAAAAAAAAAAA");
+
 		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 		// attributesInTuple.values());
 
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[2];
+		arrSQLTerms = new SQLTerm[4];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
 		arrSQLTerms[0]._strColumnName = "name";
@@ -182,20 +182,32 @@ public class Test {
 		arrSQLTerms[1]._strColumnName = "id";
 		arrSQLTerms[1]._strOperator = "<";
 		arrSQLTerms[1]._objValue = new Integer(6);
+		arrSQLTerms[2] = new SQLTerm();
+		arrSQLTerms[2]._strTableName = strTableName;
+		arrSQLTerms[2]._strColumnName = "name";
+		arrSQLTerms[2]._strOperator = ">";
+		arrSQLTerms[2]._objValue = new String("Brolosy");
+		arrSQLTerms[3] = new SQLTerm();
+		arrSQLTerms[3]._strTableName = strTableName;
+		arrSQLTerms[3]._strColumnName = "id";
+		arrSQLTerms[3]._strOperator = ">";
+		arrSQLTerms[3]._objValue = new Integer(10);
 
 
 
 
-		String[] strarrOperators = new String[1];
+		String[] strarrOperators = new String[3];
 		strarrOperators[0] = "XOR";
+		strarrOperators[1] = "AND";
+		strarrOperators[2] = "OR";
 
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
 		// table]
 		// I think yes because no joins
-		System.out.println("3AAAAAAAAAAAA");
+
 		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
-		
+
 		System.out.println("Result Set: ");
 
 		while (resultSet.hasNext()) {
