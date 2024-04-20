@@ -205,50 +205,71 @@ public class DBApp {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		String tableName = arrSQLTerms[0]._strTableName;
 		Table t = Deserialize.Table(tableName);
+
 		ArrayList<ArrayList<Object>> resultSetList = new ArrayList<>();
-		ArrayList<Object> resList = new ArrayList<>();
-		ArrayList<Object> infix = convertToInfix(arrSQLTerms, strarrOperators);
+		System.out.println(arrSQLTerms.length+" length of arrSQLTerms");
+		for (SQLTerm sqlTerm : arrSQLTerms) {
+
+			resultSetList.add(selectSQLTerm(sqlTerm,t));
+		}
+
+		System.out.println((resultSetList.size())+ "size");
+
+		ArrayList<Object> infix = convertToInfix(resultSetList, strarrOperators);
+		System.out.println(infix+" infix ");
 		ArrayList<Object> postfix = infixToPostfix(infix);
+
+		System.out.println(postfix+" postfix ");
 		Stack<Object> stck = new Stack<>();
 
-		for(int i = 0; i<postfix.size();i++){
-			if(!(postfix.get(i).equals("OR") || postfix.get(i).equals("AND") || postfix.get(i).equals("XOR"))){
+		for (int i = 0; i < postfix.size(); i++) {
+			if (!(postfix.get(i).equals("OR") || postfix.get(i).equals("AND") || postfix.get(i).equals("XOR"))) {
 				stck.push(postfix.get(i));
-			}
-			else{
-				switch((String) postfix.get(i)){
+			} else {
+				ArrayList<Object> sqlTerm1 = (ArrayList<Object>) stck.pop();
+				ArrayList<Object> sqlTerm2 = (ArrayList<Object>) stck.pop();
+				ArrayList<Object> intermediary = new ArrayList<>();
+				switch ((String) postfix.get(i)) {
 					case "AND":
-
+						intermediary = and(sqlTerm2, sqlTerm1);
+						stck.push(intermediary);
+						break;
+					case "OR":
+						intermediary = or(sqlTerm2, sqlTerm1);
+						stck.push(intermediary);
+						break;
+					default:
+						intermediary = xor(sqlTerm2, sqlTerm1);
+						stck.push(intermediary);
+						break;
 				}
 			}
 		}
-
-
-
-
-
-		for (SQLTerm sqlTerm : arrSQLTerms) {
-			try {
-				Hashtable<String, String> indicies = Table.outputIndicies(tableName, csvPath).get(0);
-				if (indicies.isEmpty()) {
-					resList.addAll(t.selectFromTableNoIndex(sqlTerm));
-				} else {
-					resList.addAll(t.selectFromTableWithIndex(sqlTerm, indicies));
-				}
-				resultSetList.add(resList);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		Iterator<Object> result = resList.iterator();
+		ArrayList<Object> finalResult = (ArrayList<Object>) stck.pop();
+		Iterator<Object> result = finalResult.iterator();
 		Serialize.Table(t, t.getStrTableName());
 		return result;
 	}
-	
+
+	public static ArrayList<Object> selectSQLTerm(SQLTerm sqlTerm, Table t) {
+
+
+		ArrayList<Object> resList = new ArrayList<>();
+		try {
+			Hashtable<String, String> indicies = Table.outputIndicies(t.getStrTableName(), csvPath).get(0);
+			if (indicies.isEmpty()) {
+				resList.addAll(t.selectFromTableNoIndex(sqlTerm));
+			} else {
+				resList.addAll(t.selectFromTableWithIndex(sqlTerm, indicies));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return resList;
+	}
 
 	public void checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		// need to check if SQLTerm tables are in MetaData File with correct data types
@@ -327,7 +348,7 @@ public class DBApp {
 
 	}
 
-	public static ArrayList<Object> convertToInfix(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+	public static ArrayList<Object> convertToInfix(ArrayList<ArrayList<Object>> arrSQLTerms, String[] strarrOperators) {
 		ArrayList<Object> res = new ArrayList<>();
 
 		Hashtable<String, ArrayList<Integer>> indiciesOfOperators = new Hashtable<>();
@@ -335,8 +356,8 @@ public class DBApp {
 		ArrayList<Integer> or = new ArrayList<>();
 		ArrayList<Integer> xor = new ArrayList<>();
 		ArrayList<Integer> all = new ArrayList<>();
-		for (int i = 0; i < arrSQLTerms.length; i++) {
-			res.add(arrSQLTerms[i]);
+		for (int i = 0; i < arrSQLTerms.size(); i++) {
+			res.add(arrSQLTerms.get(i));
 			if (i != strarrOperators.length) {
 				res.add(strarrOperators[i]);
 				switch (strarrOperators[i]) {
@@ -360,7 +381,6 @@ public class DBApp {
 		}
 
 		addBracketsNoPriority(res, all);
-
 
 		return res;
 	}
@@ -429,8 +449,6 @@ public class DBApp {
 				return 0;
 		}
 	}
-
-
 
 	@SuppressWarnings({ "removal" })
 	public static void main(String[] args) {

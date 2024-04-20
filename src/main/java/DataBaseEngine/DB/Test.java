@@ -171,14 +171,23 @@ public class Test {
 		// attributesInTuple.values());
 
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[1];
+		arrSQLTerms = new SQLTerm[2];
 		arrSQLTerms[0] = new SQLTerm();
-		arrSQLTerms[0]._strTableName = strTableName;
+		arrSQLTerms[0]._strTableName = "Student";
 		arrSQLTerms[0]._strColumnName = "name";
 		arrSQLTerms[0]._strOperator = ">";
 		arrSQLTerms[0]._objValue = new String("Andalusy");
+		arrSQLTerms[1] = new SQLTerm();
+		arrSQLTerms[1]._strTableName = "Student";
+		arrSQLTerms[1]._strColumnName = "id";
+		arrSQLTerms[1]._strOperator = "<";
+		arrSQLTerms[1]._objValue = new Integer(6);
 
-		String[] strarrOperators = new String[0];
+
+
+
+		String[] strarrOperators = new String[1];
+		strarrOperators[0] = "AND";
 
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
@@ -195,6 +204,7 @@ public class Test {
 
 	}
 
+	@SuppressWarnings("removal")
 	public static void arrayListOperations() throws DBAppException, IOException {
 
 		ArrayList<Object> a = new ArrayList<>();
@@ -248,7 +258,7 @@ public class Test {
 
 		// System.out.println("hi: "+DBApp.or(b,d));
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[6];
+		arrSQLTerms = new SQLTerm[2];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = "Student";
 		arrSQLTerms[0]._strColumnName = "name";
@@ -256,40 +266,20 @@ public class Test {
 		arrSQLTerms[0]._objValue = new String("Andalusy");
 		arrSQLTerms[1] = new SQLTerm();
 		arrSQLTerms[1]._strTableName = "Student";
-		arrSQLTerms[1]._strColumnName = "name";
-		arrSQLTerms[1]._strOperator = ">";
-		arrSQLTerms[1]._objValue = new String("Brolosy");
-		arrSQLTerms[2] = new SQLTerm();
-		arrSQLTerms[2]._strTableName = "Student";
-		arrSQLTerms[2]._strColumnName = "name";
-		arrSQLTerms[2]._strOperator = ">";
-		arrSQLTerms[2]._objValue = new String("Chadi");
-		arrSQLTerms[3] = new SQLTerm();
-		arrSQLTerms[3]._strTableName = "Student";
-		arrSQLTerms[3]._strColumnName = "name";
-		arrSQLTerms[3]._strOperator = ">";
-		arrSQLTerms[3]._objValue = new String("David");
-		arrSQLTerms[4] = new SQLTerm();
-		arrSQLTerms[4]._strTableName = "Student";
-		arrSQLTerms[4]._strColumnName = "name";
-		arrSQLTerms[4]._strOperator = ">";
-		arrSQLTerms[4]._objValue = new String("Emanuel");
-		arrSQLTerms[5] = new SQLTerm();
-		arrSQLTerms[5]._strTableName = "Student";
-		arrSQLTerms[5]._strColumnName = "name";
-		arrSQLTerms[5]._strOperator = ">";
-		arrSQLTerms[5]._objValue = new String("Fmanuel");
+		arrSQLTerms[1]._strColumnName = "id";
+		arrSQLTerms[1]._strOperator = "<";
+		arrSQLTerms[1]._objValue = new Integer(6);
 
 
-		String[] strarrOperators = new String[5];
+
+
+		String[] strarrOperators = new String[1];
 		strarrOperators[0] = "AND";
-		strarrOperators[1] = "OR";
-		strarrOperators[2] = "XOR";
-		strarrOperators[3] = "AND";
-		strarrOperators[4] = "OR";
 
 
-		System.out.println(DBApp.convertToInfix(arrSQLTerms, strarrOperators));
+
+
+		//System.out.println(DBApp.infixToPostfix(DBApp.convertToInfix(arrSQLTerms, strarrOperators)));
 
 	}
 
@@ -315,20 +305,20 @@ public class Test {
 		 * System.out.println(max); // 200
 		 */
 
-		String strTableName = "FinishLineClose";
+		String strTableName = "Done1";
 
 		DBApp d = new DBApp();
 		// createTable(d, strTableName);
 		// createIndex(d, strTableName);
 		// insert(d,strTableName);
-		// select(d,strTableName);
+		select(d,strTableName);
 		// test();
 		// delete();
 		// update();
 		// insert();
 		// printAllPages();
 
-		arrayListOperations();
+		//arrayListOperations();
 		//arrayListTest();
 
 	}

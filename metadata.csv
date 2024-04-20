@@ -1,3 +1,6 @@
 "Student","gpa","java.lang.Double","False","gpaIndex","B+ tree"
 "Student","name","java.lang.String","False","",""
 "Student","id","java.lang.Integer","True","",""
+"Done1","gpa","java.lang.Double","False","gpaIndex","B+ tree"
+"Done1","name","java.lang.String","False","",""
+"Done1","id","java.lang.Integer","True","",""
