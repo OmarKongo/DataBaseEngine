@@ -50,6 +50,13 @@ public class DBApp {
 		}
 	}
 
+	/**
+	 * This mehod is used in the overriden compareTO methods in the subsequent classes
+	 * @param o1 first object
+	 * @param o2 2nd object
+	 * @return the integer difference between the 2 objects (either Integer,Double,String)
+	 */
+
 	public static int compareValue(Object o1, Object o2) {
 		// System.out.println(o1.getClass()+""+o2.getClass());
 		if (o1 instanceof Integer && o2 instanceof Integer) {
@@ -91,6 +98,14 @@ public class DBApp {
 	// htblColNameValue will have the column name as key and the data
 	// type as value
 
+	/**
+	 * creates a table
+	 * @param strTableName
+	 * @param strClusteringKeyColumn
+	 * @param htblColNameType
+	 * @throws DBAppException
+	 * @throws IOException
+	 */
 	public void createTable(String strTableName,
 			String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
@@ -101,6 +116,15 @@ public class DBApp {
 
 	}
 
+
+	/**
+	 * 
+	 * @param strTableName
+	 * @param strColName
+	 * @param strIndexName
+	 * @throws DBAppException
+	 * @throws IOException
+	 */
 	// following method creates a B+tree index
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void createIndex(String strTableName,
@@ -198,6 +222,14 @@ public class DBApp {
 
 	}
 
+
+	/**
+	 * Selects from the tables based on the sqlterms
+	 * @param arrSQLTerms
+	 * @param strarrOperators
+	 * @return
+	 * @throws DBAppException
+	 */
 	public Iterator<Object> selectFromTable(SQLTerm[] arrSQLTerms,
 			String[] strarrOperators) throws DBAppException {
 
@@ -254,7 +286,12 @@ public class DBApp {
 
 		return result;
 	}
-
+	/**
+	 * Selects given a single SQLTerm, used in the selectFromTable method
+	 * @param sqlTerm
+	 * @param t
+	 * @return
+	 */
 	public static ArrayList<Object> selectSQLTerm(SQLTerm sqlTerm, Table t) {
 
 		ArrayList<Object> resList = new ArrayList<>();
@@ -273,6 +310,13 @@ public class DBApp {
 		return resList;
 	}
 
+
+	/**
+	 * checks if the SQLTerm is valid
+	 * @param arrSQLTerms
+	 * @param strarrOperators
+	 * @throws DBAppException
+	 */
 	public void checkValidSQLTerm(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		// need to check if SQLTerm tables are in MetaData File with correct data types
 		// Do I make this Hashtable global so as to decrease spatial complexity by not
@@ -320,6 +364,12 @@ public class DBApp {
 		}
 	}
 
+	/**
+	 * returns the result of anding two arraylists, used in strarrOperators while evaluating SQLTerms
+	 * @param a first array list
+	 * @param b second array list
+	 * @return
+	 */
 	public static ArrayList<Object> and(ArrayList<Object> a, ArrayList<Object> b) {
 		ArrayList<Object> res = new ArrayList<>();
 		res.addAll(a);
@@ -329,6 +379,12 @@ public class DBApp {
 		return res;
 	}
 
+	/**
+	 * returns the result of oring two arraylists, used in strarrOperators while evaluating SQLTerms
+	 * @param a first array list
+	 * @param b second array list
+	 * @return
+	 */
 	// No dups
 	public static ArrayList<Object> or(ArrayList<Object> a, ArrayList<Object> b) {
 		ArrayList<Object> res = new ArrayList<>();
@@ -339,7 +395,12 @@ public class DBApp {
 		}
 		return res;
 	}
-
+	/**
+	 * returns the result of xoring two arraylists, used in strarrOperators while evaluating SQLTerms
+	 * @param a first array list
+	 * @param b second array list
+	 * @return
+	 */
 	public static ArrayList<Object> xor(ArrayList<Object> a, ArrayList<Object> b) {
 		// XORING b and d
 
@@ -352,6 +413,13 @@ public class DBApp {
 
 	}
 
+	/**
+	 * given an array of operands, and and array of operators, returns the appropriate infix expression
+	 * @param arrSQLTerms
+	 * @param strarrOperators
+	 * @param arrSQLTerms2
+	 * @return
+	 */
 	public static ArrayList<Object> convertToInfix(ArrayList<ArrayList<Object>> arrSQLTerms, String[] strarrOperators,
 			SQLTerm[] arrSQLTerms2) {
 		ArrayList<Object> res = new ArrayList<>();
@@ -392,7 +460,11 @@ public class DBApp {
 
 		return res;
 	}
-
+	/**
+	 * adds brackets to the interwined operand operator expression
+	 * @param infixNoBrackets
+	 * @param indiciesOfOperators
+	 */
 	public static void addBracketsNoPriority(ArrayList<Object> infixNoBrackets,
 			ArrayList<Integer> indiciesOfOperators) {
 		// this for loop is to add brackets around AND
@@ -423,191 +495,13 @@ public class DBApp {
 		}
 
 	}
-/* 
-	public static ArrayList<Object> addBracketsPriority(ArrayList<Object> infixNoBrackets,
-			Hashtable<String, ArrayList<Integer>> indiciesOfOperators,String[] strarrOperators) {
-
-		int index;
-		Enumeration<String> e = indiciesOfOperators.keys();
-		Stack<Object> stck = new Stack<>();
 
 
-
-		for(int i = 0; i<infixNoBrackets.size();i++){
-			if(!infixNoBrackets.get(i).equals("AND")){
-				continue;
-			}
-			else{
-				if (infixNoBrackets.get(i - 1) != ")") {
-
-					infixNoBrackets.add(index - 1, "(");
-					System.out.println(infixNoBrackets);
-					infixNoBrackets.add(index + 3, ")");
-					System.out.println(infixNoBrackets);
-				}
-
-				else {
-					stck.push(infixNoBrackets.get(index - 1));
-					for (int j = index - 1; j > 0; j--) {
-						if (infixNoBrackets.get(j).equals(")")) {
-							stck.push(infixNoBrackets.get(j));
-						}
-						if (infixNoBrackets.get(j).equals("(")) {
-							stck.pop();
-						}
-						if (stck.isEmpty()) {
-							System.out.println(infixNoBrackets);
-							infixNoBrackets.add(j, "(");
-							System.out.println(infixNoBrackets);
-						}
-					}
-
-					infixNoBrackets.add(index + 3, ")");
-					System.out.println(infixNoBrackets);
-				}
-				strarrOperators.remove()
-			}
-		}
-
-			if (indiciesOfOperators.containsKey("AND")) {
-				System.out.println(infixNoBrackets);
-				System.out.println("---------------");
-				ArrayList<Integer> indexOfAnd = indiciesOfOperators.get("AND");
-				Stack<Object> stck = new Stack<>();
-				for (int m = 0; i < indexOfAnd.size(); i++) {
-					if (i != 0) {
-						indexOfAnd.set(i, indexOfAnd.get(i) + 2 * i);
-
-					}
-
-					index = indexOfAnd.get(i);
-
-					// adding left bracket
-					if (infixNoBrackets.get(index - 1) != ")") {
-
-						infixNoBrackets.add(index - 1, "(");
-						System.out.println(infixNoBrackets);
-						infixNoBrackets.add(index + 3, ")");
-						System.out.println(infixNoBrackets);
-					}
-
-					else {
-						stck.push(infixNoBrackets.get(index - 1));
-						for (int j = index - 1; j > 0; j--) {
-							if (infixNoBrackets.get(j).equals(")")) {
-								stck.push(infixNoBrackets.get(j));
-							}
-							if (infixNoBrackets.get(j).equals("(")) {
-								stck.pop();
-							}
-							if (stck.isEmpty()) {
-								System.out.println(infixNoBrackets);
-								infixNoBrackets.add(j, "(");
-								System.out.println(infixNoBrackets);
-							}
-						}
-
-						infixNoBrackets.add(index + 3, ")");
-						System.out.println(infixNoBrackets);
-					}
-
-				}
-
-			}
-			if (indiciesOfOperators.containsKey("OR")) {
-				System.out.println(infixNoBrackets);
-				System.out.println("---------------");
-				ArrayList<Integer> indexOfOR = indiciesOfOperators.get("OR");
-				Stack<Object> stck1 = new Stack<>();
-				for (int i = 0; i < indexOfOR.size(); i++) {
-					if (i != 0) {
-						indexOfOR.set(i, indexOfOR.get(i) + 2 * i);
-					}
-
-					index = indexOfOR.get(i);
-
-					// adding left bracket
-					if (infixNoBrackets.get(index - 1) != ")") {
-						System.out.println("BrolosyyyyyyyyNOOO");
-						infixNoBrackets.add(index - 1, "(");
-						System.out.println(infixNoBrackets);
-						infixNoBrackets.add(index + 3, ")");
-						System.out.println(infixNoBrackets);
-					}
-
-					else {
-						System.out.println("Brolosyyyyyyyy");
-						stck1.push(infixNoBrackets.get(index - 1));
-						for (int j = index - 1; j > 0; j--) {
-							if (infixNoBrackets.get(j).equals(")")) {
-								stck1.push(infixNoBrackets.get(j));
-							}
-							if (infixNoBrackets.get(j).equals("(")) {
-								stck1.pop();
-							}
-							if (stck1.isEmpty()) {
-								System.out.println(infixNoBrackets);
-								infixNoBrackets.add(j, "(");
-								System.out.println(infixNoBrackets);
-							}
-						}
-
-						infixNoBrackets.add(index + 3, ")");
-						System.out.println(infixNoBrackets);
-					}
-				}
-
-			}
-			if (indiciesOfOperators.containsKey("XOR")) {
-				System.out.println(infixNoBrackets);
-				System.out.println("---------------");
-				ArrayList<Integer> indexOfXOR = indiciesOfOperators.get("XOR");
-
-				Stack<Object> stck2 = new Stack<>();
-				for (int i = 0; i < indexOfXOR.size(); i++) {
-					if (i != 0) {
-						indexOfXOR.set(i, indexOfXOR.get(i) + 2 * i);
-					}
-
-					index = indexOfXOR.get(i);
-
-					// adding left bracket
-					if (infixNoBrackets.get(index - 1) != ")") {
-						infixNoBrackets.add(index - 1, "(");
-						System.out.println(infixNoBrackets);
-						infixNoBrackets.add(index + 3, ")");
-						System.out.println(infixNoBrackets);
-					}
-
-					else {
-						stck2.push(infixNoBrackets.get(index - 1));
-						for (int j = index - 1; j > 0; j--) {
-							if (infixNoBrackets.get(j).equals(")")) {
-								stck2.push(infixNoBrackets.get(j));
-							}
-							if (infixNoBrackets.get(j).equals("(")) {
-								stck2.pop();
-							}
-							if (stck2.isEmpty()) {
-								System.out.println(infixNoBrackets);
-								infixNoBrackets.add(j, "(");
-								System.out.println(infixNoBrackets);
-							}
-						}
-
-						infixNoBrackets.add(index + 3, ")");
-						System.out.println(infixNoBrackets);
-
-					}
-
-				}
-			}
-		}
-
-		return infixNoBrackets;
-	}
-	*/
-
+	/**
+	 * converts infix expression (with brackets) to postfix
+	 * @param infix an infix expression (with brackets)
+	 * @return postfix expression
+	 */
 	public static ArrayList<Object> infixToPostfix(ArrayList<Object> infix) {
 		Stack<Object> stck = new Stack<>();
 		ArrayList<Object> postfix = new ArrayList<>();
@@ -631,16 +525,6 @@ public class DBApp {
 
 	}
 
-	public static int priority(String operator) {
-		switch (operator) {
-			case "AND":
-				return 2;
-			case "OR":
-				return 1;
-			default:
-				return 0;
-		}
-	}
 
 	@SuppressWarnings({ "removal" })
 	public static void main(String[] args) {

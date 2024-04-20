@@ -503,6 +503,7 @@ public class Table implements Serializable {
 		return false;
 	}
 
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Page searchPK(Object key, boolean hasIndex, String indexName) throws DBAppException {
 		Page p = null;
@@ -851,6 +852,11 @@ public class Table implements Serializable {
 		return mid;
 	}
 
+	/**
+	 * selects records from table that has no index created on them (including primary keys)
+	 * @param sqlTerm
+	 * @return arrayList containing records
+	 */
 	public ArrayList<Object> selectFromTableNoIndex(SQLTerm sqlTerm) {
 		ArrayList<Object> res = new ArrayList<Object>();
 
@@ -938,6 +944,13 @@ public class Table implements Serializable {
 		return res;
 	}
 
+
+	/**
+	 * Selects from columns that have index created on them
+	 * @param sqlTerm
+	 * @param indicies
+	 * @return arrayList containing records
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ArrayList<Object> selectFromTableWithIndex(SQLTerm sqlTerm,
 			Hashtable<String, String> indicies) {

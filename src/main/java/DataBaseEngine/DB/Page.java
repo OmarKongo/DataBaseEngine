@@ -1,5 +1,4 @@
 package DataBaseEngine.DB;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,7 +37,7 @@ public class Page implements Serializable, Comparable<Object> {
 	}
 
 	public void display() {
-		System.out.println("                      Page [pageProp=" + pageProp + "]");
+		System.out.println("Page [pageProp=" + pageProp + "]");
 	}
 
 	public String toString() {

@@ -149,6 +149,27 @@ public class Test {
 		// D.deleteFromTable( "Student", htblColNameValue );
 	}
 
+
+
+	@SuppressWarnings("removal")
+	public static void insert2(DBApp d, String strTableName) throws DBAppException {
+		Hashtable<String,Object> htblColNameValue = new Hashtable<String,Object>( );
+		Double[]d1 = {2.0,1.3,1.2,4.0,3.1};
+			
+			for(int i = 0;i<25;i++) {
+				int key = (int)(Math.random()*5021100);
+				int dus  = (int)(Math.random()*5);
+				
+			
+				htblColNameValue.put("id", new Integer( key));
+				htblColNameValue.put("name", new String("Omar"+(i%5)) );
+				htblColNameValue.put("gpa", new Double( d1[dus] ) );
+				d.insertIntoTable( strTableName , htblColNameValue );
+				htblColNameValue.clear();
+			
+			}
+	}
+
 	public static void createTable(DBApp d, String tableName) throws Exception {
 		Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 		htblColNameType.put("id", "java.lang.Integer");
@@ -171,35 +192,14 @@ public class Test {
 		// attributesInTuple.values());
 
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[4];
+		arrSQLTerms = new SQLTerm[1];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
 		arrSQLTerms[0]._strColumnName = "name";
-		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._strOperator = "=";
 		arrSQLTerms[0]._objValue = new String("Andalusy");
-		arrSQLTerms[1] = new SQLTerm();
-		arrSQLTerms[1]._strTableName = strTableName;
-		arrSQLTerms[1]._strColumnName = "id";
-		arrSQLTerms[1]._strOperator = "<";
-		arrSQLTerms[1]._objValue = new Integer(6);
-		arrSQLTerms[2] = new SQLTerm();
-		arrSQLTerms[2]._strTableName = strTableName;
-		arrSQLTerms[2]._strColumnName = "name";
-		arrSQLTerms[2]._strOperator = ">";
-		arrSQLTerms[2]._objValue = new String("Brolosy");
-		arrSQLTerms[3] = new SQLTerm();
-		arrSQLTerms[3]._strTableName = strTableName;
-		arrSQLTerms[3]._strColumnName = "id";
-		arrSQLTerms[3]._strOperator = ">";
-		arrSQLTerms[3]._objValue = new Integer(10);
 
-
-
-
-		String[] strarrOperators = new String[3];
-		strarrOperators[0] = "XOR";
-		strarrOperators[1] = "AND";
-		strarrOperators[2] = "OR";
+		String[] strarrOperators = new String[0];
 
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
@@ -214,20 +214,53 @@ public class Test {
 			System.out.println(resultSet.next().toString());
 		}
 
-
-
 		// 3AAAAAAAAAAAA
 		// 3AAAAAAAAAAAA
 		// Andalusyhiiiiii
 		// 2 length of arrSQLTerms
-		// [John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567]Hereeeeeeeeeeee
+		// [John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia
+		// Noor,1.25,5674567]Hereeeeeeeeeeee
 		// in switchcase
 		// test count is: 5 tuples in page is: 5
-		// [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed Noor,0.95,2343432, Dalia Noor,1.25,5674567]Hereeeeeeeeeeee
+		// [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed
+		// Noor,0.95,2343432, Dalia Noor,1.25,5674567]Hereeeeeeeeeeee
 		// 2size
-		// [(, [John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567], AND, [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed Noor,0.95,2343432, Dalia Noor,1.25,5674567], )] infix 
-		// [[John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567], [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed Noor,0.95,2343432, Dalia Noor,1.25,5674567], AND] postfix 
+		// [(, [John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567],
+		// AND, [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455,
+		// Ahmed Noor,0.95,2343432, Dalia Noor,1.25,5674567], )] infix
+		// [[John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567], [John
+		// Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed
+		// Noor,0.95,2343432, Dalia Noor,1.25,5674567], AND] postfix
 		// Result Set:
+
+	}
+
+	@SuppressWarnings("removal")
+	public static void select2(DBApp d, String strTableName) throws DBAppException, IOException {
+
+		SQLTerm[] arrSQLTerms;
+		arrSQLTerms = new SQLTerm[2];
+		arrSQLTerms[0] = new SQLTerm();
+		arrSQLTerms[0]._strTableName = strTableName;
+		arrSQLTerms[0]._strColumnName = "name";
+		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._objValue = new String("Omar1");
+		arrSQLTerms[1] = new SQLTerm();
+		arrSQLTerms[1]._strTableName = strTableName;
+		arrSQLTerms[1]._strColumnName = "name";
+		arrSQLTerms[1]._strOperator = "=";
+		arrSQLTerms[1]._objValue = new String("Omar0");
+
+		String[] strarrOperators = new String[1];
+		strarrOperators[0] = "OR";
+
+		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
+
+		System.out.println("Result Set: ");
+
+		while (resultSet.hasNext()) {
+			System.out.println(resultSet.next().toString());
+		}
 
 	}
 
@@ -297,16 +330,11 @@ public class Test {
 		arrSQLTerms[1]._strOperator = "<";
 		arrSQLTerms[1]._objValue = new Integer(6);
 
-
-
-
 		String[] strarrOperators = new String[1];
 		strarrOperators[0] = "AND";
 
-
-
-
-		//System.out.println(DBApp.infixToPostfix(DBApp.convertToInfix(arrSQLTerms, strarrOperators)));
+		// System.out.println(DBApp.infixToPostfix(DBApp.convertToInfix(arrSQLTerms,
+		// strarrOperators)));
 
 	}
 
@@ -320,7 +348,7 @@ public class Test {
 		test.add(" OR ");
 		test.add(" D ");
 		System.out.println(test);
-		test.add(2,"(");
+		test.add(2, "(");
 		System.out.println(test);
 	}
 
@@ -332,21 +360,21 @@ public class Test {
 		 * System.out.println(max); // 200
 		 */
 
-		String strTableName = "Done2";
+		String strTableName = "GUC3";
 
 		DBApp d = new DBApp();
 		// createTable(d, strTableName);
 		// createIndex(d, strTableName);
 		// insert(d,strTableName);
-		select(d,strTableName);
+		select2(d, strTableName);
 		// test();
 		// delete();
 		// update();
 		// insert();
 		// printAllPages();
 
-		//arrayListOperations();
-		//arrayListTest();
+		// arrayListOperations();
+		// arrayListTest();
 
 	}
 }
