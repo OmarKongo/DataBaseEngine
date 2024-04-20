@@ -31,7 +31,7 @@ public class DBApp {
 
 		
 
-		// this.init();
+		 //this.init();
 
 	}
 
@@ -63,7 +63,7 @@ public class DBApp {
 	 */
 
 	public static int compareValue(Object o1, Object o2) {
-		// System.out.println(o1.getClass()+""+o2.getClass());
+		 
 		if (o1 instanceof Integer && o2 instanceof Integer) {
 			int first = (int) o1;
 			int second = (int) o2;
@@ -144,6 +144,7 @@ public class DBApp {
 			String strIndexName) throws DBAppException, IOException {
 
 		Table t = Deserialize.Table(strTableName);
+		
 		String type = t.addIndex(strTableName, strColName, strIndexName, csvPath);
 		bplustree btree = Table.btreeType(type);
 		ArrayList<String> pageName = new ArrayList<String>();
@@ -171,7 +172,6 @@ public class DBApp {
 
 	public void insertIntoTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
-
 
 		Hashtable<String, String> indexes = null;
 		try {
@@ -206,16 +206,19 @@ public class DBApp {
 		try {
 			indexes = Table.checkData(strTableName, htblColNameValue, csvPath);
 			Table T = Deserialize.Table(strTableName);
-			if (T.getPages().size() == 0)
-				throw new DBAppException("Empty Table");
+			
+			if (T.getPages().size() != 0) {
+				
 			String pkType = T.getPkType(csvPath);
 			Object key = Table.getOriginalKey(strClusteringKeyValue, pkType);
 			T.updateTable(key, indexes, htblColNameValue);
-		} catch (Exception e) {
+			}
+		}
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+			
 	}
 
 	// following method could be used to delete one or more rows.
@@ -235,16 +238,19 @@ public class DBApp {
 			e.printStackTrace();
 		}
 		Table T = Deserialize.Table(strTableName);
-		if(htblColNameValue.size()==0)
-			T.deleteAllPages();
-		else {
-		try {
-			T.deleteFromTable(htblColNameValue, indexes);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		if (T.getPages().size() != 0) {
+			if (htblColNameValue.size() == 0)
+				T.deleteAllPages();
+			else {
+				try {
+					T.deleteFromTable(htblColNameValue, indexes);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
+			}
 		}
+	
 	}
 
 	

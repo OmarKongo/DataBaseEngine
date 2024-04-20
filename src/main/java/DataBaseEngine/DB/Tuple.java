@@ -55,7 +55,7 @@ public class Tuple extends Page implements Comparable<Object>, Serializable {
 		//Tuple T = (Tuple) o;
 		Object x = this.getAttributesInTuple().get(this.getStrPrimaryKey());
 	 	//Object y = (T.getAttributesInTuple().get(T.getStrPrimaryKey()));
-		return DBApp.compareValue(x, o);
+		return DBApp.compareValue(x , o);
 	}
 
 	public Object getPK() {
@@ -86,7 +86,7 @@ public class Tuple extends Page implements Comparable<Object>, Serializable {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Tuple updateTuple(String pageName, Hashtable<String, String> indexes,
-			Hashtable<String, Object> htblColNameValue) {
+			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		String indexName = null;
 		Object newKey = null;
 		bplustree btree = null;

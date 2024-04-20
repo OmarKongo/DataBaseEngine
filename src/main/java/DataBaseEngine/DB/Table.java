@@ -128,7 +128,7 @@ public class Table implements Serializable {
 					.build();
 			List<String[]> allElements = reader2.readAll();
 			CSVWriter writer = new CSVWriter(new FileWriter(filePath));
-
+			
 			boolean flag = false;
 			for (String[] nextRecord : allElements) {
 				if (nextRecord[0].equals(tableName) & nextRecord[1].equals(column)) {
@@ -324,7 +324,7 @@ public class Table implements Serializable {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void addInBtree(Tuple T, Page p, Hashtable<String, String> indexes, boolean firstInsert) {
+	public static void addInBtree(Tuple T, Page p, Hashtable<String, String> indexes, boolean firstInsert) throws DBAppException {
 		ArrayList<String> pages = new ArrayList<String>();
 		for (String key : indexes.keySet()) {
 			bplustree btree = Deserialize.Index(indexes.get(key));
@@ -340,7 +340,7 @@ public class Table implements Serializable {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void deleteFromIndex(Tuple T, Page p, Hashtable<String, String> indexes, boolean insert) {
+	public static void deleteFromIndex(Tuple T, Page p, Hashtable<String, String> indexes, boolean insert) throws DBAppException {
 		String pageName = null;
 		ArrayList<String> pages = new ArrayList<String>();
 		for (String key : indexes.keySet()) {
@@ -355,7 +355,13 @@ public class Table implements Serializable {
 			pages.clear();
 		}
 	}
-
+    /**
+     * 
+     * @param Tuple T ( the tuple to be inserted)
+     * @param indexes ( Hashtable contains all the indexes that the table has)
+     * @return the table after the insertion to be serialized then
+     * @throws Exception
+     */
 	public Table insertIntoTable(Tuple T, Hashtable<String, String> indexes) throws Exception {
 		String tableName = this.getStrTableName();
 		Table table = Deserialize.Table(tableName);
@@ -385,11 +391,11 @@ public class Table implements Serializable {
 		}
 
 		else { // Search for the right page to insert in
-				// table = Deserialize.Table(tableName);
+				
 			int index = table.binarySearch(T.getPK(), true);
 			pageName = table.getPages().elementAt(index).getName();
 			p = Deserialize.Page(pageName);
-			// p = table.getPages().elementAt(index);
+		
 			if (p.tupleFounded(T.getPK()))
 				throw new DBAppException("Duplicate Tuple");
 			p = T.addTuple(p);

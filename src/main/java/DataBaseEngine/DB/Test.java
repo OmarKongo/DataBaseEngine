@@ -40,7 +40,7 @@ public class Test {
 	}
 
 	public static void test() throws DBAppException, IOException {
-		String strTableName = "Student";
+		String strTableName = "AYB";
 
 		DBApp dbApp = new DBApp();
 
@@ -49,8 +49,8 @@ public class Test {
 		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("gpa", "java.lang.Double");
 		dbApp.createTable(strTableName, "id", htblColNameType);
-		dbApp.createIndex(strTableName, "gpa", "gpaIndex");
-		dbApp.createIndex(strTableName, "name", "nameIndex");
+		dbApp.createIndex(strTableName, "gpa", "gpaIndexAYB");
+		//dbApp.createIndex(strTableName, "name", "nameIndex");
 		Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
 		Double[] d = { 2.0, 1.3, 1.2, 4.0, 3.1 };
 
@@ -74,11 +74,11 @@ public class Test {
 		}
 	}
 
-	public static void printAllPages() {
+	public static void printAllPages() throws DBAppException {
 		/// Table t = Deserialize.Table("Student");
 		// System.out.println(t.getPages());
 		Page p = null;
-		Table t = Deserialize.Table("Student");
+		Table t = Deserialize.Table("AYB");
 		for (int i = 0; i < t.getPages().size(); i++) {
 			String pn = t.getPages().elementAt(i).getName();
 			System.out.println();
@@ -97,9 +97,9 @@ public class Test {
 	public static void delete() throws DBAppException {
 		DBApp D = new DBApp();
 		Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
-		// htblColNameValue.put("name", new String( "Omar4" ) );
-		// htblColNameValue.put("gpa", new Double( 1.2 ) );
-		htblColNameValue.put("id", new Integer(652529));
+		 //htblColNameValue.put("name", new String( "" ) );
+		// htblColNameValue.put("gpa", new Double( 1.5 ) );
+		htblColNameValue.put("id", new Integer(78452));
 		// D.updateTable("Student", "350321", htblColNameValue);
 		D.deleteFromTable("Student", htblColNameValue);
 	}
@@ -107,10 +107,10 @@ public class Test {
 	public static void update() throws DBAppException {
 		DBApp D = new DBApp();
 		Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
-		// htblColNameValue.put("name", new String( "Hassan" ) );
-		htblColNameValue.put("gpa", new Double(2.44));
+		 htblColNameValue.put("name", new String( "brolosy" ) );
+		 htblColNameValue.put("gpa", new Double(0.7));
 
-		D.updateTable("Student", "3030158", htblColNameValue);
+		D.updateTable("Student", "78452", htblColNameValue);
 		// D.deleteFromTable( "Student", htblColNameValue );
 	}
 
@@ -194,19 +194,20 @@ public class Test {
 		// attributesInTuple.values());
 
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[1];
+		arrSQLTerms = new SQLTerm[4];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
 		arrSQLTerms[0]._strColumnName = "name";
-		arrSQLTerms[0]._strOperator = "=";
-		arrSQLTerms[0]._objValue = new String("Andalusy");
+		arrSQLTerms[0]._strOperator = ">";
+		arrSQLTerms[0]._objValue = new String("Omar0");
+		
+		
+
+
+
 
 		String[] strarrOperators = new String[0];
-
-		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
-		// will they all be from the same table? [ie all sql terms will have the same
-		// table]
-		// I think yes because no joins
+		
 
 		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
 
@@ -241,29 +242,44 @@ public class Test {
 	public static void select2(DBApp d, String strTableName) throws DBAppException, IOException {
 
 		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[2];
+		arrSQLTerms = new SQLTerm[4];
 		arrSQLTerms[0] = new SQLTerm();
 		arrSQLTerms[0]._strTableName = strTableName;
 		arrSQLTerms[0]._strColumnName = "name";
 		arrSQLTerms[0]._strOperator = "=";
-		arrSQLTerms[0]._objValue = new String("Omar1");
+		arrSQLTerms[0]._objValue = new String("Omar0");
+		
 		arrSQLTerms[1] = new SQLTerm();
 		arrSQLTerms[1]._strTableName = strTableName;
 		arrSQLTerms[1]._strColumnName = "name";
 		arrSQLTerms[1]._strOperator = "=";
 		arrSQLTerms[1]._objValue = new String("Omar0");
+		
+		arrSQLTerms[2] = new SQLTerm();
+		arrSQLTerms[2]._strTableName = strTableName;
+		arrSQLTerms[2]._strColumnName = "name";
+		arrSQLTerms[2]._strOperator = "=";
+		arrSQLTerms[2]._objValue = new String("Omar4");
+		
+		arrSQLTerms[3] = new SQLTerm();
+		arrSQLTerms[3]._strTableName = strTableName;
+		arrSQLTerms[3]._strColumnName = "gpa";
+		arrSQLTerms[3]._strOperator = "=";
+		arrSQLTerms[3]._objValue = new Double(1.2);
+		
 
-		String[] strarrOperators = new String[1];
-		strarrOperators[0] = "OR";
+		String[] strarrOperators = new String[3];
+		strarrOperators[0] = "AND";strarrOperators[1] = "OR";strarrOperators[2] = "XOR";
 
 		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
-
+		int i = 0;
 		System.out.println("Result Set: ");
 
 		while (resultSet.hasNext()) {
+			i++;
 			System.out.println(resultSet.next().toString());
 		}
-
+		System.out.println(i);
 	}
 
 	@SuppressWarnings("removal")
@@ -362,18 +378,18 @@ public class Test {
 		 * System.out.println(max); // 200
 		 */
 
-		String strTableName = "GUC3";
+		String strTableName = "AYB";
 
 		DBApp d = new DBApp();
 		// createTable(d, strTableName);
 		// createIndex(d, strTableName);
 		// insert(d,strTableName);
-		select2(d, strTableName);
-		// test();
-		// delete();
-		// update();
+		select(d, strTableName);
+		 //test();
+		//delete();
+		 //update();
 		// insert();
-		// printAllPages();
+		 printAllPages();
 
 		// arrayListOperations();
 		// arrayListTest();

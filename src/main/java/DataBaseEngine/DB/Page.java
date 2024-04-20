@@ -136,8 +136,7 @@ public class Page implements Serializable, Comparable<Object> {
 		Hashtable<String, Object> attributesInTuple = new Hashtable<String, Object>();
 		attributesInTuple.put(sqlTerm._strColumnName, sqlTerm._objValue);
 		int tupleIndex = Collections.binarySearch(this.getTuplesInPage(),
-				new Tuple(sqlTerm._strColumnName, attributesInTuple.keys(),
-						attributesInTuple.elements()));
+				sqlTerm._objValue);
 		return tupleIndex;
 	}
 
@@ -199,13 +198,15 @@ public class Page implements Serializable, Comparable<Object> {
 				int j = 0;
 				if (firstLoopMarker == 0) {
 					j = this.getTupleIndexUsingBS(sqlTerm);
+					
 				}
+				if(j>=0) {
 				for (int i = j; i < this.getTuplesInPage().size(); i++) {
 					testCount++;
 					Tuple t = this.getTuplesInPage().elementAt(i);
 					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
 					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
-
+                
 					if (comparison != 0) {
 						res.add(t.toString());
 					} else {
@@ -213,6 +214,7 @@ public class Page implements Serializable, Comparable<Object> {
 						res.add(t.toString());
 					}
 					// System.out.println("Printing tuple: "+t.toString());
+				}
 				}
 				break;
 			}
@@ -247,10 +249,7 @@ public class Page implements Serializable, Comparable<Object> {
 	}
 
 	public static void main(String[] args) {
-		Page p = new Page("s");
-		int r = (int) (Math.random() * 5021100);
-
-		System.out.print(r);
+		
 
 	}
 

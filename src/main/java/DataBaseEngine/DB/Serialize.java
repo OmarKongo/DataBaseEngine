@@ -105,11 +105,13 @@ class Deserialize {
 	 * @author Brolosy
 	 * @param tableFileName the .ser filename of a page
 	 * @return the table after deserialisation
+	 * @throws DBAppException 
 	 * @throws Exception either FileNotFoundException or IOException (i think)
 	 *                   Deserialises the specified table.
 	 */
 
-	public static Table Table(String tableName) {
+	@SuppressWarnings("resource")
+	public static Table Table(String tableName) throws DBAppException {
 		Table t = null;
 		String path = tablesPath + "/" + tableName + ".ser";
 		try {
@@ -119,7 +121,8 @@ class Deserialize {
 
 			// Method for deserialization of object
 			t = (Table) in.readObject();
-
+           if(t==null)
+        	   throw new DBAppException("fileNotFound");
 			in.close();
 			file.close();
 
@@ -137,7 +140,8 @@ class Deserialize {
 		return t;
 	}
 
-	public static Page Page(String pageName) {
+	@SuppressWarnings("resource")
+	public static Page Page(String pageName) throws DBAppException {
 		Page p = null;
 		String path = pagesPath + "/" + pageName + ".ser";
 		try {
@@ -147,6 +151,8 @@ class Deserialize {
 
 			// Method for deserialization of object
 			p = (Page) in.readObject();
+			if(p==null)
+	        	   throw new DBAppException("fileNotFound");
 
 			in.close();
 			file.close();
@@ -165,8 +171,8 @@ class Deserialize {
 		return p;
 	}
 
-	@SuppressWarnings({ "rawtypes" })
-	public static bplustree Index(String indexName) {
+	@SuppressWarnings({ "rawtypes", "resource" })
+	public static bplustree Index(String indexName) throws DBAppException {
 		bplustree btree = null;
 		String path = indexesPath + "/" + indexName + ".ser";
 		try {
@@ -176,6 +182,8 @@ class Deserialize {
 
 			// Method for deserialization of object
 			btree = (bplustree) in.readObject();
+			if(btree==null)
+	        	   throw new DBAppException("fileNotFound");
 
 			in.close();
 			file.close();
