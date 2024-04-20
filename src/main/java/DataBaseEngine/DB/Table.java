@@ -12,6 +12,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -590,6 +592,17 @@ public class Table implements Serializable{
 		
 		
 	}
+ 	public void deleteAllPages() {
+ 		String pageName = null;
+ 		Enumeration <String> pageNames = this.getProps().keys();
+ 		while(!this.getPages().isEmpty()) {
+ 			pageName = this.getPages().elementAt(0).getName();
+ 			this.getPages().remove(0);
+ 	 		this.getProps().remove(pageName);
+ 	 		this.deleteFile(pageName);
+ 		}
+ 		Serialize.Table(this, this.getStrTableName());
+ 	}
  	public static boolean tupleMatched(Tuple t,Hashtable<String,Object> htblColNameValue) {
  		Enumeration<String> attributes = htblColNameValue.keys();
   	  while(attributes.hasMoreElements()) {
@@ -746,7 +759,7 @@ public class Table implements Serializable{
     	
     }
     // this method return the index of the right page to insert in
-    public int binarySearch(Object key,Boolean insert) throws Exception
+    public int binarySearch(Object key,Boolean insert) throws DBAppException
     {
     	//Object key = T.getPK();
     	int mid = 0;
@@ -795,7 +808,7 @@ public class Table implements Serializable{
             		 Double min = (Double) p.getMin();
                      Double max = (Double) p.getMax();
                      if (min == (Double)key || max == (Double)key) 
-                         throw new Exception("Duplicate Key");
+                         throw new DBAppException("Duplicate Key");
                       
           
                    
@@ -813,7 +826,7 @@ public class Table implements Serializable{
             	 String min = (String) p.getMin();
                  String max = (String) p.getMax();
                  if (min.equals(key) || max.equals(key)) 
-                     throw new Exception("Duplicate Key");
+                     throw new DBAppException("Duplicate Key");
                   
       
                
@@ -832,6 +845,13 @@ public class Table implements Serializable{
      
         return mid;
     }
+ 
+    
+       
+    
+        
+   
+
 	
 	public static void main(String[]args) throws Exception {
 		

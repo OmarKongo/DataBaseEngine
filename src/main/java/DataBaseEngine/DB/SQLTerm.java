@@ -10,4 +10,10 @@ public class SQLTerm {
 		
 	}
 
+	@Override
+	public String toString() {
+		return "SQLTerm [_strColumnName=" + _strColumnName + ", _strOperator=" + _strOperator + ", _objValue="
+				+ _objValue + "]";
+	}
+
 }

@@ -737,6 +737,35 @@ public class bplustree<K extends Comparable<K>> implements Serializable {
 
 		return values;
 	}
+	public ArrayList<String> searchExclusive(K lowerBound, K upperBound) {
+
+		// Instantiate Double array to hold values
+		ArrayList<String> values = new ArrayList<String>();
+
+		// Iterate through the doubly linked list of leaves
+		LeafNode currNode = this.firstLeaf;
+		while (currNode != null) {
+
+			// Iterate through the dictionary of each node
+			DictionaryPair dps[] = currNode.dictionary;
+			for (DictionaryPair dp : dps) {
+
+				/* Stop searching the dictionary once a null value is encountered
+				   as this the indicates the end of non-null values */
+				if (dp == null) { break; }
+
+				// Include value if its key fits within the provided range
+				if ((dp.key.compareTo(lowerBound) > 0) && (dp.key.compareTo(upperBound) < 0)) {
+					values.addAll(dp.value);
+				}
+			}
+			/* Update the current node to be the right sibling,
+				leaf traversal is from left to right */
+			currNode = currNode.rightSibling;
+			}	
+
+		return values;
+	}
 
 	/**
 	 * This method takes a DictionaryPair and map the values to another key
