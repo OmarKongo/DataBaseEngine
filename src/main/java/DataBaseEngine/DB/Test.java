@@ -187,7 +187,7 @@ public class Test {
 
 
 		String[] strarrOperators = new String[1];
-		strarrOperators[0] = "OR";
+		strarrOperators[0] = "XOR";
 
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
@@ -195,7 +195,7 @@ public class Test {
 		// I think yes because no joins
 		System.out.println("3AAAAAAAAAAAA");
 		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
-
+		
 		System.out.println("Result Set: ");
 
 		while (resultSet.hasNext()) {
