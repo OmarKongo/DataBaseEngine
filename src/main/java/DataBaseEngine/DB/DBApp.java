@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -209,9 +210,8 @@ public class DBApp {
 		Table t = Deserialize.Table(tableName);
 
 		ArrayList<ArrayList<Object>> resultSetList = new ArrayList<>();
-		System.out.println(arrSQLTerms.length+" length of arrSQLTerms");
-		for (SQLTerm sqlTerm : arrSQLTerms) {
 
+		for (SQLTerm sqlTerm : arrSQLTerms) {
 			resultSetList.add(selectSQLTerm(sqlTerm,t));
 		}
 
@@ -233,7 +233,9 @@ public class DBApp {
 				ArrayList<Object> intermediary = new ArrayList<>();
 				switch ((String) postfix.get(i)) {
 					case "AND":
+						System.out.println(	"in and case");
 						intermediary = and(sqlTerm2, sqlTerm1);
+						System.out.println(intermediary+" intermediary");
 						stck.push(intermediary);
 						break;
 					case "OR":
@@ -248,8 +250,10 @@ public class DBApp {
 			}
 		}
 		ArrayList<Object> finalResult = (ArrayList<Object>) stck.pop();
+
 		Iterator<Object> result = finalResult.iterator();
 		Serialize.Table(t, t.getStrTableName());
+
 		return result;
 	}
 
@@ -268,6 +272,7 @@ public class DBApp {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return resList;
 	}
 
@@ -321,7 +326,10 @@ public class DBApp {
 	public static ArrayList<Object> and(ArrayList<Object> a, ArrayList<Object> b) {
 		ArrayList<Object> res = new ArrayList<>();
 		res.addAll(a);
+		System.out.println(res +"res 1");
 		res.retainAll(b);
+		System.out.println(b+" this is b");
+		System.out.println(res +"res 2");
 		return res;
 	}
 

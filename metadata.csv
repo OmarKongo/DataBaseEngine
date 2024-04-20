@@ -4,3 +4,6 @@
 "Done1","gpa","java.lang.Double","False","gpaIndex","B+ tree"
 "Done1","name","java.lang.String","False","",""
 "Done1","id","java.lang.Integer","True","",""
+"Done2","gpa","java.lang.Double","False","gpaIndex","B+ tree"
+"Done2","name","java.lang.String","False","",""
+"Done2","id","java.lang.Integer","True","",""

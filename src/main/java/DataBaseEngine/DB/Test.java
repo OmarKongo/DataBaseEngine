@@ -166,19 +166,19 @@ public class Test {
 
 	@SuppressWarnings("removal")
 	public static void select(DBApp d, String strTableName) throws DBAppException, IOException {
-
+		System.out.println("3AAAAAAAAAAAA");
 		// Tuple t10 = new Tuple("id",attributesInTuple.keys(),(Enumeration<Object>)
 		// attributesInTuple.values());
 
 		SQLTerm[] arrSQLTerms;
 		arrSQLTerms = new SQLTerm[2];
 		arrSQLTerms[0] = new SQLTerm();
-		arrSQLTerms[0]._strTableName = "Student";
+		arrSQLTerms[0]._strTableName = strTableName;
 		arrSQLTerms[0]._strColumnName = "name";
 		arrSQLTerms[0]._strOperator = ">";
 		arrSQLTerms[0]._objValue = new String("Andalusy");
 		arrSQLTerms[1] = new SQLTerm();
-		arrSQLTerms[1]._strTableName = "Student";
+		arrSQLTerms[1]._strTableName = strTableName;
 		arrSQLTerms[1]._strColumnName = "id";
 		arrSQLTerms[1]._strOperator = "<";
 		arrSQLTerms[1]._objValue = new Integer(6);
@@ -187,13 +187,13 @@ public class Test {
 
 
 		String[] strarrOperators = new String[1];
-		strarrOperators[0] = "AND";
+		strarrOperators[0] = "OR";
 
 		// select * from Student where Student.name = "John Noor" or Student.gpa = 1.5;
 		// will they all be from the same table? [ie all sql terms will have the same
 		// table]
 		// I think yes because no joins
-
+		System.out.println("3AAAAAAAAAAAA");
 		Iterator<Object> resultSet = d.selectFromTable(arrSQLTerms, strarrOperators);
 
 		System.out.println("Result Set: ");
@@ -201,6 +201,21 @@ public class Test {
 		while (resultSet.hasNext()) {
 			System.out.println(resultSet.next().toString());
 		}
+
+
+
+		// 3AAAAAAAAAAAA
+		// 3AAAAAAAAAAAA
+		// Andalusyhiiiiii
+		// 2 length of arrSQLTerms
+		// [John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567]Hereeeeeeeeeeee
+		// in switchcase
+		// test count is: 5 tuples in page is: 5
+		// [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed Noor,0.95,2343432, Dalia Noor,1.25,5674567]Hereeeeeeeeeeee
+		// 2size
+		// [(, [John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567], AND, [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed Noor,0.95,2343432, Dalia Noor,1.25,5674567], )] infix 
+		// [[John Noor,1.5,23498, Zaky Noor,0.88,78452, Dalia Noor,1.25,5674567], [John Noor,1.5,23498, Zaky Noor,0.88,78452, Ahmed Noor,0.95,453455, Ahmed Noor,0.95,2343432, Dalia Noor,1.25,5674567], AND] postfix 
+		// Result Set:
 
 	}
 
@@ -305,7 +320,7 @@ public class Test {
 		 * System.out.println(max); // 200
 		 */
 
-		String strTableName = "Done1";
+		String strTableName = "Done2";
 
 		DBApp d = new DBApp();
 		// createTable(d, strTableName);

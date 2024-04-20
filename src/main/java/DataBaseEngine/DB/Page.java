@@ -154,32 +154,32 @@ public class Page implements Serializable, Comparable<Object> {
 			switch (sqlTerm._strOperator) {
 				case ">":
 					if (comparison > 0) {
-						res.add(t);
+						res.add(t.toString());;
 					}
 					break;
 				case ">=":
 					if (comparison >= 0) {
-						res.add(t);
+						res.add(t.toString());;
 					}
 					break;
 				case "<":
 					if (comparison < 0) {
-						res.add(t);
+						res.add(t.toString());;
 					}
 					break;
 				case "<=":
 					if (comparison <= 0) {
-						res.add(t);
+						res.add(t.toString());;
 					}
 					break;
 				case "!=":
 					if (comparison != 0) {
-						res.add(t);
+						res.add(t.toString());;
 					}
 					break;
 				case "=":
 					if (comparison == 0) {
-						res.add(t);
+						res.add(t.toString());
 					}
 					break;
 
@@ -208,10 +208,10 @@ public class Page implements Serializable, Comparable<Object> {
 					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
 
 					if (comparison != 0) {
-						res.add(t);
+						res.add(t.toString());
 					} else {
 						if (sqlTerm._strOperator.equals(">="))
-							res.add(t);
+						res.add(t.toString());
 					}
 					// System.out.println("Printing tuple: "+t.toString());
 				}
@@ -225,10 +225,10 @@ public class Page implements Serializable, Comparable<Object> {
 					Object tupleObjectValue = t.getAttributesInTuple().get(searchedColumn);
 					int comparison = DBApp.compareValue(tupleObjectValue, searchedValue);
 					if (comparison != 0) {
-						res.add(t);
+						res.add(t.toString());
 					} else {
 						if (sqlTerm._strOperator.equals("<=")) {
-							res.add(t);
+							res.add(t.toString());
 							break;
 						} else {
 							if (sqlTerm._strOperator.equals("<")) {
